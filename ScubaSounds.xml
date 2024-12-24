@@ -1,0 +1,83 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+    
+    <Script file="ScubaSounds.lua"/>
+    
+    <Frame name="ScubaSoundsOptionsFrame" movable="true" parent="UIParent" enableMouse="true" hidden="true" mixin="ScubaSounds,BackdropTemplateMixin" inherits="BackdropTemplate">
+        <Size>
+            <AbsDimension x="200" y="200" />
+        </Size>
+        <Anchors>
+            <Anchor point="CENTER" />
+        </Anchors>
+        <Scripts>
+            <OnLoad>
+                self:RegisterForDrag("LeftButton")
+                self:SetBackdrop({
+                    bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background", 
+                    edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+                    tile = true,
+                    tileSize = 32,
+                    edgeSize = 32,
+                    insets = {left = 12, right = 12, top = 12, bottom = 11},
+                })
+			</OnLoad>
+            <OnDragStart>
+                self:StartMoving()
+            </OnDragStart>
+            <OnDragStop>
+                self:StopMovingOrSizing()
+            </OnDragStop>
+        </Scripts>
+
+        <Layers>
+            <Layer level="ARTWORK">
+                <Texture name="ScubaSoundsOptionsFrameTitle" file="Interface\DialogFrame\UI-DialogBox-Header">
+                    <Size>
+                        <AbsDimension x="268" y="64" />
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOP">
+                            <Offset>
+                                <AbsDimension x="0" y="12" />
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+
+                <FontString name="ScubaSoundsOptionsFrameTitleText" inherits="GameFontNormal" text="ScubaSounds Options">
+                    <Anchors>
+                        <Anchor point="TOP" relativeTo="ScubaSoundsOptionsFrame">
+                            <Offset>
+                                <AbsDimension x="0" y="-2" />
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+
+        <Frames>
+
+            <Button name="ScubaSoundsOptionsFrameClose" inherits="GameMenuButtonTemplate" text="X">
+                <Size>
+                    <AbsDimension x="30" y="30"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPRIGHT" relativeTo="ScubaSoundsOptionsFrame">
+                        <Offset>
+                            <AbsDimension x="-10" y="-10" />
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnClick>
+                        ScubaSoundsOptionsFrame:Hide()
+                    </OnClick>
+                </Scripts>
+            </Button>
+
+        </Frames>
+
+    </Frame>
+</Ui>
