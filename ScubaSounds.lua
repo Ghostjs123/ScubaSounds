@@ -94,49 +94,48 @@ ScubaSounds_SoundInfo = {
     }
 }
 
-ScubaSounds_BigItemsIds = {
-    -- stuff out in the world
-    12363, -- Arcane Crystal
-    12361, -- Blue Sapphire
-    13468, -- Black Lotus
-    -- dungeon items
-    11815, -- Hand of Justice
-    13143, -- Mark of the Dragon Lord
-    11684, -- Ironfoe
-    11808, -- Circle of Flame
-    11726, -- Savage Gladiator Chain
-    17780, -- Blade of Eternal Darkness
-    12871, -- Chromatic Carapace
-    12590, -- Felstriker
-    12731, -- Pristine Hide of the Beast
-    12592, -- Blackblade of Shahram
-    18538, -- Treant's Bane
-    13314, -- Alanna's Embrace
-    13937, -- Headmaster's Charge
-    13505, -- Runeblade of Baron Rivendare
-    13353, -- Book of the Dead
-    -- epic mounts
-    18796, -- Horn of the Swift Brown Wolf
-    18798, -- Horn of the Swift Gray Wolf
-    18797, -- Horn of the Swift Timber Wolf
-    13334, -- Green Skeletal Warhorse
-    18791, -- Purple Skeletal Warhorse
-    18794, -- Great Brown Kodo
-    18795, -- Great Gray Kodo
-    18793, -- Great White Kodo
-    18788, -- Swift Blue Raptor
-    18789, -- Swift Olive Raptor
-    18790, -- Swift Orange Raptor
-    18245, -- Horn of the Black War Wolf
-    18248, -- Red Skeletal Warhorse
-    18247, -- Black War Kodo
-    18246, -- Whistle of the Black War Raptor
-    19029, -- Horn of the Frostwolf Howler
-    13335, -- Deathcharger's Reins
-    19872, -- Swift Razzashi Raptor
-    19902, -- Swift Zulian Tiger
-    21321, -- Red Qiraji Resonating Crystal
-    21176, -- Black Qiraji Resonating Crystal
+ScubaSounds_BigItemIds = { -- stuff out in the world
+12363, -- Arcane Crystal
+12361, -- Blue Sapphire
+13468, -- Black Lotus
+-- dungeon items
+11815, -- Hand of Justice
+13143, -- Mark of the Dragon Lord
+11684, -- Ironfoe
+11808, -- Circle of Flame
+11726, -- Savage Gladiator Chain
+17780, -- Blade of Eternal Darkness
+12871, -- Chromatic Carapace
+12590, -- Felstriker
+12731, -- Pristine Hide of the Beast
+12592, -- Blackblade of Shahram
+18538, -- Treant's Bane
+13314, -- Alanna's Embrace
+13937, -- Headmaster's Charge
+13505, -- Runeblade of Baron Rivendare
+13353, -- Book of the Dead
+-- epic mounts
+18796, -- Horn of the Swift Brown Wolf
+18798, -- Horn of the Swift Gray Wolf
+18797, -- Horn of the Swift Timber Wolf
+13334, -- Green Skeletal Warhorse
+18791, -- Purple Skeletal Warhorse
+18794, -- Great Brown Kodo
+18795, -- Great Gray Kodo
+18793, -- Great White Kodo
+18788, -- Swift Blue Raptor
+18789, -- Swift Olive Raptor
+18790, -- Swift Orange Raptor
+18245, -- Horn of the Black War Wolf
+18248, -- Red Skeletal Warhorse
+18247, -- Black War Kodo
+18246, -- Whistle of the Black War Raptor
+19029, -- Horn of the Frostwolf Howler
+13335, -- Deathcharger's Reins
+19872, -- Swift Razzashi Raptor
+19902, -- Swift Zulian Tiger
+21321, -- Red Qiraji Resonating Crystal
+21176 -- Black Qiraji Resonating Crystal
 }
 
 ScubaSounds_JacksonNames = {"Grandmasterb", "Gaymasterb"}
@@ -337,7 +336,7 @@ function ScubaSounds:HandleLoot(lootMessage)
         local itemLink = lootMessage:match("|c%x+|Hitem:.-|h%[.-%]|h|r")
         if itemLink then
             local itemId = ScubaSounds:ItemIdFromItemLink(itemLink)
-            if itemLink:find("|cffff8000") or ScubaSounds:HasValue(ScubaSounds_BigItemsIds, itemId) then -- cffff8000 = legendary
+            if itemLink:find("|cffff8000") or ScubaSounds:HasValue(ScubaSounds_BigItemIds, itemId) then -- cffff8000 = legendary
                 C_ChatInfo.SendAddonMessage(ScubaSounds_ADDON_PREFIX, ScubaSounds_LegendaryReceivedCommand .. ":" ..
                     playerName .. ":" .. itemLink, "GUILD")
             end
@@ -358,10 +357,13 @@ end
 
 function ScubaSounds:BuildOptionsFrame()
     local parent = getglobal("ScubaSoundsOptionsFrame")
-    for idx, sound in ipairs(ScubaSounds_SoundInfo) do
-        ScubaSounds.OptionsCheckboxes[sound] = ScubaSounds:NewCheckBox(parent, sound, idx)
+    local count = 1
+    for sound, _ in pairs(ScubaSounds_SoundInfo) do
+        print(idx, sound)
+        ScubaSounds.OptionsCheckboxes[sound] = ScubaSounds:NewCheckBox(parent, sound, count)
+        count = count + 1
     end
-    parent:SetHeight(40 + table.getn(ScubaSounds_SoundInfo) * 23)
+    parent:SetHeight(40 + (count - 1) * 23)
 end
 
 function ScubaSounds:ShowOptions()
