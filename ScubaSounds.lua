@@ -9,6 +9,9 @@ local GetItemCooldown = C_Container and _G.C_Container.GetItemCooldown or _G.Get
 
 ScubaSounds = {}
 
+-- OptionsFrame
+ScubaSounds.OptionsCheckboxes = {}
+
 ScubaSounds_EventFrame = CreateFrame("Frame")
 ScubaSounds_EventFrame:RegisterEvent("ADDON_LOADED")
 ScubaSounds_EventFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
@@ -21,76 +24,126 @@ ScubaSounds_EventFrame:RegisterEvent("ZONE_CHANGED_INDOORS")
 ScubaSounds_EventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 ScubaSounds_EventFrame:RegisterEvent("CHAT_MSG_ADDON")
 ScubaSounds_EventFrame:RegisterEvent("CHAT_MSG_LOOT")
+ScubaSounds_EventFrame:RegisterEvent("TRADE_SHOW")
+ScubaSounds_EventFrame:RegisterEvent("TRADE_ACCEPT_UPDATE")
+ScubaSounds_EventFrame:RegisterEvent("TRADE_CLOSED")
+ScubaSounds_EventFrame:RegisterEvent("PLAYER_LOGIN")
 ScubaSounds_EventFrame:SetScript("OnEvent", ScubaSounds_OnEvent)
 
 ScubaSounds_SoundInfo = {
     ["5Sunders"] = {
         extension = "mp3",
-        duration = 2
+        duration = 2,
+        canOverlapSelf = false,
+        timeout = nil
     },
     ["63KCrit"] = {
         extension = "mp3",
-        duration = 4
+        duration = 4,
+        canOverlapSelf = false,
+        timeout = nil
     },
     ["Cavern"] = {
         extension = "mp3",
-        duration = 1
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = nil
     },
     ["Deleted"] = {
         extension = "mp3",
-        duration = 1
+        duration = 1,
+        canOverlapSelf = true,
+        timeout = nil
     },
     ["Fahb"] = {
         extension = "ogg",
-        duration = 1
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = nil
+    },
+    ["HeLipped"] = {
+        extension = "mp3",
+        duration = 2,
+        canOverlapSelf = false,
+        timeout = nil
     },
     ["HelloThere"] = {
         extension = "mp3",
-        duration = 1
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = nil
     },
     ["IWasChosen"] = {
         extension = "mp3",
-        duration = 1
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = 5
     },
     ["KyakPenis"] = {
         extension = "mp3",
-        duration = 1
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = nil
     },
     ["LotrFlee"] = {
         extension = "mp3",
-        duration = 7
+        duration = 7,
+        canOverlapSelf = false,
+        timeout = 60
+    },
+    ["MagesCancer"] = {
+        extension = "mp3",
+        duration = 6,
+        canOverlapSelf = false,
+        timeout = nil
     },
     ["MongolianTechno"] = {
         extension = "mp3",
-        duration = 22
+        duration = 22,
+        canOverlapSelf = false,
+        timeout = 60
     },
     ["NowThatsALottaDmg"] = {
         extension = "mp3",
-        duration = 2
+        duration = 2,
+        canOverlapSelf = false,
+        timeout = nil
     },
     ["OhTheBear"] = {
         extension = "mp3",
-        duration = 1
+        duration = 1,
+        canOverlapSelf = true,
+        timeout = nil
     },
     ["Omg"] = {
         extension = "mp3",
-        duration = 1
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = nil
     },
     ["OnceYouGoShaq"] = {
         extension = "mp3",
-        duration = 3
+        duration = 3,
+        canOverlapSelf = false,
+        timeout = nil
     },
     ["RecklessnessPoggers"] = {
         extension = "mp3",
-        duration = 1
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = 60
     },
     ["ScreamingSheep"] = {
         extension = "mp3",
-        duration = 2
+        duration = 2,
+        canOverlapSelf = false,
+        timeout = nil
     },
     ["Warsong"] = {
         extension = "mp3",
-        duration = 5
+        duration = 5,
+        canOverlapSelf = false,
+        timeout = nil
     }
 }
 
@@ -98,6 +151,25 @@ ScubaSounds_BigItemIds = { -- stuff out in the world
 12363, -- Arcane Crystal
 12361, -- Blue Sapphire
 13468, -- Black Lotus
+-- world drop epics
+2243, -- Hand of Edward the Odd
+811, -- Axe of the Deep Woods
+871, -- Flurry Axe
+1728, -- Teebu's Blazing Longsword
+2244, -- Krol Blade
+14555, -- Alcor's Sunrazor
+873, -- Staff of Jordan
+2291, -- Kang the Decapitator
+943, -- Warden Staff
+944, -- Elemental Mage Staff
+912, -- Glowing Brightwood Staff
+2100, -- Precisely Calibrated Boomstick
+1168, -- Skullflame Shield 
+2246, -- Myrmidon's Signet
+942, -- Freezing Band
+14551, -- Edgemaster's Handguards
+14553, -- Sash of Mercy
+14554, -- Cloudkeeper Legplates
 -- dungeon items
 11815, -- Hand of Justice
 13143, -- Mark of the Dragon Lord
@@ -114,6 +186,7 @@ ScubaSounds_BigItemIds = { -- stuff out in the world
 13937, -- Headmaster's Charge
 13505, -- Runeblade of Baron Rivendare
 13353, -- Book of the Dead
+18401, -- Nostro's Compendium of Dragon Slaying
 -- epic mounts
 18796, -- Horn of the Swift Brown Wolf
 18798, -- Horn of the Swift Gray Wolf
@@ -138,7 +211,11 @@ ScubaSounds_BigItemIds = { -- stuff out in the world
 21176 -- Black Qiraji Resonating Crystal
 }
 
+-- Player names
 ScubaSounds_JacksonNames = {"Grandmasterb", "Gaymasterb"}
+ScubaSounds_NigelNames = {"Nigelsworth", "Nigel"}
+ScubaSounds_FahbNames = {"Fahbulous", "Resistofcofc", "Theemus", "Magev", "Resistofc"}
+ScubaSounds_StarrsNames = {"Starrs"}
 
 ScubaSounds_EndBossIds = { -- Instanced
 11502, -- Rag
@@ -156,22 +233,15 @@ ScubaSounds_EndBossIds = { -- Instanced
 14890 -- Taerar
 }
 
-ScubaSounds_ADDON_PREFIX = "SSAddonPrefix" -- 16 char limit
-C_ChatInfo.RegisterAddonMessagePrefix(ScubaSounds_ADDON_PREFIX)
-
--- constants
-ScubaSounds_PrintFormat = "|c00f7f26c%s|r"
-ScubaSounds_NumBagSlots = 4
-ScubaSounds_LegendaryReceivedCommand = "LEGENDARYRECEIVED"
-
-ScubaSounds_EndBossSoundPlayed = false
-ScubaSounds_PlayerLoggedIn = false -- stops some sounds from playing on login
-ScubaSounds_PlayerChangingZones = false -- stops some sounds from playing when changing zones
-
 -- Units
-ScubaSounds_CoreHoundUnitId = 11671
+ScubaSounds_CoreHoundUnitIds {11673, -- Ancient Core Hound
+11671, -- Core Hound
+184367, -- Core Hound <Spawn of Magmadar>
+228907 -- Core Hound <Spawn of Magmadar>
+}
 -- Buffs
 ScubaSounds_MarkOfTheChosenBuffId = 21969
+ScubaSounds_LipBuffId = 3169
 -- Debuffs
 ScubaSounds_LivingBombDebuffId = 20475
 -- Spells
@@ -180,21 +250,50 @@ ScubaSounds_RecklessnessSpellId = 1719
 -- Zones
 ScubaSounds_WarsongZoneId = 3277
 
--- saved variables
+-- Addon message stuff
+ScubaSounds_ADDON_PREFIX = "SSAddonPrefix" -- 16 char limit
+C_ChatInfo.RegisterAddonMessagePrefix(ScubaSounds_ADDON_PREFIX)
+ScubaSounds_LegendaryReceivedCommand = "LEGENDARYRECEIVED"
+ScubaSounds_GzNigelCommand = "GZNIGEL"
+ScubaSounds_GzNigelSenders = {"Aloha", "Stavis"}
+
+-- Saved variables
 ScubaSounds_Options = {}
 
--- OptionsFrame
-ScubaSounds.OptionsCheckboxes = {}
+-- Misc constants
+ScubaSounds_PrintFormat = "|c00f7f26c%s|r"
+ScubaSounds_NumBagSlots = 4
+
+-- State
+ScubaSounds_EndBossSoundPlayed = false
+ScubaSounds_IsTradingWithNigel = false
+ScubaSounds_TradePartnerName = nil
+ScubaSounds_IsFirstLogin = true
+ScubaSounds_CurrentlyPlayingSounds = {}
+ScubaSounds_SoundsOnTimeout = {}
 
 function ScubaSounds_OnEvent(self, event, arg1, arg2, arg3)
-    if event == "PLAYER_ENTERING_WORLD" then
-        ScubaSounds_PlayerLoggedIn = true
-        ScubaSounds_PlayerChangingZones = false
-    elseif event == "ZONE_CHANGED" or event == "ZONE_CHANGED_NEW_AREA" or event == "ZONE_CHANGED_INDOORS" then
-        ScubaSounds_PlayerChangingZones = true
-        C_Timer.After(30, function()
-            ScubaSounds_PlayerChangingZones = false
-        end)
+    if event == "TRADE_SHOW" then
+        ScubaSounds_TradePartnerName = GetUnitName("NPC", true)
+        if ScubaSounds:HasValue(ScubaSounds_NigelNames, ScubaSounds_TradePartnerName) then
+            ScubaSounds_IsTradingWithNigel = true
+        else
+            ScubaSounds_IsTradingWithNigel = false
+        end
+    elseif event == "TRADE_ACCEPT_UPDATE" and ScubaSounds_IsTradingWithNigel then
+        for i = 1, 6 do
+            local itemLink = GetTradePlayerItemLink(i)
+            if itemLink then
+                local _, _, itemQuality = GetItemInfo(itemLink)
+                if itemQuality == 4 and ScubaSounds:HasValue(ScubaSounds_GzNigelSenders, UnitName("player")) then
+                    C_ChatInfo.SendAddonMessage(ScubaSounds_ADDON_PREFIX,
+                        ScubaSounds_GzNigelCommand .. ":" .. ScubaSounds_TradePartnerName, "GUILD")
+                end
+            end
+        end
+    elseif event == "TRADE_CLOSED" then
+        ScubaSounds_IsTradingWithNigel = false
+        ScubaSounds_TradePartnerName = nil
     end
 
     if event == "ADDON_LOADED" and arg1 == "ScubaSounds" then
@@ -207,12 +306,14 @@ function ScubaSounds_OnEvent(self, event, arg1, arg2, arg3)
         end
     elseif event == "UNIT_HEALTH" or event == "UNIT_HEALTH_FREQUENT" then
         ScubaSounds:HandleUnitHealth(arg1)
-    elseif event == "ZONE_CHANGED_NEW_AREA" or event == "PLAYER_ENTERING_WORLD" then
+    elseif event == "ZONE_CHANGED_NEW_AREA" then
         ScubaSounds:HandleZoneChange()
     elseif event == "CHAT_MSG_LOOT" then
         ScubaSounds:HandleLoot(arg1)
     elseif event == "CHAT_MSG_ADDON" then
         ScubaSounds:HandleAddonMessage(arg1, arg2)
+    elseif event == "PLAYER_ENTERING_WORLD" then
+        ScubaSounds:HandleEnteringWorld(arg1, arg2)
     end
 end
 
@@ -254,16 +355,17 @@ function ScubaSounds:HandleUnitDeath(sourceGUID, destGUID, destName, damage)
         end
 
         if damage == "Lava" then
-            ScubaSounds:PlaySound("ScreamingSheep")
+            ScubaSounds:PlaySound("Omg")
         elseif ScubaSounds:HasValue(ScubaSounds_JacksonNames, destName) then
             ScubaSounds:PlaySound("Cavern")
-        elseif destName == "Starrs" then
+        elseif ScubaSounds:HasValue(ScubaSounds_StarrsNames, destName) then
             ScubaSounds:PlaySound("KyakPenis")
-        elseif destName == "Fahbulous" then
+        elseif ScubaSounds:HasValue(ScubaSounds_FahbNames, destName) then
             ScubaSounds:PlaySound("Fahb")
         elseif className == "MAGE" then
             ScubaSounds:PlaySound("Deleted")
-        elseif sourceUnitType == "Creature" and tonumber(sourceUnitId) == ScubaSounds_CoreHoundUnitId then
+        elseif sourceUnitType == "Creature" and
+            ScubaSounds:HasValue(ScubaSounds_CoreHoundUnitIds, tonumber(sourceUnitId)) then
             ScubaSounds:PlaySound("OhTheBear")
         end
         -- NPCs
@@ -276,6 +378,8 @@ function ScubaSounds:HandlePlayerAura()
     if ScubaSounds:HasBuff("player", ScubaSounds_MarkOfTheChosenBuffId) or
         ScubaSounds:HasDebuff("player", ScubaSounds_LivingBombDebuffId) then
         ScubaSounds:PlaySound("IHaveBeenChosen")
+    elseif ScubaSounds:HasBuff("player", ScubaSounds_LipBuffId) then
+        ScubaSounds:PlaySound("HeLipped")
     end
 end
 
@@ -347,11 +451,20 @@ end
 
 function ScubaSounds:HandleAddonMessage(prefix, message)
     if prefix == ScubaSounds_ADDON_PREFIX then
-        local command, playerName, itemLink = string.match(message, "(%w+):([^:]+):(.+)")
+        local command, playerName, itemLink = string.match(message, "(%w+):([^:]+):?(.*)")
         if command == ScubaSounds_LegendaryReceivedCommand then
             ScubaSounds:PlaySound("HelloThere")
             ScubaSounds:SendMessage(playerName .. " received item: " .. itemLink)
+        elseif command == ScubaSounds_GzNigelCommand then
+            SendChatMessage("gz nigel", "WHISPER", nil, playerName)
         end
+    end
+end
+
+function ScubaSounds:HandleEnteringWorld(isInitialLogin, isReloadingUI)
+    if isInitialLogin and ScubaSounds_IsFirstLogin and select(2, UnitClass("player")) == "MAGE" then
+        ScubaSounds_IsFirstLogin = false
+        ScubaSounds:PlaySound("MagesCancer")
     end
 end
 
@@ -359,7 +472,6 @@ function ScubaSounds:BuildOptionsFrame()
     local parent = getglobal("ScubaSoundsOptionsFrame")
     local count = 1
     for sound, _ in pairs(ScubaSounds_SoundInfo) do
-        print(idx, sound)
         ScubaSounds.OptionsCheckboxes[sound] = ScubaSounds:NewCheckBox(parent, sound, count)
         count = count + 1
     end
@@ -398,17 +510,42 @@ function ScubaSounds:NewCheckBox(parent, option, num)
 end
 
 function ScubaSounds:ShouldPlay(sound)
-    -- TODO: need 3 timing checks
-    -- sound currently playing
-    -- sound played in last x seconds - leaning towards x = 2
-    -- sounds like reck need a longer cd
-    return ScubaSounds_Options[sound] == nil or ScubaSounds_Options[sound]
+    -- Sound is playing and can overlap
+    if ScubaSounds_CurrentlyPlayingSounds[sound] and ScubaSounds_SoundInfo[sound].canOverlapSelf then
+        return false
+    end
+
+    -- On timeout
+    if ScubaSounds_SoundsOnTimeout[sound] then
+        return false
+    end
+
+    -- Sound is disabled in /ss options
+    if ScubaSounds_Options[sound] == false then
+        -- NOTE: ScubaSounds_Options[sound] == nil if fresh saved vars
+        return false
+    end
+
+    return true
 end
 
 function ScubaSounds:PlaySound(sound)
     if ScubaSounds:ShouldPlay(sound) then
-        local extension = ScubaSounds_SoundInfo[sound].extension
-        PlaySoundFile("Interface/Addons/ScubaSounds/Sounds/" .. sound .. "." .. extension, "Master")
+        -- play the sound
+        PlaySoundFile("Interface/Addons/ScubaSounds/Sounds/" .. sound .. "." .. ScubaSounds_SoundInfo[sound].extension,
+            "Master")
+        -- mark it as playing
+        ScubaSounds_CurrentlyPlayingSounds[sound] = true
+        C_Timer.After(ScubaSounds_SoundInfo[sound].duration, function()
+            ScubaSounds_CurrentlyPlayingSounds[sound] = false
+        end)
+        -- handle timeout if applicable
+        if ScubaSounds_SoundInfo[sound].timeout ~= nil then
+            ScubaSounds_SoundsOnTimeout[sound] = true
+            C_Timer.After(ScubaSounds_SoundInfo[sound].timeout, function()
+                ScubaSounds_SoundsOnTimeout[sound] = false
+            end)
+        end
         return true
     end
     return false
