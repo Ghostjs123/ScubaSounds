@@ -77,7 +77,7 @@ ScubaSounds_SoundInfo = {
         extension = "mp3",
         duration = 1,
         canOverlapSelf = false,
-        timeout = 5
+        timeout = 30
     },
     ["KyakPenis"] = {
         extension = "mp3",
@@ -234,7 +234,8 @@ ScubaSounds_EndBossIds = { -- Instanced
 }
 
 -- Units
-ScubaSounds_CoreHoundUnitIds {11673, -- Ancient Core Hound
+ScubaSounds_CoreHoundUnitIds = {
+11673, -- Ancient Core Hound
 11671, -- Core Hound
 184367, -- Core Hound <Spawn of Magmadar>
 228907 -- Core Hound <Spawn of Magmadar>
@@ -364,8 +365,8 @@ function ScubaSounds:HandleUnitDeath(sourceGUID, destGUID, destName, damage)
             ScubaSounds:PlaySound("Fahb")
         elseif className == "MAGE" then
             ScubaSounds:PlaySound("Deleted")
-        elseif sourceUnitType == "Creature" and
-            ScubaSounds:HasValue(ScubaSounds_CoreHoundUnitIds, tonumber(sourceUnitId)) then
+        elseif sourceUnitType == "Creature" then
+            ScubaSounds:HasValue(ScubaSounds_CoreHoundUnitIds, tonumber(sourceUnitId))
             ScubaSounds:PlaySound("OhTheBear")
         end
         -- NPCs
@@ -377,8 +378,8 @@ end
 function ScubaSounds:HandlePlayerAura()
     if ScubaSounds:HasBuff("player", ScubaSounds_MarkOfTheChosenBuffId) or
         ScubaSounds:HasDebuff("player", ScubaSounds_LivingBombDebuffId) then
-        ScubaSounds:PlaySound("IHaveBeenChosen")
-    elseif ScubaSounds:HasBuff("player", ScubaSounds_LipBuffId) then
+        ScubaSounds:PlaySound("IWasChosen")
+    elseif ScubaSounds:HasBuff("player", ScubaSounds_LipBuffId) or ScubaSounds:HasBuff("target", ScubaSounds_LipBuffId) then
         ScubaSounds:PlaySound("HeLipped")
     end
 end
@@ -497,7 +498,7 @@ function ScubaSounds:NewCheckBox(parent, option, num)
             ScubaSounds:SendMessage(option .. " disabled")
         end
     end)
-    -- new sound was added or addon loading for the first time ever
+    -- New sound was added or addon loading for the first time ever
     if ScubaSounds_Options[option] == nil then
         ScubaSounds_Options[option] = true
     end
@@ -531,15 +532,15 @@ end
 
 function ScubaSounds:PlaySound(sound)
     if ScubaSounds:ShouldPlay(sound) then
-        -- play the sound
+        -- Play the sound
         PlaySoundFile("Interface/Addons/ScubaSounds/Sounds/" .. sound .. "." .. ScubaSounds_SoundInfo[sound].extension,
             "Master")
-        -- mark it as playing
+        -- Mark it as playing
         ScubaSounds_CurrentlyPlayingSounds[sound] = true
         C_Timer.After(ScubaSounds_SoundInfo[sound].duration, function()
             ScubaSounds_CurrentlyPlayingSounds[sound] = false
         end)
-        -- handle timeout if applicable
+        -- Handle timeout if applicable
         if ScubaSounds_SoundInfo[sound].timeout ~= nil then
             ScubaSounds_SoundsOnTimeout[sound] = true
             C_Timer.After(ScubaSounds_SoundInfo[sound].timeout, function()
@@ -563,7 +564,7 @@ function SlashCmdList.SCUBASOUNDS(args)
         words[i] = strlower(words[i])
     end
 
-    if ScubaSounds:HasValue(words, "options") then
+    if ScubaSounds:HasValue(words, "options") or ScubaSounds:HasValue(words, "option") then
         ScubaSounds:ShowOptions()
     else
         ScubaSounds:SendMessage("Options: options")
