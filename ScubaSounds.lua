@@ -65,7 +65,7 @@ ScubaSounds_SoundInfo = {
         extension = "mp3",
         duration = 2,
         canOverlapSelf = false,
-        timeout = nil
+        timeout = 6
     },
     ["HelloThere"] = {
         extension = "mp3",
@@ -77,7 +77,7 @@ ScubaSounds_SoundInfo = {
         extension = "mp3",
         duration = 1,
         canOverlapSelf = false,
-        timeout = 30
+        timeout = 10
     },
     ["KyakPenis"] = {
         extension = "mp3",
@@ -241,7 +241,7 @@ ScubaSounds_CoreHoundUnitIds = {
 228907 -- Core Hound <Spawn of Magmadar>
 }
 -- Buffs
-ScubaSounds_MarkOfTheChosenBuffId = 21969
+ScubaSounds_MarkOfTheChosenBuffId = 21970
 ScubaSounds_LipBuffId = 3169
 -- Debuffs
 ScubaSounds_LivingBombDebuffId = 20475
@@ -256,7 +256,7 @@ ScubaSounds_ADDON_PREFIX = "SSAddonPrefix" -- 16 char limit
 C_ChatInfo.RegisterAddonMessagePrefix(ScubaSounds_ADDON_PREFIX)
 ScubaSounds_LegendaryReceivedCommand = "LEGENDARYRECEIVED"
 ScubaSounds_GzNigelCommand = "GZNIGEL"
-ScubaSounds_GzNigelSenders = {"Aloha", "Stavis"}
+ScubaSounds_GzNigelSenders = {"Aloha", "Stavis", "Zarix"}
 
 -- Saved variables
 ScubaSounds_Options = {}
@@ -272,6 +272,7 @@ ScubaSounds_TradePartnerName = nil
 ScubaSounds_IsFirstLogin = true
 ScubaSounds_CurrentlyPlayingSounds = {}
 ScubaSounds_SoundsOnTimeout = {}
+ScubaSounds_ActiveAuras = {}
 
 function ScubaSounds_OnEvent(self, event, arg1, arg2, arg3)
     if event == "TRADE_SHOW" then
@@ -376,12 +377,33 @@ function ScubaSounds:HandleUnitDeath(sourceGUID, destGUID, destName, damage)
 end
 
 function ScubaSounds:HandlePlayerAura()
-    if ScubaSounds:HasBuff("player", ScubaSounds_MarkOfTheChosenBuffId) or
-        ScubaSounds:HasDebuff("player", ScubaSounds_LivingBombDebuffId) then
+    -- Player debuffs
+    if ScubaSounds:HasDebuff("player", ScubaSounds_LivingBombDebuffId) then
         ScubaSounds:PlaySound("IWasChosen")
-    elseif ScubaSounds:HasBuff("player", ScubaSounds_LipBuffId) or ScubaSounds:HasBuff("target", ScubaSounds_LipBuffId) then
+    end
+    -- Target debuffs
+    if ScubaSounds:HasBuff("target", ScubaSounds_LipBuffId) then
         ScubaSounds:PlaySound("HeLipped")
     end
+    -- Player buffs
+    local currentAuras = {}
+    for i = 1, 40 do
+        local _, _, _, _, _, _, _, _, _, spellId = UnitBuff("player", i)
+        if not spellId then
+            break
+        end
+
+        if not ScubaSounds_ActiveAuras[spellId] then
+            if spellId == ScubaSounds_MarkOfTheChosenBuffId then
+                ScubaSounds:PlaySound("IWasChosen")
+                currentAuras[spellId] = true
+            elseif spellId == ScubaSounds_LipBuffId then
+                ScubaSounds:PlaySound("HeLipped")
+                currentAuras[spellId] = true
+            end
+        end
+    end
+    ScubaSounds_ActiveAuras = currentAuras
 end
 
 function ScubaSounds:HandleResurrect(destName, spellId)
@@ -405,7 +427,7 @@ function ScubaSounds:HandleUnitHealth(unit)
             end
         elseif IsInRaid() then
             local numRaidMembers = GetNumGroupMembers()
-            if numRaidMembers >= 20 then
+            if numRaidMembers >= 16 then -- < 20 for split onys
                 local allDead = true
 
                 for i = 1, numRaidMembers do
