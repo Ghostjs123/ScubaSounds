@@ -44,49 +44,49 @@ ScubaSounds_SoundInfo = {
         timeout = nil
     },
     ["Cavern"] = {
-        extension = "mp3",
+        extension = "wav",
         duration = 1,
         canOverlapSelf = false,
         timeout = nil
     },
     ["Deleted"] = {
-        extension = "mp3",
+        extension = "wav",
         duration = 1,
         canOverlapSelf = true,
         timeout = nil
     },
     ["Fahb"] = {
-        extension = "ogg",
+        extension = "wav",
         duration = 1,
         canOverlapSelf = false,
         timeout = nil
     },
     ["HeLipped"] = {
-        extension = "mp3",
+        extension = "wav",
         duration = 2,
         canOverlapSelf = false,
         timeout = 6
     },
     ["HelloThere"] = {
-        extension = "mp3",
+        extension = "wav",
         duration = 1,
         canOverlapSelf = false,
         timeout = nil
     },
     ["IWasChosen"] = {
-        extension = "mp3",
+        extension = "wav",
         duration = 1,
         canOverlapSelf = false,
         timeout = 10
     },
     ["KyakPenis"] = {
-        extension = "mp3",
+        extension = "wav",
         duration = 1,
         canOverlapSelf = false,
         timeout = nil
     },
     ["LotrFlee"] = {
-        extension = "mp3",
+        extension = "wav",
         duration = 7,
         canOverlapSelf = false,
         timeout = 60
@@ -104,31 +104,31 @@ ScubaSounds_SoundInfo = {
         timeout = 60
     },
     ["NowThatsALottaDmg"] = {
-        extension = "mp3",
+        extension = "wav",
         duration = 2,
         canOverlapSelf = false,
         timeout = nil
     },
     ["OhTheBear"] = {
-        extension = "mp3",
+        extension = "wav",
         duration = 1,
         canOverlapSelf = true,
         timeout = nil
     },
     ["Omg"] = {
-        extension = "mp3",
+        extension = "wav",
         duration = 1,
         canOverlapSelf = false,
         timeout = nil
     },
     ["OnceYouGoShaq"] = {
-        extension = "mp3",
+        extension = "wav",
         duration = 3,
         canOverlapSelf = false,
         timeout = nil
     },
     ["RecklessnessPoggers"] = {
-        extension = "mp3",
+        extension = "wav",
         duration = 1,
         canOverlapSelf = false,
         timeout = 60
@@ -234,8 +234,7 @@ ScubaSounds_EndBossIds = { -- Instanced
 }
 
 -- Units
-ScubaSounds_CoreHoundUnitIds = {
-11673, -- Ancient Core Hound
+ScubaSounds_CoreHoundUnitIds = {11673, -- Ancient Core Hound
 11671, -- Core Hound
 184367, -- Core Hound <Spawn of Magmadar>
 228907 -- Core Hound <Spawn of Magmadar>
@@ -243,11 +242,13 @@ ScubaSounds_CoreHoundUnitIds = {
 -- Buffs
 ScubaSounds_MarkOfTheChosenBuffId = 21970
 ScubaSounds_LipBuffId = 3169
+ScubaSounds_BattleShoutBuffId = 11551
 -- Debuffs
 ScubaSounds_LivingBombDebuffId = 20475
 -- Spells
 ScubaSounds_AnkhSpellId = 20608
 ScubaSounds_RecklessnessSpellId = 1719
+ScubaSounds_GeddonAoeSpellId = 19698
 -- Zones
 ScubaSounds_WarsongZoneId = 3277
 
@@ -256,7 +257,7 @@ ScubaSounds_ADDON_PREFIX = "SSAddonPrefix" -- 16 char limit
 C_ChatInfo.RegisterAddonMessagePrefix(ScubaSounds_ADDON_PREFIX)
 ScubaSounds_LegendaryReceivedCommand = "LEGENDARYRECEIVED"
 ScubaSounds_GzNigelCommand = "GZNIGEL"
-ScubaSounds_GzNigelSenders = {"Aloha", "Stavis", "Zarix"}
+ScubaSounds_GzNigelSenders = {"Aloha", "Stavis", "Zarix", "Fahbulous"}
 
 -- Saved variables
 ScubaSounds_Options = {}
@@ -320,19 +321,25 @@ function ScubaSounds_OnEvent(self, event, arg1, arg2, arg3)
 end
 
 function ScubaSounds:HandleCombatLogEvent()
-    local _, subEvent, _, sourceGUID, sourceName, sourceFlags, _, destGUID, destName, destFlags, _, spellId, spellName,
-        amount, overkill, school, resisted, blocked, absorbed, critical = CombatLogGetCurrentEventInfo()
+    -- Base parameters (1 - 11)
+    local timestamp, subEvent, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName,
+        destFlags, destRaidFlags = CombatLogGetCurrentEventInfo()
+    -- Event based parameters (12 - rest)
+    local eventBasedParams = {select(12, CombatLogGetCurrentEventInfo())}
 
     if subEvent == "UNIT_DIED" then
-        ScubaSounds:HandleUnitDeath(sourceGUID, destGUID, destName, damage)
+        ScubaSounds:HandleUnitDeath(destFlags, destName, eventBasedParams[1])
     elseif subEvent == "SPELL_RESURRECT" then
-        ScubaSounds:HandleResurrect(destName, spellId)
-    elseif (subEvent == "SPELL_DAMAGE" or subEvent == "SWING_DAMAGE") and critical and sourceGUID == UnitGUID("player") and
-        amount >= 6300 and amount < 6400 then
-        ScubaSounds:PlaySound("63KCrit")
-    elseif spellId == ScubaSounds_GeddonAoeSpellId and destGUID == UnitGUID("player") then
+        ScubaSounds:HandleResurrect(destName, eventBasedParams[1])
+    elseif subEvent == "SWING_DAMAGE" then
+        ScubaSounds:HandleDamage(sourceGUID, destGUID, eventBasedParams[1], eventBasedParams[7], eventBasedParams[2])
+    elseif subEvent == "SPELL_DAMAGE" or subEvent == "RANGE_DAMAGE" then
+        ScubaSounds:HandleDamage(sourceGUID, destGUID, eventBasedParams[4], eventBasedParams[10], eventBasedParams[3])
+    elseif subEvent == "ENVIRONMENTAL_DAMAGE" then
+        ScubaSounds:HandleDamage(sourceGUID, destGUID, eventBasedParams[2], 0, false, -1)
+    elseif eventBasedParams[1] == ScubaSounds_GeddonAoeSpellId and destGUID == UnitGUID("player") then
         ScubaSounds:PlaySound("LotrFlee")
-    elseif subEvent == "SPELL_CAST_SUCCESS" and spellId == ScubaSounds_RecklessnessSpellId then
+    elseif subEvent == "SPELL_CAST_SUCCESS" and eventBasedParams[1] == ScubaSounds_RecklessnessSpellId then
         if sourceFlags and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_RAID) ~= 0 then
             if select(2, UnitClass(sourceName)) == "WARRIOR" then
                 ScubaSounds:PlaySound("RecklessnessPoggers")
@@ -341,22 +348,11 @@ function ScubaSounds:HandleCombatLogEvent()
     end
 end
 
-function ScubaSounds:HandleUnitDeath(sourceGUID, destGUID, destName, damage)
-    local sourceUnitType, _, _, _, _, sourceUnitId = strsplit("-", sourceGUID)
-    local destUnitType, _, _, _, _, destUnitId = strsplit("-", destGUID)
-    if destUnitType == "Player" then -- a player
+function ScubaSounds:HandleUnitDeath(destFlags, destName, environmentalType)
+    if bit.band(destFlags, COMBATLOG_OBJECT_TYPE_PLAYER) > 0 then -- a player
         local _, className = UnitClass(destName)
 
-        if UnitGUID("player") == destGUID then -- I'm the player
-            local maxHealth = UnitHealthMax("player")
-            local currentHealth = UnitHealth("player")
-            if damage and damage >= currentHealth and currentHealth >= maxHealth * 0.95 then
-                ScubaSounds:PlaySound("NowThatsALottaDmg")
-                return
-            end
-        end
-
-        if damage == "Lava" then
+        if environmentalType == "Lava" then
             ScubaSounds:PlaySound("Omg")
         elseif ScubaSounds:HasValue(ScubaSounds_JacksonNames, destName) then
             ScubaSounds:PlaySound("Cavern")
@@ -366,9 +362,6 @@ function ScubaSounds:HandleUnitDeath(sourceGUID, destGUID, destName, damage)
             ScubaSounds:PlaySound("Fahb")
         elseif className == "MAGE" then
             ScubaSounds:PlaySound("Deleted")
-        elseif sourceUnitType == "Creature" then
-            ScubaSounds:HasValue(ScubaSounds_CoreHoundUnitIds, tonumber(sourceUnitId))
-            ScubaSounds:PlaySound("OhTheBear")
         end
         -- NPCs
     elseif destName == "Vanndar Stormpike" then
@@ -388,12 +381,12 @@ function ScubaSounds:HandlePlayerAura()
     -- Player buffs
     local currentAuras = {}
     for i = 1, 40 do
-        local _, _, _, _, _, _, _, _, _, spellId = UnitBuff("player", i)
+        local _, _, _, _, duration, expirationTime, _, _, _, spellId = UnitBuff("player", i)
         if not spellId then
             break
         end
 
-        if not ScubaSounds_ActiveAuras[spellId] then
+        if ScubaSounds_ActiveAuras[spellId] ~= true and ScubaSounds:IsRecentAura(duration, expirationTime) then
             if spellId == ScubaSounds_MarkOfTheChosenBuffId then
                 ScubaSounds:PlaySound("IWasChosen")
                 currentAuras[spellId] = true
@@ -412,6 +405,31 @@ function ScubaSounds:HandleResurrect(destName, spellId)
     end
 end
 
+function ScubaSounds:HandleDamage(sourceGUID, destGUID, amount, critical, overkill)
+    -- Stuff involving me
+    if destGUID == UnitGUID("player") then -- I took the dmg
+        if amount >= UnitHealthMax("player") * 0.95 then
+            ScubaSounds:PlaySound("NowThatsALottaDmg")
+            return
+        end
+    elseif sourceGUID == UnitGUID("player") then -- I did the dmg
+        if critical and amount >= 6300 and amount < 6400 then
+            ScubaSounds:PlaySound("63KCrit")
+            return
+        end
+    end
+
+    -- Stuff involving everyone
+    local _, _, _, _, _, sourceUnitId = strsplit("-", sourceGUID);
+    sourceUnitId = tonumber(sourceUnitId);
+    local sourceUnitName = UnitName(sourceGUID);
+
+    if (ScubaSounds:HasValue(ScubaSounds_CoreHoundUnitIds, sourceUnitId) or sourceUnitName:lower():find("bear")) and
+        overkill > 0 then
+        ScubaSounds:PlaySound("OhTheBear")
+    end
+end
+
 function ScubaSounds:HandleUnitHealth(unit)
     local guid = UnitGUID(unit)
     if guid then
@@ -419,7 +437,7 @@ function ScubaSounds:HandleUnitHealth(unit)
         if ScubaSounds:HasValue(ScubaSounds_EndBossIds, creatureId) then
             local healthPercent = (UnitHealth(unit) / UnitHealthMax(unit)) * 100
             if healthPercent <= 10 then
-                if ScubaSounds:PlaySound("MongolianTecho") then
+                if ScubaSounds:PlaySound("MongolianTechno") then
                     ScubaSounds_EndBossSoundPlayed = true
                 end
             elseif healthPercent > 10 then
@@ -573,6 +591,7 @@ function ScubaSounds:PlaySound(sound)
     end
     return false
 end
+-- /script PlaySoundFile("Interface/Addons/ScubaSounds/Sounds/HeLipped.wav", "Master")
 
 SLASH_SCUBASOUNDS1 = "/ss"
 SLASH_SCUBASOUNDS2 = "/scubasounds"
@@ -634,6 +653,13 @@ function ScubaSounds:HasDebuff(unit, debuffId)
         end
     end
     return false
+end
+
+function ScubaSounds:IsRecentAura(duration, expirationTime)
+    if duration == nil or expirationTime == nil then
+        return false
+    end
+    return duration - (expirationTime - GetTime()) < 3
 end
 
 function ScubaSounds:GetCreateIdFromGuid(guid)
