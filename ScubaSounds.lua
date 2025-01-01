@@ -422,10 +422,8 @@ function ScubaSounds:HandleDamage(sourceGUID, destGUID, amount, critical, overki
     -- Stuff involving everyone
     local _, _, _, _, _, sourceUnitId = strsplit("-", sourceGUID);
     sourceUnitId = tonumber(sourceUnitId);
-    local sourceUnitName = UnitName(sourceGUID);
 
-    if (ScubaSounds:HasValue(ScubaSounds_CoreHoundUnitIds, sourceUnitId) or sourceUnitName:lower():find("bear")) and
-        overkill > 0 then
+    if ScubaSounds:HasValue(ScubaSounds_CoreHoundUnitIds, sourceUnitId) and overkill > 0 then
         ScubaSounds:PlaySound("OhTheBear")
     end
 end
