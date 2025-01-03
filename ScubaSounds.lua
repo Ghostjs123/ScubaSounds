@@ -334,7 +334,7 @@ function ScubaSounds:HandleCombatLogEvent()
     elseif subEvent == "SWING_DAMAGE" then
         ScubaSounds:HandleDamage(sourceGUID, destGUID, eventBasedParams[1], eventBasedParams[7], eventBasedParams[2])
     elseif subEvent == "SPELL_DAMAGE" or subEvent == "RANGE_DAMAGE" then
-        ScubaSounds:HandleDamage(sourceGUID, destGUID, eventBasedParams[4], eventBasedParams[10], eventBasedParams[3])
+        ScubaSounds:HandleDamage(sourceGUID, destGUID, eventBasedParams[4], eventBasedParams[10], eventBasedParams[5])
     elseif subEvent == "ENVIRONMENTAL_DAMAGE" then
         ScubaSounds:HandleDamage(sourceGUID, destGUID, eventBasedParams[2], 0, false, -1)
     elseif eventBasedParams[1] == ScubaSounds_GeddonAoeSpellId and destGUID == UnitGUID("player") then
@@ -434,7 +434,7 @@ function ScubaSounds:HandleUnitHealth(unit)
         local creatureId = ScubaSounds:GetCreateIdFromGuid(guid)
         if ScubaSounds:HasValue(ScubaSounds_EndBossIds, creatureId) then
             local healthPercent = (UnitHealth(unit) / UnitHealthMax(unit)) * 100
-            if healthPercent <= 10 then
+            if healthPercent <= 10 and not ScubaSounds_EndBossSoundPlayed then
                 if ScubaSounds:PlaySound("MongolianTechno") then
                     ScubaSounds_EndBossSoundPlayed = true
                 end
