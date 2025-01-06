@@ -349,7 +349,7 @@ function ScubaSounds:HandleCombatLogEvent()
 end
 
 function ScubaSounds:HandleUnitDeath(destFlags, destName, environmentalType)
-    if bit.band(destFlags, COMBATLOG_OBJECT_TYPE_PLAYER) > 0 then -- a player
+    if bit.band(destFlags, COMBATLOG_OBJECT_TYPE_PLAYER) ~= 0 then -- a player
         local _, className = UnitClass(destName)
 
         if environmentalType == "Lava" then
