@@ -158,13 +158,31 @@ ScubaSounds_BigItemIds = { -- quest rewards
 21180, -- Earthstrike
 21186, -- Rockfury Bracers
 21025, -- Recipe: Dirge's Kickin' Chimaerok Chops
+19969, -- Nat Pagle's Extreme Anglin' Boots
+19970, -- Arcanite Fishing Pole
+19971, -- High Test Eternium Fishing Line
+19972, -- Lucky Fishing Hat
+19979, -- Hook of the Master Angler
+19491, -- Amulet of the Darkmoon
+19426, -- Orb of the Darkmoon
+19288, -- Darkmoon Card: Blue Dragon
 -- crafted stuff
 12640, -- Lionheart Helm
 22797, -- Force Reactive Disk
+21161, -- Sulfuron Hammer
+19830, -- Arcanite Dragonling
+18457, -- Robe of the Archmage
+18456, -- Truefaith Vestments
+18458, -- Robe of the Void
 -- stuff out in the world
 12363, -- Arcane Crystal
 12361, -- Blue Sapphire
 13468, -- Black Lotus
+19024, -- Arena Grand Master
+23007, -- Piglet's Collar
+23015, -- Rat Cage
+23002, -- Turtle Box
+23022, -- Curmudgeon's Payoff
 -- world drop epics
 2243, -- Hand of Edward the Odd
 811, -- Axe of the Deep Woods
