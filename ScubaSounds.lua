@@ -155,6 +155,12 @@ ScubaSounds_BigItemIds = { -- quest rewards
 21210, -- Signet Ring of the Bronze Dragonflight (stam/int)
 21200, -- Signet Ring of the Bronze Dragonflight (str)
 17333, -- Aqual Quintessence
+21180, -- Earthstrike
+21186, -- Rockfury Bracers
+21025, -- Recipe: Dirge's Kickin' Chimaerok Chops
+-- crafted stuff
+12640, -- Lionheart Helm
+22797, -- Force Reactive Disk
 -- stuff out in the world
 12363, -- Arcane Crystal
 12361, -- Blue Sapphire
@@ -178,6 +184,62 @@ ScubaSounds_BigItemIds = { -- quest rewards
 14551, -- Edgemaster's Handguards
 14553, -- Sash of Mercy
 14554, -- Cloudkeeper Legplates
+-- wboss items
+19132, -- Crystal Adorned Crown
+18208, -- Drape of Benediction
+18541, -- Puissant Cape
+18547, -- Unmelting Ice Girdle
+18545, -- Leggings of Arcane Supremacy
+19131, -- Snowblind Shoes
+19130, -- Cold Snap
+17070, -- Fang of the Mystics
+18202, -- Eskhandar's Left Claw
+18542, -- Typhoon
+18704, -- Mature Blue Dragon Sinew
+18546, -- Infernal Headcage
+17111, -- Blazefury Medallion
+18204, -- Eskhandar's Pelt
+19135, -- Blacklight Bracer
+18544, -- Doomhide Gauntlets
+19134, -- Flayed Doomguard Belt
+19133, -- Fel Infused Leggings
+18543, -- Ring of Entropy
+17112, -- Empyrean Demolisher
+17113, -- Amberseal Keeper
+18665, -- Eye of Shadow
+20628, -- Deviate Growth Cap
+20626, -- Black Bark Wristbands
+20630, -- Gauntlets of the Shining Light
+20625, -- Belt of the Dark Bog
+20627, -- Dark Heart Pants
+20629, -- Malignant Footguards
+20579, -- Green Dragonskin Cloak
+20615, -- Dragonspur Wraps
+20616, -- Dragonbone Wristguards
+20618, -- Gloves of Delusional Power
+20617, -- Ancient Corroded Leggings
+20619, -- Acid Inscribed Greaves
+20582, -- Trance Stone
+20644, -- Nightmare Engulfed Object
+20600, -- Malfurion's Signet Ring
+20580, -- Hammer of Bestial Fury
+20581, -- Staff of Rampant Growth
+20623, -- Circlet of Restless Dreams
+20622, -- Dragonheart Necklace
+20624, -- Ring of the Unliving
+20621, -- Boots of the Endless Moor
+20599, -- Polished Ironwood Crossbow
+20633, -- Unnatural Leather Spaulders
+20631, -- Mendicant's Slippers
+20634, -- Boots of Fright
+20632, -- Mindtear Band
+20577, -- Nightmare Blade
+20637, -- Acid Inscribed Pauldrons
+20635, -- Jade Inlaid Vestments
+20638, -- Leggings of the Demented Mind
+20639, -- Strangely Glyphed Legplates
+20636, -- Hibernation Crystal
+20578, -- Emerald Dragonfang
 -- dungeon items
 11815, -- Hand of Justice
 13143, -- Mark of the Dragon Lord
