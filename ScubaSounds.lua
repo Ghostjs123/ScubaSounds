@@ -259,6 +259,7 @@ ScubaSounds_BigItemIds = { -- quest rewards
 20636, -- Hibernation Crystal
 20578, -- Emerald Dragonfang
 -- dungeon items
+12940, -- Dal'Rend's Sacred Charge
 11815, -- Hand of Justice
 13143, -- Mark of the Dragon Lord
 11684, -- Ironfoe
