@@ -147,7 +147,15 @@ ScubaSounds_SoundInfo = {
     }
 }
 
-ScubaSounds_BigItemIds = { -- stuff out in the world
+ScubaSounds_BigItemIds = { -- quest rewards
+18608, -- Benediction
+18713, -- Rhok'delar
+18348, -- Quel'Serrar
+21205, -- Signet Ring of the Bronze Dragonflight (agi)
+21210, -- Signet Ring of the Bronze Dragonflight (stam/int)
+21200, -- Signet Ring of the Bronze Dragonflight (str)
+17333, -- Aqual Quintessence
+-- stuff out in the world
 12363, -- Arcane Crystal
 12361, -- Blue Sapphire
 13468, -- Black Lotus
@@ -479,7 +487,8 @@ function ScubaSounds:HandleLoot(lootMessage)
         local itemLink = lootMessage:match("|c%x+|Hitem:.-|h%[.-%]|h|r")
         if itemLink then
             local itemId = ScubaSounds:ItemIdFromItemLink(itemLink)
-            if itemLink:find("|cffff8000") or ScubaSounds:HasValue(ScubaSounds_BigItemIds, itemId) then -- cffff8000 = legendary
+            if (itemLink:find("|cffff8000") or ScubaSounds:HasValue(ScubaSounds_BigItemIds, itemId)) and
+                not ScubaSounds:IsItemLinkEnchanted(itemLink) then -- cffff8000 = legendary
                 C_ChatInfo.SendAddonMessage(ScubaSounds_ADDON_PREFIX, ScubaSounds_LegendaryReceivedCommand .. ":" ..
                     playerName .. ":" .. itemLink, "GUILD")
             end
@@ -623,6 +632,14 @@ function ScubaSounds:HasValue(tab, val)
         if value == val then
             return true
         end
+    end
+    return false
+end
+
+function ScubaSounds:IsItemLinkEnchanted(itemLink)
+    local enchantID = select(2, itemLink:match("item:(%d+):(%d+):"))
+    if enchantID and tonumber(enchantID) > 0 then
+        return true
     end
     return false
 end
