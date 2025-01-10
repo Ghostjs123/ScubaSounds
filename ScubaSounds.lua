@@ -137,7 +137,7 @@ ScubaSounds_SoundInfo = {
         extension = "mp3",
         duration = 2,
         canOverlapSelf = false,
-        timeout = nil
+        timeout = 300
     },
     ["Warsong"] = {
         extension = "mp3",
@@ -150,6 +150,7 @@ ScubaSounds_SoundInfo = {
 ScubaSounds_BigItemIds = { -- quest rewards
 18608, -- Benediction
 18713, -- Rhok'delar
+18707, -- Ancient Rune Etched Stave
 18348, -- Quel'Serrar
 21205, -- Signet Ring of the Bronze Dragonflight (agi)
 21210, -- Signet Ring of the Bronze Dragonflight (stam/int)
@@ -301,7 +302,7 @@ ScubaSounds_BigItemIds = { -- quest rewards
 }
 
 -- Player names
-ScubaSounds_JacksonNames = {"Grandmasterb", "Gaymasterb"}
+ScubaSounds_JacksonNames = {"Grandmasterb", "Gaymasterb", "Combyobeard"}
 ScubaSounds_NigelNames = {"Nigelsworth", "Nigel"}
 ScubaSounds_FahbNames = {"Fahbulous", "Resistofcofc", "Theemus", "Magev", "Resistofc"}
 ScubaSounds_StarrsNames = {"Starrs"}
@@ -417,7 +418,7 @@ function ScubaSounds:HandleCombatLogEvent()
     local eventBasedParams = {select(12, CombatLogGetCurrentEventInfo())}
 
     if subEvent == "UNIT_DIED" then
-        ScubaSounds:HandleUnitDeath(destFlags, destName, eventBasedParams[1])
+        ScubaSounds:HandleUnitDeath(destFlags, destName, destGUID, eventBasedParams[1])
     elseif subEvent == "SPELL_RESURRECT" then
         ScubaSounds:HandleResurrect(destName, eventBasedParams[1])
     elseif subEvent == "SWING_DAMAGE" then
@@ -437,10 +438,14 @@ function ScubaSounds:HandleCombatLogEvent()
     end
 end
 
-function ScubaSounds:HandleUnitDeath(destFlags, destName, environmentalType)
-    if bit.band(destFlags, COMBATLOG_OBJECT_TYPE_PLAYER) ~= 0 then -- a player
-        local _, className = UnitClass(destName)
+function ScubaSounds:HandleUnitDeath(destFlags, destName, destGUID, environmentalType)
+    local _, className = GetPlayerInfoByGUID(destGUID)
+    if className == "MAGE" then
+        ScubaSounds:PlaySound("Deleted")
+        return
+    end
 
+    if bit.band(destFlags, COMBATLOG_OBJECT_TYPE_PLAYER) ~= 0 then -- a friendly player
         if environmentalType == "Lava" then
             ScubaSounds:PlaySound("Omg")
         elseif ScubaSounds:HasValue(ScubaSounds_JacksonNames, destName) then
@@ -449,8 +454,6 @@ function ScubaSounds:HandleUnitDeath(destFlags, destName, environmentalType)
             ScubaSounds:PlaySound("KyakPenis")
         elseif ScubaSounds:HasValue(ScubaSounds_FahbNames, destName) then
             ScubaSounds:PlaySound("Fahb")
-        elseif className == "MAGE" then
-            ScubaSounds:PlaySound("Deleted")
         end
         -- NPCs
     elseif destName == "Vanndar Stormpike" then
@@ -497,7 +500,7 @@ end
 function ScubaSounds:HandleDamage(sourceGUID, destGUID, amount, critical, overkill)
     -- Stuff involving me
     if destGUID == UnitGUID("player") then -- I took the dmg
-        if amount >= UnitHealthMax("player") * 0.95 then
+        if amount >= UnitHealthMax("player") * 0.95 and overkill > 0 then
             ScubaSounds:PlaySound("NowThatsALottaDmg")
             return
         end
