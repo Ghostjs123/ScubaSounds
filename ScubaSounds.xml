@@ -5,7 +5,7 @@
     
     <Frame name="ScubaSoundsOptionsFrame" movable="true" parent="UIParent" enableMouse="true" hidden="true" mixin="ScubaSounds,BackdropTemplateMixin" inherits="BackdropTemplate">
         <Size>
-            <AbsDimension x="200" y="200" />
+            <AbsDimension x="220" y="200" />
         </Size>
         <Anchors>
             <Anchor point="CENTER" />

@@ -35,115 +35,153 @@ ScubaSounds_SoundInfo = {
         extension = "mp3",
         duration = 2,
         canOverlapSelf = false,
-        timeout = nil
+        timeout = nil,
+        deathSoundFor = nil,
+        alwaysPlays = false
     },
     ["63KCrit"] = {
         extension = "mp3",
         duration = 4,
         canOverlapSelf = false,
-        timeout = nil
+        timeout = nil,
+        deathSoundFor = nil,
+        alwaysPlays = false
     },
     ["Cavern"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = nil
+        timeout = nil,
+        deathSoundFor = "Jackson",
+        alwaysPlays = false
     },
     ["Deleted"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = true,
-        timeout = nil
+        timeout = nil,
+        deathSoundFor = nil, -- not a specific person
+        alwaysPlays = false
     },
     ["Fahb"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = nil
+        timeout = nil,
+        deathSoundFor = "Fahb",
+        alwaysPlays = false
     },
     ["HeLipped"] = {
         extension = "wav",
         duration = 2,
         canOverlapSelf = false,
-        timeout = 6
+        timeout = 6,
+        deathSoundFor = nil,
+        alwaysPlays = false
     },
     ["HelloThere"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = nil
+        timeout = nil,
+        deathSoundFor = nil,
+        alwaysPlays = false
     },
     ["IWasChosen"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = 10
+        timeout = 10,
+        deathSoundFor = nil,
+        alwaysPlays = false
     },
     ["KyakPenis"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = nil
+        timeout = nil,
+        deathSoundFor = "Starrs",
+        alwaysPlays = false
     },
     ["LotrFlee"] = {
         extension = "wav",
         duration = 7,
         canOverlapSelf = false,
-        timeout = 60
+        timeout = 60,
+        deathSoundFor = nil,
+        alwaysPlays = false
     },
     ["MagesCancer"] = {
         extension = "mp3",
         duration = 6,
         canOverlapSelf = false,
-        timeout = nil
+        timeout = nil,
+        deathSoundFor = nil,
+        alwaysPlays = true
     },
     ["MongolianTechno"] = {
         extension = "mp3",
         duration = 22,
         canOverlapSelf = false,
-        timeout = 60
+        timeout = 60,
+        deathSoundFor = nil,
+        alwaysPlays = false
     },
     ["NowThatsALottaDmg"] = {
         extension = "wav",
         duration = 2,
         canOverlapSelf = false,
-        timeout = nil
+        timeout = nil,
+        deathSoundFor = nil,
+        alwaysPlays = false
     },
     ["OhTheBear"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = true,
-        timeout = nil
+        timeout = nil,
+        deathSoundFor = nil,
+        alwaysPlays = false
     },
     ["Omg"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = nil
+        timeout = nil,
+        deathSoundFor = nil,
+        alwaysPlays = false
     },
     ["OnceYouGoShaq"] = {
         extension = "wav",
         duration = 3,
         canOverlapSelf = false,
-        timeout = nil
+        timeout = nil,
+        deathSoundFor = nil,
+        alwaysPlays = false
     },
     ["RecklessnessPoggers"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = 60
+        timeout = 60,
+        deathSoundFor = nil,
+        alwaysPlays = false
     },
     ["ScreamingSheep"] = {
         extension = "mp3",
         duration = 2,
         canOverlapSelf = false,
-        timeout = 300
+        timeout = 300,
+        deathSoundFor = nil,
+        alwaysPlays = false
     },
     ["Warsong"] = {
         extension = "mp3",
         duration = 5,
         canOverlapSelf = false,
-        timeout = nil
+        timeout = nil,
+        deathSoundFor = nil,
+        alwaysPlays = false
     }
 }
 
@@ -174,7 +212,7 @@ ScubaSounds_BigItemIds = { -- quest rewards
 19830, -- Arcanite Dragonling
 18457, -- Robe of the Archmage
 18456, -- Truefaith Vestments
-18458, -- Robe of the Void
+14153, -- Robe of the Void
 -- stuff out in the world
 12363, -- Arcane Crystal
 12361, -- Blue Sapphire
@@ -302,10 +340,12 @@ ScubaSounds_BigItemIds = { -- quest rewards
 }
 
 -- Player names
-ScubaSounds_JacksonNames = {"Grandmasterb", "Gaymasterb", "Combyobeard"}
-ScubaSounds_NigelNames = {"Nigelsworth", "Nigel"}
-ScubaSounds_FahbNames = {"Fahbulous", "Resistofcofc", "Theemus", "Magev", "Resistofc"}
-ScubaSounds_StarrsNames = {"Starrs"}
+ScubaSounds_PlayerNames = {
+    ["Jackson"] = {"Grandmasterb", "Gaymasterb", "Combyobeard"},
+    ["Nigel"] = {"Nigelsworth", "Nigel"},
+    ["Fahb"] = {"Fahbulous", "Resistofcofc", "Theemus", "Magev", "Resistofc"},
+    ["Starrs"] = {"Starrs"}
+}
 
 ScubaSounds_EndBossIds = { -- Instanced
 11502, -- Rag
@@ -341,6 +381,15 @@ ScubaSounds_RecklessnessSpellId = 1719
 ScubaSounds_GeddonAoeSpellId = 19698
 -- Zones
 ScubaSounds_WarsongZoneId = 3277
+ScubaSounds_RaidIds = {
+    [409] = "Molten Core",
+    [469] = "Blackwing Lair",
+    [509] = "Ruins of Ahn'Qiraj",
+    [531] = "Temple of Ahn'Qiraj",
+    [533] = "Naxxramas",
+    [249] = "Onyxia's Lair",
+    [309] = "Zul'Gurub"
+}
 
 -- Addon message stuff
 ScubaSounds_ADDON_PREFIX = "SSAddonPrefix" -- 16 char limit
@@ -348,6 +397,7 @@ C_ChatInfo.RegisterAddonMessagePrefix(ScubaSounds_ADDON_PREFIX)
 ScubaSounds_LegendaryReceivedCommand = "LEGENDARYRECEIVED"
 ScubaSounds_GzNigelCommand = "GZNIGEL"
 ScubaSounds_GzNigelSenders = {"Aloha", "Stavis", "Zarix", "Fahbulous"}
+ScubaSounds_PlayDeathSoundCommand = "PLAYDEATHSOUND"
 
 -- Saved variables
 ScubaSounds_Options = {}
@@ -355,6 +405,8 @@ ScubaSounds_Options = {}
 -- Misc constants
 ScubaSounds_PrintFormat = "|c00f7f26c%s|r"
 ScubaSounds_NumBagSlots = 4
+ScubaSounds_PlayOutsideRaid = "Play outside of raid"
+ScubaSounds_DeathSoundsOutsideRaid = "Death sounds outside raid"
 
 -- State
 ScubaSounds_EndBossSoundPlayed = false
@@ -368,7 +420,7 @@ ScubaSounds_ActiveAuras = {}
 function ScubaSounds_OnEvent(self, event, arg1, arg2, arg3)
     if event == "TRADE_SHOW" then
         ScubaSounds_TradePartnerName = GetUnitName("NPC", true)
-        if ScubaSounds:HasValue(ScubaSounds_NigelNames, ScubaSounds_TradePartnerName) then
+        if ScubaSounds:HasValue(ScubaSounds_PlayerNames["Nigel"], ScubaSounds_TradePartnerName) then
             ScubaSounds_IsTradingWithNigel = true
         else
             ScubaSounds_IsTradingWithNigel = false
@@ -448,11 +500,11 @@ function ScubaSounds:HandleUnitDeath(destFlags, destName, destGUID, environmenta
     if bit.band(destFlags, COMBATLOG_OBJECT_TYPE_PLAYER) ~= 0 then -- a friendly player
         if environmentalType == "Lava" then
             ScubaSounds:PlaySound("Omg")
-        elseif ScubaSounds:HasValue(ScubaSounds_JacksonNames, destName) then
+        elseif ScubaSounds:HasValue(ScubaSounds_PlayerNames["Jackson"], destName) then
             ScubaSounds:PlaySound("Cavern")
-        elseif ScubaSounds:HasValue(ScubaSounds_StarrsNames, destName) then
+        elseif ScubaSounds:HasValue(ScubaSounds_PlayerNames["Starrs"], destName) then
             ScubaSounds:PlaySound("KyakPenis")
-        elseif ScubaSounds:HasValue(ScubaSounds_FahbNames, destName) then
+        elseif ScubaSounds:HasValue(ScubaSounds_PlayerNames["Fahb"], destName) then
             ScubaSounds:PlaySound("Fahb")
         end
         -- NPCs
@@ -583,12 +635,23 @@ end
 
 function ScubaSounds:HandleAddonMessage(prefix, message)
     if prefix == ScubaSounds_ADDON_PREFIX then
-        local command, playerName, itemLink = string.match(message, "(%w+):([^:]+):?(.*)")
+        local command, playerOrSoundName, itemLink = string.match(message, "(%w+):([^:]+):?(.*)")
         if command == ScubaSounds_LegendaryReceivedCommand then
             ScubaSounds:PlaySound("HelloThere")
-            ScubaSounds:SendMessage(playerName .. " received item: " .. itemLink)
+            ScubaSounds:SendMessage(playerOrSoundName .. " received item: " .. itemLink)
         elseif command == ScubaSounds_GzNigelCommand then
-            SendChatMessage("gz nigel", "WHISPER", nil, playerName)
+            SendChatMessage("gz nigel", "WHISPER", nil, playerOrSoundName)
+        elseif command == ScubaSounds_PlayDeathSoundCommand and ScubaSounds_Options[ScubaSounds_DeathSoundsOutsideRaid] then
+            local playerInGroup = false
+            local deathSoundPlayerName = ScubaSounds_SoundInfo[playerOrSoundName].deathSoundFor
+            for _, playerName in ipairs(ScubaSounds_PlayerNames[deathSoundPlayerName]) do
+                if ScubaSounds:IsPlayerInGroup(playerName) then
+                    playerInGroup = true
+                end
+            end
+            if not playerInGroup then
+                ScubaSounds:PlaySound(playerOrSoundName)
+            end
         end
     end
 end
@@ -602,12 +665,26 @@ end
 
 function ScubaSounds:BuildOptionsFrame()
     local parent = getglobal("ScubaSoundsOptionsFrame")
+    -- add all of the checkboxes
     local count = 1
     for sound, _ in pairs(ScubaSounds_SoundInfo) do
         ScubaSounds.OptionsCheckboxes[sound] = ScubaSounds:NewCheckBox(parent, sound, count)
         count = count + 1
     end
     parent:SetHeight(40 + (count - 1) * 23)
+    -- add divider
+    local line = parent:CreateTexture(nil, "ARTWORK")
+    line:SetColorTexture(1, 0.82, 0, 1)
+    line:SetHeight(2)
+    line:SetPoint("LEFT", parent, "LEFT", 10, 0)
+    line:SetPoint("RIGHT", parent, "RIGHT", -10, 0)
+    line:SetPoint("BOTTOM", parent, "BOTTOM", 0, 10 + 23 * 2)
+    -- add extra options
+    local currentHeight = parent:GetHeight()
+    parent:SetHeight(currentHeight + 23 * 2)
+    ScubaSounds:NewCheckBox(parent, ScubaSounds_PlayOutsideRaid, count)
+    ScubaSounds:NewCheckBox(parent, ScubaSounds_DeathSoundsOutsideRaid, count + 1)
+
 end
 
 function ScubaSounds:ShowOptions()
@@ -642,6 +719,14 @@ function ScubaSounds:NewCheckBox(parent, option, num)
 end
 
 function ScubaSounds:ShouldPlay(sound)
+    if ScubaSounds_SoundInfo[sound].alwaysPlays then
+        return true
+    end
+
+    if not ScubaSounds:IsInClassicRaid() and ScubaSounds_Options[ScubaSounds_PlayOutsideRaid] == false then
+        return false
+    end
+
     -- Sound is playing and can overlap
     if ScubaSounds_CurrentlyPlayingSounds[sound] and ScubaSounds_SoundInfo[sound].canOverlapSelf then
         return false
@@ -663,6 +748,15 @@ end
 
 function ScubaSounds:PlaySound(sound)
     if ScubaSounds:ShouldPlay(sound) then
+        if ScubaSounds_SoundInfo[sound].deathSoundFor ~= nil and ScubaSounds:IsInClassicRaid() then
+            local playerName = UnitName("player")
+            if ScubaSounds:HasValue(ScubaSounds_PlayerNames[ScubaSounds_SoundInfo[sound].deathSoundFor], playerName) then
+                -- I'm the player
+                C_ChatInfo.SendAddonMessage(ScubaSounds_ADDON_PREFIX, ScubaSounds_PlayDeathSoundCommand .. ":" .. sound,
+                    "GUILD")
+            end
+        end
+
         -- Play the sound
         PlaySoundFile("Interface/Addons/ScubaSounds/Sounds/" .. sound .. "." .. ScubaSounds_SoundInfo[sound].extension,
             "Master")
@@ -768,4 +862,29 @@ end
 
 function ScubaSounds:ItemIdFromItemLink(itemLink)
     return tonumber(itemLink:match("item:(%d+)"))
+end
+
+function ScubaSounds:IsInClassicRaid()
+    local mapID = C_Map.GetBestMapForUnit("player")
+    return ScubaSounds_RaidIds[mapID] ~= nil
+end
+
+function ScubaSounds:IsPlayerInGroup(playerName)
+    if IsInGroup() then
+        local groupSize = GetNumGroupMembers()
+        local isRaid = IsInRaid()
+
+        -- Loop through party or raid members
+        for i = 1, groupSize do
+            local unit = (isRaid and "raid" .. i) or (i == groupSize and "player" or "party" .. i)
+            local name = GetUnitName(unit, true)
+            if name and name:find("-") then
+                name = name:match("^[^-]+")
+            end
+            if name and name == playerName then
+                return true
+            end
+        end
+    end
+    return false
 end
