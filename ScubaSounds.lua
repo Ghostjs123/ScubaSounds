@@ -28,6 +28,7 @@ ScubaSounds_EventFrame:RegisterEvent("TRADE_SHOW")
 ScubaSounds_EventFrame:RegisterEvent("TRADE_ACCEPT_UPDATE")
 ScubaSounds_EventFrame:RegisterEvent("TRADE_CLOSED")
 ScubaSounds_EventFrame:RegisterEvent("PLAYER_LOGIN")
+ScubaSounds_EventFrame:RegisterEvent("GUILD_ROSTER_UPDATE")
 ScubaSounds_EventFrame:SetScript("OnEvent", ScubaSounds_OnEvent)
 
 ScubaSounds_SoundInfo = {
@@ -47,12 +48,20 @@ ScubaSounds_SoundInfo = {
         deathSoundFor = nil,
         alwaysPlays = false
     },
+    ["BonVoyagePussy"] = {
+        extension = "wav",
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = nil,
+        deathSoundFor = nil,
+        alwaysPlays = false
+    },
     ["Cavern"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
         timeout = nil,
-        deathSoundFor = "Jackson",
+        deathSoundFor = nil, -- not Jackson anymore :(
         alwaysPlays = false
     },
     ["Deleted"] = {
@@ -61,6 +70,14 @@ ScubaSounds_SoundInfo = {
         canOverlapSelf = true,
         timeout = nil,
         deathSoundFor = nil, -- not a specific person
+        alwaysPlays = false
+    },
+    ["Downer"] = {
+        extension = "wav",
+        duration = 3,
+        canOverlapSelf = false,
+        timeout = nil,
+        deathSoundFor = nil,
         alwaysPlays = false
     },
     ["Fahb"] = {
@@ -130,6 +147,14 @@ ScubaSounds_SoundInfo = {
     ["NowThatsALottaDmg"] = {
         extension = "wav",
         duration = 2,
+        canOverlapSelf = false,
+        timeout = nil,
+        deathSoundFor = nil,
+        alwaysPlays = false
+    },
+    ["OhBabyATriple"] = {
+        extension = "mp3",
+        duration = 4,
         canOverlapSelf = false,
         timeout = nil,
         deathSoundFor = nil,
@@ -217,6 +242,7 @@ ScubaSounds_BigItemIds = { -- quest rewards
 12363, -- Arcane Crystal
 12361, -- Blue Sapphire
 13468, -- Black Lotus
+7080, -- Essence of Water
 19024, -- Arena Grand Master
 23007, -- Piglet's Collar
 23015, -- Rat Cage
@@ -378,9 +404,10 @@ ScubaSounds_LivingBombDebuffId = 20475
 -- Spells
 ScubaSounds_AnkhSpellId = 20608
 ScubaSounds_RecklessnessSpellId = 1719
-ScubaSounds_GeddonAoeSpellId = 19698
+ScubaSounds_GeddonAoeSpellId = 19695
 -- Zones
 ScubaSounds_WarsongZoneId = 3277
+ScubaSounds_OnyxiasLairId = 2159
 ScubaSounds_RaidIds = {
     [409] = "Molten Core",
     [469] = "Blackwing Lair",
@@ -416,8 +443,17 @@ ScubaSounds_IsFirstLogin = true
 ScubaSounds_CurrentlyPlayingSounds = {}
 ScubaSounds_SoundsOnTimeout = {}
 ScubaSounds_ActiveAuras = {}
+ScubaSounds_HelloTheresInTheLastMinute = 0
+ScubaSounds_PreviousGuildMemberCount = nil
+
+-- Setup timers
+C_Timer.After(5, function()
+    ScubaSounds_PreviousGuildMemberCount = GetNumGuildMembers()
+    print('ScubaSounds_PreviousGuildMemberCount', ScubaSounds_PreviousGuildMemberCount)
+end)
 
 function ScubaSounds_OnEvent(self, event, arg1, arg2, arg3)
+    -- Trading stuff
     if event == "TRADE_SHOW" then
         ScubaSounds_TradePartnerName = GetUnitName("NPC", true)
         if ScubaSounds:HasValue(ScubaSounds_PlayerNames["Nigel"], ScubaSounds_TradePartnerName) then
@@ -440,7 +476,7 @@ function ScubaSounds_OnEvent(self, event, arg1, arg2, arg3)
         ScubaSounds_IsTradingWithNigel = false
         ScubaSounds_TradePartnerName = nil
     end
-
+    -- The rest
     if event == "ADDON_LOADED" and arg1 == "ScubaSounds" then
         ScubaSounds:BuildOptionsFrame()
     elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
@@ -459,6 +495,8 @@ function ScubaSounds_OnEvent(self, event, arg1, arg2, arg3)
         ScubaSounds:HandleAddonMessage(arg1, arg2)
     elseif event == "PLAYER_ENTERING_WORLD" then
         ScubaSounds:HandleEnteringWorld(arg1, arg2)
+    elseif event == "GUILD_ROSTER_UPDATE" then
+        ScubaSounds:HandleGuildRosterUpdate(arg1)
     end
 end
 
@@ -611,6 +649,8 @@ function ScubaSounds:HandleZoneChange()
     local currentZoneId = C_Map.GetBestMapForUnit("player")
     if currentZoneId == ScubaSounds_WarsongZoneId then
         ScubaSounds:PlaySound("Warsong")
+    elseif currentZoneId == ScubaSounds_OnyxiasLairId then
+        ScubaSounds:PlaySound("Cavern")
     end
 end
 
@@ -628,8 +668,10 @@ function ScubaSounds:HandleLoot(lootMessage)
                 C_ChatInfo.SendAddonMessage(ScubaSounds_ADDON_PREFIX, ScubaSounds_LegendaryReceivedCommand .. ":" ..
                     playerName .. ":" .. itemLink, "GUILD")
             end
+            if ScubaSounds:HasValue(ScubaSounds_WompWimpItemIds, itemId) then
+                ScubaSounds:PlaySound("Downer")
+            end
         end
-
     end
 end
 
@@ -637,7 +679,16 @@ function ScubaSounds:HandleAddonMessage(prefix, message)
     if prefix == ScubaSounds_ADDON_PREFIX then
         local command, playerOrSoundName, itemLink = string.match(message, "(%w+):([^:]+):?(.*)")
         if command == ScubaSounds_LegendaryReceivedCommand then
-            ScubaSounds:PlaySound("HelloThere")
+            ScubaSounds_HelloTheresInTheLastMinute = ScubaSounds_HelloTheresInTheLastMinute + 1
+            if ScubaSounds_HelloTheresInTheLastMinute == 3 then
+                ScubaSounds_HelloTheresInTheLastMinute = 0
+                ScubaSounds:PlaySound("OhBabyATriple")
+            else
+                C_Timer.After(60, function()
+                    ScubaSounds_HelloTheresInTheLastMinute = ScubaSounds_HelloTheresInTheLastMinute - 1
+                end)
+                ScubaSounds:PlaySound("HelloThere")
+            end
             ScubaSounds:SendMessage(playerOrSoundName .. " received item: " .. itemLink)
         elseif command == ScubaSounds_GzNigelCommand then
             SendChatMessage("gz nigel", "WHISPER", nil, playerOrSoundName)
@@ -684,7 +735,19 @@ function ScubaSounds:BuildOptionsFrame()
     parent:SetHeight(currentHeight + 23 * 2)
     ScubaSounds:NewCheckBox(parent, ScubaSounds_PlayOutsideRaid, count)
     ScubaSounds:NewCheckBox(parent, ScubaSounds_DeathSoundsOutsideRaid, count + 1)
+end
 
+function ScubaSounds:HandleGuildRosterUpdate(canRequestRosterUpdate)
+    if canRequestRosterUpdate == false and ScubaSounds_PreviousGuildMemberCount ~= nil then
+        local currentGuildMemberCount = GetNumGuildMembers()
+
+        if currentGuildMemberCount < ScubaSounds_PreviousGuildMemberCount then
+            -- welcome
+            ScubaSounds:PlaySound("BonVoyagePussy")
+        end
+
+        ScubaSounds_PreviousGuildMemberCount = currentGuildMemberCount
+    end
 end
 
 function ScubaSounds:ShowOptions()
@@ -719,6 +782,12 @@ function ScubaSounds:NewCheckBox(parent, option, num)
 end
 
 function ScubaSounds:ShouldPlay(sound)
+    -- Sound is disabled in /ss options
+    if ScubaSounds_Options[sound] == false then
+        -- NOTE: ScubaSounds_Options[sound] == nil if fresh saved vars
+        return false
+    end
+
     if ScubaSounds_SoundInfo[sound].alwaysPlays then
         return true
     end
@@ -734,12 +803,6 @@ function ScubaSounds:ShouldPlay(sound)
 
     -- On timeout
     if ScubaSounds_SoundsOnTimeout[sound] then
-        return false
-    end
-
-    -- Sound is disabled in /ss options
-    if ScubaSounds_Options[sound] == false then
-        -- NOTE: ScubaSounds_Options[sound] == nil if fresh saved vars
         return false
     end
 
