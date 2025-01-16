@@ -365,6 +365,23 @@ ScubaSounds_BigItemIds = { -- quest rewards
 21176 -- Black Qiraji Resonating Crystal
 }
 
+ScubaSounds_WompWompItemIds = { -- mining stuff
+12364, -- Huge Emerald
+12800, -- Azerothian Diamond
+12799, -- Large Opal
+-- bad world drop epics
+1981, -- Icemail Jerkin
+867, -- Gloves of Holy Might
+1315, -- Lei of Lilies
+1447, -- Ring of Saviors
+1204, -- The Green Tower
+1169, -- Blackskull Shield
+1982, -- Nightblade
+2915, -- Taran Icebreaker
+869, -- Dazzling Longsword
+868, -- Ardent Custodian
+}
+
 -- Player names
 ScubaSounds_PlayerNames = {
     ["Jackson"] = {"Grandmasterb", "Gaymasterb", "Combyobeard"},
@@ -668,7 +685,7 @@ function ScubaSounds:HandleLoot(lootMessage)
                 C_ChatInfo.SendAddonMessage(ScubaSounds_ADDON_PREFIX, ScubaSounds_LegendaryReceivedCommand .. ":" ..
                     playerName .. ":" .. itemLink, "GUILD")
             end
-            if ScubaSounds:HasValue(ScubaSounds_WompWimpItemIds, itemId) then
+            if ScubaSounds:HasValue(ScubaSounds_WompWompItemIds, itemId) then
                 ScubaSounds:PlaySound("Downer")
             end
         end
