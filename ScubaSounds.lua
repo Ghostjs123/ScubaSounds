@@ -56,6 +56,14 @@ ScubaSounds_SoundInfo = {
         deathSoundFor = nil,
         alwaysPlays = false
     },
+    ["BreakingNews"] = {
+        extension = "wav",
+        duration = 5,
+        canOverlapSelf = false,
+        timeout = nil,
+        deathSoundFor = "Kaymon",
+        alwaysPlays = false
+    },
     ["Cavern"] = {
         extension = "wav",
         duration = 1,
@@ -68,7 +76,7 @@ ScubaSounds_SoundInfo = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = true,
-        timeout = nil,
+        timeout = 1,
         deathSoundFor = nil, -- not a specific person
         alwaysPlays = false
     },
@@ -200,6 +208,14 @@ ScubaSounds_SoundInfo = {
         deathSoundFor = nil,
         alwaysPlays = false
     },
+    ["VitoliSuxDix"] = {
+        extension = "wav",
+        duration = 2,
+        canOverlapSelf = false,
+        timeout = nil,
+        deathSoundFor = "Vitoli",
+        alwaysPlays = false
+    },
     ["Warsong"] = {
         extension = "mp3",
         duration = 5,
@@ -214,6 +230,7 @@ ScubaSounds_BigItemIds = { -- quest rewards
 18608, -- Benediction
 18713, -- Rhok'delar
 18707, -- Ancient Rune Etched Stave
+18714, -- Ancient Sinew Wrapped Lamina
 18348, -- Quel'Serrar
 21205, -- Signet Ring of the Bronze Dragonflight (agi)
 21210, -- Signet Ring of the Bronze Dragonflight (stam/int)
@@ -387,7 +404,9 @@ ScubaSounds_PlayerNames = {
     ["Jackson"] = {"Grandmasterb", "Gaymasterb", "Combyobeard"},
     ["Nigel"] = {"Nigelsworth", "Nigel"},
     ["Fahb"] = {"Fahbulous", "Resistofcofc", "Theemus", "Magev", "Resistofc"},
-    ["Starrs"] = {"Starrs"}
+    ["Starrs"] = {"Starrs"},
+    ["Kaymon"] = {"Kaymon"},
+    ["Vitoli"] = {"Vitoli", "Uglyvit"}
 }
 
 ScubaSounds_EndBossIds = { -- Instanced
@@ -397,6 +416,7 @@ ScubaSounds_EndBossIds = { -- Instanced
 14834, -- Hakkar
 15727, -- C'Thun
 15990, -- KT
+11948, -- Vanndar Stormpike
 -- Wboss
 12397, -- Kazzak
 6109, -- Azuregos
@@ -466,7 +486,6 @@ ScubaSounds_PreviousGuildMemberCount = nil
 -- Setup timers
 C_Timer.After(5, function()
     ScubaSounds_PreviousGuildMemberCount = GetNumGuildMembers()
-    print('ScubaSounds_PreviousGuildMemberCount', ScubaSounds_PreviousGuildMemberCount)
 end)
 
 function ScubaSounds_OnEvent(self, event, arg1, arg2, arg3)
@@ -561,10 +580,11 @@ function ScubaSounds:HandleUnitDeath(destFlags, destName, destGUID, environmenta
             ScubaSounds:PlaySound("KyakPenis")
         elseif ScubaSounds:HasValue(ScubaSounds_PlayerNames["Fahb"], destName) then
             ScubaSounds:PlaySound("Fahb")
+        elseif ScubaSounds:HasValue(ScubaSounds_PlayerNames["Kaymon"], destName) then
+            ScubaSounds:PlaySound("BreakingNews")
+        elseif ScubaSounds:HasValue(ScubaSounds_PlayerNames["Vitoli"], destName) then
+            ScubaSounds:PlaySound("VitoliSuxDix")
         end
-        -- NPCs
-    elseif destName == "Vanndar Stormpike" then
-        ScubaSounds:PlaySound("MongolianTechno")
     end
 end
 
