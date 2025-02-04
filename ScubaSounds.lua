@@ -132,7 +132,7 @@ ScubaSounds_SoundInfo = {
         extension = "wav",
         duration = 7,
         canOverlapSelf = false,
-        timeout = 60,
+        timeout = 120,
         deathSoundFor = nil,
         alwaysPlays = false
     },
@@ -341,6 +341,7 @@ ScubaSounds_BigItemIds = { -- quest rewards
 20636, -- Hibernation Crystal
 20578, -- Emerald Dragonfang
 -- dungeon items
+12811, -- Righteous Orb
 12940, -- Dal'Rend's Sacred Charge
 11815, -- Hand of Justice
 13143, -- Mark of the Dragon Lord
@@ -444,7 +445,7 @@ ScubaSounds_RecklessnessSpellId = 1719
 ScubaSounds_GeddonAoeSpellId = 19695
 -- Zones
 ScubaSounds_WarsongZoneId = 3277
-ScubaSounds_OnyxiasLairId = 2159
+ScubaSounds_OnyxiasLairId = 249
 ScubaSounds_RaidIds = {
     [409] = "Molten Core",
     [469] = "Blackwing Lair",
@@ -586,6 +587,25 @@ function ScubaSounds:HandleUnitDeath(destFlags, destName, destGUID, environmenta
             ScubaSounds:PlaySound("VitoliSuxDix")
         end
     end
+
+    if ScubaSounds:IsInClassicRaid() then
+        local numRaidMembers = GetNumGroupMembers()
+        if numRaidMembers >= 16 then -- < 20 for split onys
+            local numDead = true
+
+            for i = 1, numRaidMembers do
+                local raidUnit = "raid" .. i
+                if UnitExists(raidUnit) and not UnitIsDeadOrGhost(raidUnit) then
+                    numDead = numDead + 1
+                end
+            end
+
+            -- Play sound if all members are dead
+            if numDead <= numRaidMembers / 2 then
+                ScubaSounds:PlaySound("LotrFlee")
+            end
+        end
+    end
 end
 
 function ScubaSounds:HandlePlayerAura()
@@ -660,7 +680,7 @@ function ScubaSounds:HandleUnitHealth(unit)
             elseif healthPercent > 10 then
                 ScubaSounds_EndBossSoundPlayed = false
             end
-        elseif IsInRaid() then
+        elseif ScubaSounds:IsInClassicRaid() then
             local numRaidMembers = GetNumGroupMembers()
             if numRaidMembers >= 16 then -- < 20 for split onys
                 local allDead = true
