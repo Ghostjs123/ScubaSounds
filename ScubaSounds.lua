@@ -37,7 +37,6 @@ ScubaSounds_SoundInfo = {
         duration = 2,
         canOverlapSelf = false,
         timeout = nil,
-        deathSoundFor = nil,
         alwaysPlays = false
     },
     ["63KCrit"] = {
@@ -45,7 +44,6 @@ ScubaSounds_SoundInfo = {
         duration = 4,
         canOverlapSelf = false,
         timeout = nil,
-        deathSoundFor = nil,
         alwaysPlays = false
     },
     ["BonVoyagePussy"] = {
@@ -53,7 +51,6 @@ ScubaSounds_SoundInfo = {
         duration = 1,
         canOverlapSelf = false,
         timeout = nil,
-        deathSoundFor = nil,
         alwaysPlays = false
     },
     ["BreakingNews"] = {
@@ -61,7 +58,6 @@ ScubaSounds_SoundInfo = {
         duration = 5,
         canOverlapSelf = false,
         timeout = nil,
-        deathSoundFor = "Kaymon",
         alwaysPlays = false
     },
     ["Cavern"] = {
@@ -69,7 +65,6 @@ ScubaSounds_SoundInfo = {
         duration = 1,
         canOverlapSelf = false,
         timeout = nil,
-        deathSoundFor = nil, -- not Jackson anymore :(
         alwaysPlays = false
     },
     ["Deleted"] = {
@@ -77,7 +72,6 @@ ScubaSounds_SoundInfo = {
         duration = 1,
         canOverlapSelf = true,
         timeout = 1,
-        deathSoundFor = nil, -- not a specific person
         alwaysPlays = false
     },
     ["Downer"] = {
@@ -85,7 +79,13 @@ ScubaSounds_SoundInfo = {
         duration = 3,
         canOverlapSelf = false,
         timeout = nil,
-        deathSoundFor = nil,
+        alwaysPlays = false
+    },
+    ["DoYouSeeMyMana"] = {
+        extension = "wav",
+        duration = 2,
+        canOverlapSelf = false,
+        timeout = 120,
         alwaysPlays = false
     },
     ["Fahb"] = {
@@ -93,7 +93,6 @@ ScubaSounds_SoundInfo = {
         duration = 1,
         canOverlapSelf = false,
         timeout = nil,
-        deathSoundFor = "Fahb",
         alwaysPlays = false
     },
     ["HeLipped"] = {
@@ -101,7 +100,6 @@ ScubaSounds_SoundInfo = {
         duration = 2,
         canOverlapSelf = false,
         timeout = 6,
-        deathSoundFor = nil,
         alwaysPlays = false
     },
     ["HelloThere"] = {
@@ -109,7 +107,13 @@ ScubaSounds_SoundInfo = {
         duration = 1,
         canOverlapSelf = false,
         timeout = nil,
-        deathSoundFor = nil,
+        alwaysPlays = false
+    },
+    ["ImRetarded"] = {
+        extension = "wav",
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = nil,
         alwaysPlays = false
     },
     ["IWasChosen"] = {
@@ -117,7 +121,6 @@ ScubaSounds_SoundInfo = {
         duration = 1,
         canOverlapSelf = false,
         timeout = 10,
-        deathSoundFor = nil,
         alwaysPlays = false
     },
     ["KyakPenis"] = {
@@ -125,7 +128,6 @@ ScubaSounds_SoundInfo = {
         duration = 1,
         canOverlapSelf = false,
         timeout = nil,
-        deathSoundFor = "Starrs",
         alwaysPlays = false
     },
     ["LotrFlee"] = {
@@ -133,7 +135,6 @@ ScubaSounds_SoundInfo = {
         duration = 7,
         canOverlapSelf = false,
         timeout = 120,
-        deathSoundFor = nil,
         alwaysPlays = false
     },
     ["MagesCancer"] = {
@@ -141,7 +142,6 @@ ScubaSounds_SoundInfo = {
         duration = 6,
         canOverlapSelf = false,
         timeout = nil,
-        deathSoundFor = nil,
         alwaysPlays = true
     },
     ["MongolianTechno"] = {
@@ -149,7 +149,13 @@ ScubaSounds_SoundInfo = {
         duration = 22,
         canOverlapSelf = false,
         timeout = 60,
-        deathSoundFor = nil,
+        alwaysPlays = false
+    },
+    ["NorthScream"] = {
+        extension = "wav",
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = nil,
         alwaysPlays = false
     },
     ["NowThatsALottaDmg"] = {
@@ -157,7 +163,6 @@ ScubaSounds_SoundInfo = {
         duration = 2,
         canOverlapSelf = false,
         timeout = nil,
-        deathSoundFor = nil,
         alwaysPlays = false
     },
     ["OhBabyATriple"] = {
@@ -165,7 +170,6 @@ ScubaSounds_SoundInfo = {
         duration = 4,
         canOverlapSelf = false,
         timeout = nil,
-        deathSoundFor = nil,
         alwaysPlays = false
     },
     ["OhTheBear"] = {
@@ -173,7 +177,6 @@ ScubaSounds_SoundInfo = {
         duration = 1,
         canOverlapSelf = true,
         timeout = nil,
-        deathSoundFor = nil,
         alwaysPlays = false
     },
     ["Omg"] = {
@@ -181,7 +184,6 @@ ScubaSounds_SoundInfo = {
         duration = 1,
         canOverlapSelf = false,
         timeout = nil,
-        deathSoundFor = nil,
         alwaysPlays = false
     },
     ["OnceYouGoShaq"] = {
@@ -189,7 +191,6 @@ ScubaSounds_SoundInfo = {
         duration = 3,
         canOverlapSelf = false,
         timeout = nil,
-        deathSoundFor = nil,
         alwaysPlays = false
     },
     ["RecklessnessPoggers"] = {
@@ -197,7 +198,6 @@ ScubaSounds_SoundInfo = {
         duration = 1,
         canOverlapSelf = false,
         timeout = 60,
-        deathSoundFor = nil,
         alwaysPlays = false
     },
     ["ScreamingSheep"] = {
@@ -205,7 +205,13 @@ ScubaSounds_SoundInfo = {
         duration = 2,
         canOverlapSelf = false,
         timeout = 300,
-        deathSoundFor = nil,
+        alwaysPlays = false
+    },
+    ["SevvyLove"] = {
+        extension = "wav",
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = nil,
         alwaysPlays = false
     },
     ["VitoliSuxDix"] = {
@@ -213,7 +219,6 @@ ScubaSounds_SoundInfo = {
         duration = 2,
         canOverlapSelf = false,
         timeout = nil,
-        deathSoundFor = "Vitoli",
         alwaysPlays = false
     },
     ["Warsong"] = {
@@ -221,9 +226,42 @@ ScubaSounds_SoundInfo = {
         duration = 5,
         canOverlapSelf = false,
         timeout = nil,
-        deathSoundFor = nil,
         alwaysPlays = false
     }
+}
+
+local Jackson = "Jackson"
+local Nigel = "Nigel"
+local Fahb = "Fahb"
+local Starrs = "Starrs"
+local Kaymon = "Kaymon"
+local Vitoli = "Vitoli"
+local Sevvy = "Sevvy"
+local Sleeby = "Sleeby"
+local Sweatyhong = "Sweatyhong"
+local Uncletouches = "Uncletouches"
+local Arenthis = "Arenthis"
+ScubaSounds_PlayerNames = {
+    [Jackson] = {"Grandmasterb", "Gaymasterb", "Combyobeard"},
+    [Nigel] = {"Nigelsworth", "Nigel"},
+    [Fahb] = {"Fahbulous", "Resistofcofc", "Theemus", "Magev", "Resistofc"},
+    [Starrs] = {"Starrs"},
+    [Kaymon] = {"Kaymon"},
+    [Vitoli] = {"Vitoli", "Uglyvit"},
+    [Sevvy] = {"Sevvy"},
+    [Sleeby] = {"Sleeby"}
+}
+
+ScubaSounds_DeathSoundMap = {
+    [Kaymon] = "BreakingNews",
+    [Fahb] = "Fahb",
+    [Sweatyhong] = "ImRetarded",
+    [Uncletouches] = "ImRetarded",
+    [Arenthis] = "ImRetarded",
+    [Starrs] = "KyakPenis",
+    [Sleeby] = "NorthScream",
+    [Sevvy] = "SevvyLove",
+    [Vitoli] = "VitoliSuxDix"
 }
 
 ScubaSounds_BigItemIds = { -- quest rewards
@@ -397,17 +435,7 @@ ScubaSounds_WompWompItemIds = { -- mining stuff
 1982, -- Nightblade
 2915, -- Taran Icebreaker
 869, -- Dazzling Longsword
-868, -- Ardent Custodian
-}
-
--- Player names
-ScubaSounds_PlayerNames = {
-    ["Jackson"] = {"Grandmasterb", "Gaymasterb", "Combyobeard"},
-    ["Nigel"] = {"Nigelsworth", "Nigel"},
-    ["Fahb"] = {"Fahbulous", "Resistofcofc", "Theemus", "Magev", "Resistofc"},
-    ["Starrs"] = {"Starrs"},
-    ["Kaymon"] = {"Kaymon"},
-    ["Vitoli"] = {"Vitoli", "Uglyvit"}
+868 -- Ardent Custodian
 }
 
 ScubaSounds_EndBossIds = { -- Instanced
@@ -566,6 +594,36 @@ function ScubaSounds:HandleCombatLogEvent()
 end
 
 function ScubaSounds:HandleUnitDeath(destFlags, destName, destGUID, environmentalType)
+    -- Sounds for >1 people. Do not return
+    if ScubaSounds:IsInClassicRaid() then
+        local numRaidMembers = GetNumGroupMembers()
+        if numRaidMembers >= 16 then -- < 20 for split onys
+            local numDead = true
+            local onlyMagesAlive = true
+
+            for i = 1, 40 do
+                local raidUnit = "raid" .. i
+                if UnitExists(raidUnit) then
+                    if UnitIsDeadOrGhost(raidUnit) then
+                        numDead = numDead + 1
+                    elseif select(2, UnitClass("player")) ~= "MAGE" then
+                        onlyMagesAlive = false
+                    end
+                end
+            end
+
+            -- Play sound if all members are dead
+            if numDead <= numRaidMembers / 2 then
+                ScubaSounds:PlaySound("LotrFlee")
+            end
+
+            if onlyMagesAlive then
+                ScubaSounds:PlaySound("DoYouSeeMyMana")
+            end
+        end
+    end
+
+    -- Sounds for the individual
     local _, className = GetPlayerInfoByGUID(destGUID)
     if className == "MAGE" then
         ScubaSounds:PlaySound("Deleted")
@@ -575,35 +633,13 @@ function ScubaSounds:HandleUnitDeath(destFlags, destName, destGUID, environmenta
     if bit.band(destFlags, COMBATLOG_OBJECT_TYPE_PLAYER) ~= 0 then -- a friendly player
         if environmentalType == "Lava" then
             ScubaSounds:PlaySound("Omg")
-        elseif ScubaSounds:HasValue(ScubaSounds_PlayerNames["Jackson"], destName) then
-            ScubaSounds:PlaySound("Cavern")
-        elseif ScubaSounds:HasValue(ScubaSounds_PlayerNames["Starrs"], destName) then
-            ScubaSounds:PlaySound("KyakPenis")
-        elseif ScubaSounds:HasValue(ScubaSounds_PlayerNames["Fahb"], destName) then
-            ScubaSounds:PlaySound("Fahb")
-        elseif ScubaSounds:HasValue(ScubaSounds_PlayerNames["Kaymon"], destName) then
-            ScubaSounds:PlaySound("BreakingNews")
-        elseif ScubaSounds:HasValue(ScubaSounds_PlayerNames["Vitoli"], destName) then
-            ScubaSounds:PlaySound("VitoliSuxDix")
         end
     end
 
-    if ScubaSounds:IsInClassicRaid() then
-        local numRaidMembers = GetNumGroupMembers()
-        if numRaidMembers >= 16 then -- < 20 for split onys
-            local numDead = true
-
-            for i = 1, numRaidMembers do
-                local raidUnit = "raid" .. i
-                if UnitExists(raidUnit) and not UnitIsDeadOrGhost(raidUnit) then
-                    numDead = numDead + 1
-                end
-            end
-
-            -- Play sound if all members are dead
-            if numDead <= numRaidMembers / 2 then
-                ScubaSounds:PlaySound("LotrFlee")
-            end
+    local trueName = ScubaSounds:GetTruePlayerName(destName)
+    if trueName ~= nil then
+        if ScubaSounds_DeathSoundMap[trueName] ~= nil then
+            ScubaSounds:PlaySound(ScubaSounds_DeathSoundMap[trueName])
         end
     end
 end
@@ -659,8 +695,8 @@ function ScubaSounds:HandleDamage(sourceGUID, destGUID, amount, critical, overki
     end
 
     -- Stuff involving everyone
-    local _, _, _, _, _, sourceUnitId = strsplit("-", sourceGUID);
-    sourceUnitId = tonumber(sourceUnitId);
+    local _, _, _, _, _, sourceUnitId = strsplit("-", sourceGUID)
+    sourceUnitId = tonumber(sourceUnitId)
 
     if ScubaSounds:HasValue(ScubaSounds_CoreHoundUnitIds, sourceUnitId) and overkill > 0 then
         ScubaSounds:PlaySound("OhTheBear")
@@ -685,7 +721,7 @@ function ScubaSounds:HandleUnitHealth(unit)
             if numRaidMembers >= 16 then -- < 20 for split onys
                 local allDead = true
 
-                for i = 1, numRaidMembers do
+                for i = 1, 40 do
                     local raidUnit = "raid" .. i
                     if UnitExists(raidUnit) and not UnitIsDeadOrGhost(raidUnit) then
                         allDead = false
@@ -734,7 +770,7 @@ end
 
 function ScubaSounds:HandleAddonMessage(prefix, message)
     if prefix == ScubaSounds_ADDON_PREFIX then
-        local command, playerOrSoundName, itemLink = string.match(message, "(%w+):([^:]+):?(.*)")
+        local command, playerName, itemLink = string.match(message, "(%w+):([^:]+):?(.*)")
         if command == ScubaSounds_LegendaryReceivedCommand then
             ScubaSounds_HelloTheresInTheLastMinute = ScubaSounds_HelloTheresInTheLastMinute + 1
             if ScubaSounds_HelloTheresInTheLastMinute == 3 then
@@ -746,19 +782,12 @@ function ScubaSounds:HandleAddonMessage(prefix, message)
                 end)
                 ScubaSounds:PlaySound("HelloThere")
             end
-            ScubaSounds:SendMessage(playerOrSoundName .. " received item: " .. itemLink)
+            ScubaSounds:SendMessage(playerName .. " received item: " .. itemLink)
         elseif command == ScubaSounds_GzNigelCommand then
-            SendChatMessage("gz nigel", "WHISPER", nil, playerOrSoundName)
+            SendChatMessage("gz nigel", "WHISPER", nil, playerName)
         elseif command == ScubaSounds_PlayDeathSoundCommand and ScubaSounds_Options[ScubaSounds_DeathSoundsOutsideRaid] then
-            local playerInGroup = false
-            local deathSoundPlayerName = ScubaSounds_SoundInfo[playerOrSoundName].deathSoundFor
-            for _, playerName in ipairs(ScubaSounds_PlayerNames[deathSoundPlayerName]) do
-                if ScubaSounds:IsPlayerInGroup(playerName) then
-                    playerInGroup = true
-                end
-            end
-            if not playerInGroup then
-                ScubaSounds:PlaySound(playerOrSoundName)
+            if not ScubaSounds:IsPlayerInGroup(playerName) then
+                ScubaSounds:PlaySound(playerName)
             end
         end
     end
@@ -868,12 +897,12 @@ end
 
 function ScubaSounds:PlaySound(sound)
     if ScubaSounds:ShouldPlay(sound) then
-        if ScubaSounds_SoundInfo[sound].deathSoundFor ~= nil and ScubaSounds:IsInClassicRaid() then
-            local playerName = UnitName("player")
-            if ScubaSounds:HasValue(ScubaSounds_PlayerNames[ScubaSounds_SoundInfo[sound].deathSoundFor], playerName) then
-                -- I'm the player
-                C_ChatInfo.SendAddonMessage(ScubaSounds_ADDON_PREFIX, ScubaSounds_PlayDeathSoundCommand .. ":" .. sound,
-                    "GUILD")
+        local playerName = UnitName("player")
+        local trueName = ScubaSounds:GetTruePlayerName(playerName)
+        if trueName ~= nil then
+            if ScubaSounds_DeathSoundMap[playerName] ~= nil and ScubaSounds:IsInClassicRaid() then
+                C_ChatInfo.SendAddonMessage(ScubaSounds_ADDON_PREFIX,
+                    ScubaSounds_PlayDeathSoundCommand .. ":" .. playerName, "GUILD")
             end
         end
 
@@ -1007,4 +1036,14 @@ function ScubaSounds:IsPlayerInGroup(playerName)
         end
     end
     return false
+end
+
+function ScubaSounds:GetTruePlayerName(playerName)
+    -- This could be made to be O(1) with a reverse map but idc
+    for trueName, otherNames in pairs(ScubaSounds_PlayerNames) do
+        if ScubaSounds:HasValue(otherNames, playerName) then
+            return trueName
+        end
+    end
+    return nil
 end
