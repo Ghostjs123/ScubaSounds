@@ -380,6 +380,9 @@ ScubaSounds_BigItemIds = { -- quest rewards
 20578, -- Emerald Dragonfang
 -- dungeon items
 12811, -- Righteous Orb
+4484, -- Libram of Voracity
+11733, -- Libram of Constitution
+18333, -- Libram of Focus
 12940, -- Dal'Rend's Sacred Charge
 11815, -- Hand of Justice
 13143, -- Mark of the Dragon Lord
@@ -582,7 +585,7 @@ function ScubaSounds:HandleCombatLogEvent()
         ScubaSounds:HandleDamage(sourceGUID, destGUID, eventBasedParams[4], eventBasedParams[10], eventBasedParams[5])
     elseif subEvent == "ENVIRONMENTAL_DAMAGE" then
         ScubaSounds:HandleDamage(sourceGUID, destGUID, eventBasedParams[2], 0, false, -1)
-    elseif eventBasedParams[1] == ScubaSounds_GeddonAoeSpellId and destGUID == UnitGUID("player") then
+    elseif subEvent == "SPELL_CAST_SUCCESS" and eventBasedParams[1] == ScubaSounds_GeddonAoeSpellId then
         ScubaSounds:PlaySound("LotrFlee")
     elseif subEvent == "SPELL_CAST_SUCCESS" and eventBasedParams[1] == ScubaSounds_RecklessnessSpellId then
         if sourceFlags and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_RAID) ~= 0 then
@@ -787,7 +790,7 @@ function ScubaSounds:HandleAddonMessage(prefix, message)
             SendChatMessage("gz nigel", "WHISPER", nil, playerName)
         elseif command == ScubaSounds_PlayDeathSoundCommand and ScubaSounds_Options[ScubaSounds_DeathSoundsOutsideRaid] then
             if not ScubaSounds:IsPlayerInGroup(playerName) then
-                ScubaSounds:PlaySound(playerName)
+                ScubaSounds:PlaySound(ScubaSounds_DeathSoundMap[playerName])
             end
         end
     end
@@ -902,7 +905,7 @@ function ScubaSounds:PlaySound(sound)
         if trueName ~= nil then
             if ScubaSounds_DeathSoundMap[playerName] ~= nil and ScubaSounds:IsInClassicRaid() then
                 C_ChatInfo.SendAddonMessage(ScubaSounds_ADDON_PREFIX,
-                    ScubaSounds_PlayDeathSoundCommand .. ":" .. playerName, "GUILD")
+                    ScubaSounds_PlayDeathSoundCommand .. ":" .. trueName, "GUILD")
             end
         end
 
