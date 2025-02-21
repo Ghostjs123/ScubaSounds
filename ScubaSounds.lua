@@ -200,6 +200,13 @@ ScubaSounds_SoundInfo = {
         timeout = 60,
         alwaysPlays = false
     },
+    ["Ryan"] = {
+        extension = "wav",
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = nil,
+        alwaysPlays = false
+    },
     ["ScreamingSheep"] = {
         extension = "mp3",
         duration = 2,
@@ -241,6 +248,8 @@ local Sleeby = "Sleeby"
 local Sweatyhong = "Sweatyhong"
 local Uncletouches = "Uncletouches"
 local Arenthis = "Arenthis"
+local Vimy = "Vimy"
+local Stud = "Stud"
 ScubaSounds_PlayerNames = {
     [Jackson] = {"Grandmasterb", "Gaymasterb", "Combyobeard"},
     [Nigel] = {"Nigelsworth", "Nigel"},
@@ -248,8 +257,10 @@ ScubaSounds_PlayerNames = {
     [Starrs] = {"Starrs"},
     [Kaymon] = {"Kaymon"},
     [Vitoli] = {"Vitoli", "Uglyvit"},
-    [Sevvy] = {"Sevvy"},
-    [Sleeby] = {"Sleeby"}
+    [Sevvy] = {"Sevvy", "Blowies"},
+    [Sleeby] = {"Sleeby"},
+    [Vimy] = {"Vimy"},
+    [Stud] = {"Bitcoins"}
 }
 
 ScubaSounds_DeathSoundMap = {
@@ -258,10 +269,12 @@ ScubaSounds_DeathSoundMap = {
     [Sweatyhong] = "ImRetarded",
     [Uncletouches] = "ImRetarded",
     [Arenthis] = "ImRetarded",
+    [Vimy] = "ImRetarded",
     [Starrs] = "KyakPenis",
     [Sleeby] = "NorthScream",
     [Sevvy] = "SevvyLove",
-    [Vitoli] = "VitoliSuxDix"
+    [Vitoli] = "VitoliSuxDix",
+    [Stud] = "Ryan"
 }
 
 ScubaSounds_BigItemIds = { -- quest rewards
