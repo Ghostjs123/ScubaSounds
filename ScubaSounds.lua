@@ -46,6 +46,13 @@ ScubaSounds_SoundInfo = {
         timeout = nil,
         alwaysPlays = false
     },
+    ["ANewRecord"] = {
+        extension = "wav",
+        duration = 2,
+        canOverlapSelf = false,
+        timeout = nil,
+        alwaysPlays = false
+    },
     ["BonVoyagePussy"] = {
         extension = "wav",
         duration = 1,
@@ -124,6 +131,13 @@ ScubaSounds_SoundInfo = {
         alwaysPlays = false
     },
     ["KyakPenis"] = {
+        extension = "wav",
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = nil,
+        alwaysPlays = false
+    },
+    ["LegoYoda"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
@@ -250,6 +264,8 @@ local Uncletouches = "Uncletouches"
 local Arenthis = "Arenthis"
 local Vimy = "Vimy"
 local Stud = "Stud"
+local Chaka = "Chaka"
+local Leaflix = "Leaflix"
 ScubaSounds_PlayerNames = {
     [Jackson] = {"Grandmasterb", "Gaymasterb", "Combyobeard"},
     [Nigel] = {"Nigelsworth", "Nigel"},
@@ -260,7 +276,9 @@ ScubaSounds_PlayerNames = {
     [Sevvy] = {"Sevvy", "Blowies"},
     [Sleeby] = {"Sleeby"},
     [Vimy] = {"Vimy"},
-    [Stud] = {"Bitcoins"}
+    [Stud] = {"Bitcoins"},
+    [Chaka] = {"Chaka", "Chakaog"},
+    [Leaflix] = {"Leaflix"}
 }
 
 ScubaSounds_DeathSoundMap = {
@@ -274,7 +292,9 @@ ScubaSounds_DeathSoundMap = {
     [Sleeby] = "NorthScream",
     [Sevvy] = "SevvyLove",
     [Vitoli] = "VitoliSuxDix",
-    [Stud] = "Ryan"
+    [Stud] = "Ryan",
+    [Chaka] = "LegoYoda",
+    [Leaflix] = "ANewRecord"
 }
 
 ScubaSounds_BigItemIds = { -- quest rewards
@@ -312,6 +332,7 @@ ScubaSounds_BigItemIds = { -- quest rewards
 13468, -- Black Lotus
 7080, -- Essence of Water
 19024, -- Arena Grand Master
+1404, -- Tidal Charm
 23007, -- Piglet's Collar
 23015, -- Rat Cage
 23002, -- Turtle Box
