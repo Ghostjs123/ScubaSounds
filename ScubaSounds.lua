@@ -660,24 +660,26 @@ function ScubaSounds:HandleUnitDeath(destFlags, destName, destGUID, environmenta
         end
     end
 
-    -- Sounds for the individual
-    local _, className = GetPlayerInfoByGUID(destGUID)
-    if className == "MAGE" then
-        ScubaSounds:PlaySound("Deleted")
-        return
+    -- Sounds for the individual. Return after PlaySound
+    local trueName = ScubaSounds:GetTruePlayerName(destName)
+    if trueName ~= nil then
+        if ScubaSounds_DeathSoundMap[trueName] ~= nil then
+            ScubaSounds:PlaySound(ScubaSounds_DeathSoundMap[trueName])
+            return
+        end
     end
 
     if bit.band(destFlags, COMBATLOG_OBJECT_TYPE_PLAYER) ~= 0 then -- a friendly player
         if environmentalType == "Lava" then
             ScubaSounds:PlaySound("Omg")
+            return
         end
     end
 
-    local trueName = ScubaSounds:GetTruePlayerName(destName)
-    if trueName ~= nil then
-        if ScubaSounds_DeathSoundMap[trueName] ~= nil then
-            ScubaSounds:PlaySound(ScubaSounds_DeathSoundMap[trueName])
-        end
+    local _, className = GetPlayerInfoByGUID(destGUID)
+    if className == "MAGE" then
+        ScubaSounds:PlaySound("Deleted")
+        return
     end
 end
 
@@ -1082,5 +1084,7 @@ function ScubaSounds:GetTruePlayerName(playerName)
             return trueName
         end
     end
-    return nil
+    -- Better than nil
+    local trueName = UnitName(playerName)
+    return trueName or playerName
 end
