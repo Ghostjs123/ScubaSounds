@@ -74,6 +74,13 @@ ScubaSounds_SoundInfo = {
         timeout = nil,
         alwaysPlays = false
     },
+    ["Dahhart"] = {
+        extension = "mp3",
+        duration = 3,
+        canOverlapSelf = false,
+        timeout = nil,
+        alwaysPlays = false
+    },
     ["Deleted"] = {
         extension = "wav",
         duration = 1,
@@ -266,6 +273,7 @@ local Vimy = "Vimy"
 local Stud = "Stud"
 local Chaka = "Chaka"
 local Leaflix = "Leaflix"
+local Dahhart = "Dahhart"
 ScubaSounds_PlayerNames = {
     [Jackson] = {"Grandmasterb", "Gaymasterb", "Combyobeard"},
     [Nigel] = {"Nigelsworth", "Nigel"},
@@ -278,7 +286,8 @@ ScubaSounds_PlayerNames = {
     [Vimy] = {"Vimy"},
     [Stud] = {"Bitcoins"},
     [Chaka] = {"Chaka", "Chakaog"},
-    [Leaflix] = {"Leaflix"}
+    [Leaflix] = {"Leaflix"},
+    [Dahhart] = {"Dahhart"}
 }
 
 ScubaSounds_DeathSoundMap = {
@@ -294,7 +303,8 @@ ScubaSounds_DeathSoundMap = {
     [Vitoli] = "VitoliSuxDix",
     [Stud] = "Ryan",
     [Chaka] = "LegoYoda",
-    [Leaflix] = "ANewRecord"
+    [Leaflix] = "ANewRecord",
+    [Dahhart] = "Dahhart"
 }
 
 ScubaSounds_BigItemIds = { -- quest rewards
