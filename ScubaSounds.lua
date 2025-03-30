@@ -29,6 +29,7 @@ ScubaSounds_EventFrame:RegisterEvent("TRADE_ACCEPT_UPDATE")
 ScubaSounds_EventFrame:RegisterEvent("TRADE_CLOSED")
 ScubaSounds_EventFrame:RegisterEvent("PLAYER_LOGIN")
 ScubaSounds_EventFrame:RegisterEvent("GUILD_ROSTER_UPDATE")
+ScubaSounds_EventFrame:RegisterEvent("UI_ERROR_MESSAGE")
 ScubaSounds_EventFrame:SetScript("OnEvent", ScubaSounds_OnEvent)
 
 ScubaSounds_SoundInfo = {
@@ -53,6 +54,20 @@ ScubaSounds_SoundInfo = {
         timeout = nil,
         alwaysPlays = false
     },
+    ["AriseSoldiers"] = {
+        extension = "ogg",
+        duration = 3,
+        canOverlapSelf = false,
+        timeout = nil,
+        alwaysPlays = false
+    },
+    ["BallsATug"] = {
+        extension = "wav",
+        duration = 2,
+        canOverlapSelf = false,
+        timeout = nil,
+        alwaysPlays = false
+    },
     ["BonVoyagePussy"] = {
         extension = "wav",
         duration = 1,
@@ -63,6 +78,13 @@ ScubaSounds_SoundInfo = {
     ["BreakingNews"] = {
         extension = "wav",
         duration = 5,
+        canOverlapSelf = false,
+        timeout = nil,
+        alwaysPlays = false
+    },
+    ["Burn"] = {
+        extension = "ogg",
+        duration = 2,
         canOverlapSelf = false,
         timeout = nil,
         alwaysPlays = false
@@ -99,12 +121,19 @@ ScubaSounds_SoundInfo = {
         extension = "wav",
         duration = 2,
         canOverlapSelf = false,
-        timeout = 120,
+        timeout = 300,
         alwaysPlays = false
     },
     ["Fahb"] = {
         extension = "wav",
         duration = 1,
+        canOverlapSelf = false,
+        timeout = nil,
+        alwaysPlays = false
+    },
+    ["Goofy"] = {
+        extension = "wav",
+        duration = 2,
         canOverlapSelf = false,
         timeout = nil,
         alwaysPlays = false
@@ -119,6 +148,20 @@ ScubaSounds_SoundInfo = {
     ["HelloThere"] = {
         extension = "wav",
         duration = 1,
+        canOverlapSelf = false,
+        timeout = nil,
+        alwaysPlays = false
+    },
+    ["How"] = {
+        extension = "wav",
+        duration = 3,
+        canOverlapSelf = false,
+        timeout = nil,
+        alwaysPlays = false
+    },
+    ["IgnisDeath"] = {
+        extension = "ogg",
+        duration = 4,
         canOverlapSelf = false,
         timeout = nil,
         alwaysPlays = false
@@ -242,6 +285,20 @@ ScubaSounds_SoundInfo = {
         timeout = nil,
         alwaysPlays = false
     },
+    ["SuperSaiyan"] = {
+        extension = "wav",
+        duration = 19,
+        canOverlapSelf = false,
+        timeout = 60,
+        alwaysPlays = false
+    },
+    ["ThanksDahfart"] = {
+        extension = "mp3",
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = nil,
+        alwaysPlays = false
+    },
     ["VitoliSuxDix"] = {
         extension = "wav",
         duration = 2,
@@ -274,6 +331,8 @@ local Stud = "Stud"
 local Chaka = "Chaka"
 local Leaflix = "Leaflix"
 local Dahhart = "Dahhart"
+local Nacho = "Nacho"
+local Scharf = "Scharf"
 ScubaSounds_PlayerNames = {
     [Jackson] = {"Grandmasterb", "Gaymasterb", "Combyobeard"},
     [Nigel] = {"Nigelsworth", "Nigel"},
@@ -287,24 +346,28 @@ ScubaSounds_PlayerNames = {
     [Stud] = {"Bitcoins"},
     [Chaka] = {"Chaka", "Chakaog"},
     [Leaflix] = {"Leaflix"},
-    [Dahhart] = {"Dahhart"}
+    [Dahhart] = {"Dahhart"},
+    [Nacho] = {"Nachô"},
+    [Scharf] = {"Bostwain", "Hotassrandy", "Swabiton", "Frostwain"}
 }
 
 ScubaSounds_DeathSoundMap = {
-    [Kaymon] = "BreakingNews",
-    [Fahb] = "Fahb",
-    [Sweatyhong] = "ImRetarded",
-    [Uncletouches] = "ImRetarded",
-    [Arenthis] = "ImRetarded",
-    [Vimy] = "ImRetarded",
-    [Starrs] = "KyakPenis",
-    [Sleeby] = "NorthScream",
-    [Sevvy] = "SevvyLove",
-    [Vitoli] = "VitoliSuxDix",
-    [Stud] = "Ryan",
-    [Chaka] = "LegoYoda",
-    [Leaflix] = "ANewRecord",
-    [Dahhart] = "Dahhart"
+    [Kaymon] = {"BreakingNews"},
+    [Fahb] = {"Fahb"},
+    [Sweatyhong] = {"IgnisDeath", "AriseSoldiers", "Burn"},
+    [Uncletouches] = {"BallsATug"},
+    [Arenthis] = {"ImRetarded"},
+    [Vimy] = {"ImRetarded"},
+    [Starrs] = {"KyakPenis"},
+    [Sleeby] = {"NorthScream"},
+    [Sevvy] = {"SevvyLove"},
+    [Vitoli] = {"VitoliSuxDix"},
+    [Stud] = {"Ryan"},
+    [Chaka] = {"LegoYoda"},
+    [Leaflix] = {"ANewRecord"},
+    [Dahhart] = {"Dahhart", "ThanksDahfart"},
+    [Nacho] = {"Goofy"},
+    [Scharf] = {"How"}
 }
 
 ScubaSounds_BigItemIds = { -- quest rewards
@@ -512,12 +575,22 @@ ScubaSounds_CoreHoundUnitIds = {11673, -- Ancient Core Hound
 ScubaSounds_MarkOfTheChosenBuffId = 21970
 ScubaSounds_LipBuffId = 3169
 ScubaSounds_BattleShoutBuffId = 11551
+ScubaSounds_FeignDeathBuffId = 5384
 -- Debuffs
 ScubaSounds_LivingBombDebuffId = 20475
+ScubaSounds_FlameBuffetDebuffId = 23341
+ScubaSounds_BurningAdrenalineDebuffId = 23620
 -- Spells
 ScubaSounds_AnkhSpellId = 20608
 ScubaSounds_RecklessnessSpellId = 1719
 ScubaSounds_GeddonAoeSpellId = 19695
+ScubaSounds_ChromaggusBreathSpellIds = {
+    [23310] = true, -- Time Lapse
+    [23312] = true, -- Corrosive Acid
+    [23313] = true, -- Ignite Flesh
+    [23314] = true, -- Incinerate
+    [23315] = true -- Frost Burn
+}
 -- Zones
 ScubaSounds_WarsongZoneId = 3277
 ScubaSounds_OnyxiasLairId = 249
@@ -558,6 +631,7 @@ ScubaSounds_SoundsOnTimeout = {}
 ScubaSounds_ActiveAuras = {}
 ScubaSounds_HelloTheresInTheLastMinute = 0
 ScubaSounds_PreviousGuildMemberCount = nil
+ScubaSounds_FeignDeaths = {}
 
 -- Setup timers
 C_Timer.After(5, function()
@@ -609,6 +683,8 @@ function ScubaSounds_OnEvent(self, event, arg1, arg2, arg3)
         ScubaSounds:HandleEnteringWorld(arg1, arg2)
     elseif event == "GUILD_ROSTER_UPDATE" then
         ScubaSounds:HandleGuildRosterUpdate(arg1)
+    elseif event == "UI_ERROR_MESSAGE" then
+        ScubaSounds:HandleUiErrorMessage(arg2)
     end
 end
 
@@ -619,6 +695,16 @@ function ScubaSounds:HandleCombatLogEvent()
     -- Event based parameters (12 - rest)
     local eventBasedParams = {select(12, CombatLogGetCurrentEventInfo())}
 
+    if subEvent == "SPELL_AURA_APPLIED" then
+        if eventBasedParams[1] == ScubaSounds_FeignDeathBuffId then
+            ScubaSounds_FeignDeaths[destGUID] = true
+        end
+    elseif subEvent == "SPELL_AURA_REMOVED" then
+        if eventBasedParams[1] == ScubaSounds_FeignDeathBuffId then
+            ScubaSounds_FeignDeaths[destGUID] = false
+        end
+    end
+
     if subEvent == "UNIT_DIED" then
         ScubaSounds:HandleUnitDeath(destFlags, destName, destGUID, eventBasedParams[1])
     elseif subEvent == "SPELL_RESURRECT" then
@@ -626,7 +712,8 @@ function ScubaSounds:HandleCombatLogEvent()
     elseif subEvent == "SWING_DAMAGE" then
         ScubaSounds:HandleDamage(sourceGUID, destGUID, eventBasedParams[1], eventBasedParams[7], eventBasedParams[2])
     elseif subEvent == "SPELL_DAMAGE" or subEvent == "RANGE_DAMAGE" then
-        ScubaSounds:HandleDamage(sourceGUID, destGUID, eventBasedParams[4], eventBasedParams[10], eventBasedParams[5])
+        ScubaSounds:HandleDamage(sourceGUID, destGUID, eventBasedParams[4], eventBasedParams[10], eventBasedParams[5],
+            eventBasedParams[1])
     elseif subEvent == "ENVIRONMENTAL_DAMAGE" then
         ScubaSounds:HandleDamage(sourceGUID, destGUID, eventBasedParams[2], 0, false, -1)
     elseif subEvent == "SPELL_CAST_SUCCESS" and eventBasedParams[1] == ScubaSounds_GeddonAoeSpellId then
@@ -670,11 +757,15 @@ function ScubaSounds:HandleUnitDeath(destFlags, destName, destGUID, environmenta
         end
     end
 
+    if ScubaSounds_FeignDeaths[destGUID] then
+        return
+    end
+
     -- Sounds for the individual. Return after PlaySound
     local trueName = ScubaSounds:GetTruePlayerName(destName)
     if trueName ~= nil then
         if ScubaSounds_DeathSoundMap[trueName] ~= nil then
-            ScubaSounds:PlaySound(ScubaSounds_DeathSoundMap[trueName])
+            ScubaSounds:PlaySound(ScubaSounds:SelectRandom(ScubaSounds_DeathSoundMap[trueName]))
             return
         end
     end
@@ -697,6 +788,12 @@ function ScubaSounds:HandlePlayerAura()
     -- Player debuffs
     if ScubaSounds:HasDebuff("player", ScubaSounds_LivingBombDebuffId) then
         ScubaSounds:PlaySound("IWasChosen")
+    end
+    if ScubaSounds:HasDebuff("player", ScubaSounds_FlameBuffetDebuffId, 8) then
+        ScubaSounds:PlaySound("LotrFlee")
+    end
+    if ScubaSounds:HasDebuff("player", ScubaSounds_BurningAdrenalineDebuffId) then
+        ScubaSounds:PlaySound("SuperSaiyan")
     end
     -- Target debuffs
     if ScubaSounds:HasBuff("target", ScubaSounds_LipBuffId) then
@@ -729,11 +826,15 @@ function ScubaSounds:HandleResurrect(destName, spellId)
     end
 end
 
-function ScubaSounds:HandleDamage(sourceGUID, destGUID, amount, critical, overkill)
+function ScubaSounds:HandleDamage(sourceGUID, destGUID, amount, critical, overkill, spellId)
     -- Stuff involving me
     if destGUID == UnitGUID("player") then -- I took the dmg
         if amount >= UnitHealthMax("player") * 0.95 and overkill > 0 then
             ScubaSounds:PlaySound("NowThatsALottaDmg")
+            return
+        end
+        if ScubaSounds_ChromaggusBreathSpellIds[spellId] then
+            ScubaSounds:PlaySound("ScreamingSheep")
             return
         end
     elseif sourceGUID == UnitGUID("player") then -- I did the dmg
@@ -849,29 +950,6 @@ function ScubaSounds:HandleEnteringWorld(isInitialLogin, isReloadingUI)
     end
 end
 
-function ScubaSounds:BuildOptionsFrame()
-    local parent = getglobal("ScubaSoundsOptionsFrame")
-    -- add all of the checkboxes
-    local count = 1
-    for sound, _ in pairs(ScubaSounds_SoundInfo) do
-        ScubaSounds.OptionsCheckboxes[sound] = ScubaSounds:NewCheckBox(parent, sound, count)
-        count = count + 1
-    end
-    parent:SetHeight(40 + (count - 1) * 23)
-    -- add divider
-    local line = parent:CreateTexture(nil, "ARTWORK")
-    line:SetColorTexture(1, 0.82, 0, 1)
-    line:SetHeight(2)
-    line:SetPoint("LEFT", parent, "LEFT", 10, 0)
-    line:SetPoint("RIGHT", parent, "RIGHT", -10, 0)
-    line:SetPoint("BOTTOM", parent, "BOTTOM", 0, 10 + 23 * 2)
-    -- add extra options
-    local currentHeight = parent:GetHeight()
-    parent:SetHeight(currentHeight + 23 * 2)
-    ScubaSounds:NewCheckBox(parent, ScubaSounds_PlayOutsideRaid, count)
-    ScubaSounds:NewCheckBox(parent, ScubaSounds_DeathSoundsOutsideRaid, count + 1)
-end
-
 function ScubaSounds:HandleGuildRosterUpdate(canRequestRosterUpdate)
     if canRequestRosterUpdate == false and ScubaSounds_PreviousGuildMemberCount ~= nil then
         local currentGuildMemberCount = GetNumGuildMembers()
@@ -885,6 +963,43 @@ function ScubaSounds:HandleGuildRosterUpdate(canRequestRosterUpdate)
     end
 end
 
+function ScubaSounds:HandleUiErrorMessage(errorMessage)
+    if errorMessage == ERR_OUT_OF_MANA then
+        ScubaSounds:PlaySound("DoYouSeeMyMana")
+    end
+end
+
+function ScubaSounds:BuildOptionsFrame()
+    local parent = getglobal("ScubaSoundsOptionsFrame")
+    -- add all of the checkboxes
+    local count = 0
+    for sound, _ in pairs(ScubaSounds_SoundInfo) do
+        local xOffset = 14 + 200 * (count % 2)
+        local yOffset = -2 - 23 * (math.floor(count / 2) + 1)
+        ScubaSounds.OptionsCheckboxes[sound] = ScubaSounds:NewCheckBox(parent, sound, xOffset, yOffset)
+        count = count + 1
+    end
+    parent:SetHeight(40 + (count / 2) * 23)
+    -- add divider
+    local line = parent:CreateTexture(nil, "ARTWORK")
+    line:SetColorTexture(1, 0.82, 0, 1)
+    line:SetHeight(2)
+    line:SetPoint("LEFT", parent, "LEFT", 10, 0)
+    line:SetPoint("RIGHT", parent, "RIGHT", -10, 0)
+    line:SetPoint("BOTTOM", parent, "BOTTOM", 0, -5 + 23 * 2)
+    -- add extra options
+    local currentHeight = parent:GetHeight()
+    parent:SetHeight(currentHeight + 23 * 2)
+    count = count + 2 + (count % 2)
+    local xOffset = 14 + 200 * (count % 2)
+    local yOffset = -9 - 23 * math.floor(count / 2)
+    ScubaSounds:NewCheckBox(parent, ScubaSounds_PlayOutsideRaid, xOffset, yOffset)
+    count = count + 1
+    local xOffset = 14 + 200 * (count % 2)
+    local yOffset = -9 - 23 * math.floor(count / 2)
+    ScubaSounds:NewCheckBox(parent, ScubaSounds_DeathSoundsOutsideRaid, xOffset, yOffset)
+end
+
 function ScubaSounds:ShowOptions()
     ScubaSoundsOptionsFrame:Show()
     for _, f in pairs(ScubaSounds.OptionsCheckboxes) do
@@ -892,9 +1007,9 @@ function ScubaSounds:ShowOptions()
     end
 end
 
-function ScubaSounds:NewCheckBox(parent, option, num)
+function ScubaSounds:NewCheckBox(parent, option, xOffset, yOffset)
     local f = CreateFrame("CheckButton", nil, parent, "UICheckButtonTemplate")
-    f:SetPoint("TOPLEFT", 14, -2 - 23 * num)
+    f:SetPoint("TOPLEFT", xOffset, yOffset)
     f:SetFrameStrata("MEDIUM")
     f:SetScript("OnClick", function(self)
         ScubaSounds_Options[option] = f:GetChecked()
@@ -1033,13 +1148,16 @@ function ScubaSounds:HasBuff(unit, buffId)
     return false
 end
 
-function ScubaSounds:HasDebuff(unit, debuffId)
+function ScubaSounds:HasDebuff(unit, debuffId, threshold)
     for i = 1, 40 do
-        local _, _, _, _, _, _, _, _, _, spellId = UnitDebuff(unit, i)
+        local _, _, count, _, _, _, _, _, _, spellId = UnitDebuff(unit, i)
         if not spellId then
             break
         end
         if spellId == debuffId then
+            if threshold ~= nil then
+                return count >= threshold
+            end
             return true
         end
     end
@@ -1097,4 +1215,12 @@ function ScubaSounds:GetTruePlayerName(playerName)
     -- Better than nil
     local trueName = UnitName(playerName)
     return trueName or playerName
+end
+
+function ScubaSounds:SelectRandom(list)
+    if #list == 0 then
+        return nil
+    end
+    local index = math.random(1, #list)
+    return list[index]
 end
