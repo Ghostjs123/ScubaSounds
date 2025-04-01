@@ -264,6 +264,13 @@ ScubaSounds_SoundInfo = {
         timeout = 60,
         alwaysPlays = false
     },
+    ["RightToJail"] = {
+        extension = "wav",
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = nil,
+        alwaysPlays = false
+    },
     ["Ryan"] = {
         extension = "wav",
         duration = 1,
@@ -311,6 +318,13 @@ ScubaSounds_SoundInfo = {
         duration = 5,
         canOverlapSelf = false,
         timeout = nil,
+        alwaysPlays = false
+    },
+    ["YouHaveNoMana"] = {
+        extension = "wav",
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = 300,
         alwaysPlays = false
     }
 }
@@ -594,6 +608,7 @@ ScubaSounds_ChromaggusBreathSpellIds = {
 -- Zones
 ScubaSounds_WarsongZoneId = 3277
 ScubaSounds_OnyxiasLairId = 249
+ScubaSounds_AlteracValleyId = 1459
 ScubaSounds_RaidIds = {
     [409] = "Molten Core",
     [469] = "Blackwing Lair",
@@ -894,6 +909,8 @@ function ScubaSounds:HandleZoneChange()
         ScubaSounds:PlaySound("Warsong")
     elseif currentZoneId == ScubaSounds_OnyxiasLairId then
         ScubaSounds:PlaySound("Cavern")
+    elseif currentZoneId == ScubaSounds_AlteracValleyId then
+        ScubaSounds:PlaySound("RightToJail")
     end
 end
 
@@ -937,7 +954,7 @@ function ScubaSounds:HandleAddonMessage(prefix, message)
             SendChatMessage("gz nigel", "WHISPER", nil, playerName)
         elseif command == ScubaSounds_PlayDeathSoundCommand and ScubaSounds_Options[ScubaSounds_DeathSoundsOutsideRaid] then
             if not ScubaSounds:IsPlayerInGroup(playerName) then
-                ScubaSounds:PlaySound(ScubaSounds_DeathSoundMap[playerName])
+                ScubaSounds:PlaySound(ScubaSounds:SelectRandom(ScubaSounds_DeathSoundMap[playerName]))
             end
         end
     end
@@ -965,7 +982,7 @@ end
 
 function ScubaSounds:HandleUiErrorMessage(errorMessage)
     if errorMessage == ERR_OUT_OF_MANA then
-        ScubaSounds:PlaySound("DoYouSeeMyMana")
+        ScubaSounds:PlaySound(ScubaSounds:SelectRandom({"DoYouSeeMyMana", "YouHaveNoMana"}))
     end
 end
 
@@ -1059,6 +1076,7 @@ function ScubaSounds:ShouldPlay(sound)
     return true
 end
 
+-- /script C_ChatInfo.SendAddonMessage(ScubaSounds_ADDON_PREFIX, ScubaSounds_PlayDeathSoundCommand .. ":Starrs", "GUILD")
 function ScubaSounds:PlaySound(sound)
     if ScubaSounds:ShouldPlay(sound) then
         local playerName = UnitName("player")
