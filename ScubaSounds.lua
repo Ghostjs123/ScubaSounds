@@ -30,6 +30,7 @@ ScubaSounds_EventFrame:RegisterEvent("TRADE_CLOSED")
 ScubaSounds_EventFrame:RegisterEvent("PLAYER_LOGIN")
 ScubaSounds_EventFrame:RegisterEvent("GUILD_ROSTER_UPDATE")
 ScubaSounds_EventFrame:RegisterEvent("UI_ERROR_MESSAGE")
+ScubaSounds_EventFrame:RegisterEvent("UPDATE_BATTLEFIELD_SCORE")
 ScubaSounds_EventFrame:SetScript("OnEvent", ScubaSounds_OnEvent)
 
 ScubaSounds_SoundInfo = {
@@ -96,6 +97,13 @@ ScubaSounds_SoundInfo = {
         timeout = nil,
         alwaysPlays = false
     },
+    ["CopCuties"] = {
+        extension = "wav",
+        duration = 4,
+        canOverlapSelf = false,
+        timeout = nil,
+        alwaysPlays = false
+    },
     ["Dahhart"] = {
         extension = "mp3",
         duration = 3,
@@ -114,7 +122,7 @@ ScubaSounds_SoundInfo = {
         extension = "wav",
         duration = 3,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 2,
         alwaysPlays = false
     },
     ["DoYouSeeMyMana"] = {
@@ -347,6 +355,7 @@ local Leaflix = "Leaflix"
 local Dahhart = "Dahhart"
 local Nacho = "Nacho"
 local Scharf = "Scharf"
+local Nips = "Nips"
 ScubaSounds_PlayerNames = {
     [Jackson] = {"Grandmasterb", "Gaymasterb", "Combyobeard"},
     [Nigel] = {"Nigelsworth", "Nigel"},
@@ -362,7 +371,8 @@ ScubaSounds_PlayerNames = {
     [Leaflix] = {"Leaflix"},
     [Dahhart] = {"Dahhart"},
     [Nacho] = {"Nachô"},
-    [Scharf] = {"Bostwain", "Hotassrandy", "Swabiton", "Frostwain"}
+    [Scharf] = {"Bostwain", "Hotassrandy", "Swabiton", "Frostwain"},
+    [Nips] = {"Nips", "Lx", "Px"}
 }
 
 ScubaSounds_DeathSoundMap = {
@@ -381,7 +391,8 @@ ScubaSounds_DeathSoundMap = {
     [Leaflix] = {"ANewRecord"},
     [Dahhart] = {"Dahhart", "ThanksDahfart"},
     [Nacho] = {"Goofy"},
-    [Scharf] = {"How"}
+    [Scharf] = {"How"},
+    [Nips] = {"CopCuties"}
 }
 
 ScubaSounds_BigItemIds = { -- quest rewards
@@ -647,6 +658,7 @@ ScubaSounds_ActiveAuras = {}
 ScubaSounds_HelloTheresInTheLastMinute = 0
 ScubaSounds_PreviousGuildMemberCount = nil
 ScubaSounds_FeignDeaths = {}
+ScubaSounds_InBattleground = false
 
 -- Setup timers
 C_Timer.After(5, function()
@@ -700,6 +712,8 @@ function ScubaSounds_OnEvent(self, event, arg1, arg2, arg3)
         ScubaSounds:HandleGuildRosterUpdate(arg1)
     elseif event == "UI_ERROR_MESSAGE" then
         ScubaSounds:HandleUiErrorMessage(arg2)
+    elseif event == "UPDATE_BATTLEFIELD_SCORE" then
+        ScubaSounds:UpdateBattlefieldScore()
     end
 end
 
@@ -983,6 +997,21 @@ end
 function ScubaSounds:HandleUiErrorMessage(errorMessage)
     if errorMessage == ERR_OUT_OF_MANA then
         ScubaSounds:PlaySound(ScubaSounds:SelectRandom({"DoYouSeeMyMana", "YouHaveNoMana"}))
+    end
+end
+
+function ScubaSounds:UpdateBattlefieldScore()
+    local playerFaction = UnitFactionGroup("player")
+    local winner = GetBattlefieldWinner()
+    -- 0 = Horde, 1 = Alliance, nil if unknown
+    local win = (winner == 0 and playerFaction == "Horde") or
+                (winner == 1 and playerFaction == "Alliance")
+    local loss = (winner == 0 and playerFaction == "Alliance") or
+                 (winner == 1 and playerFaction == "Horde")
+    if win then
+        ScubaSounds:PlaySound("MongolianTechno")
+    elseif loss then
+        ScubaSounds:PlaySound("Downer")
     end
 end
 
