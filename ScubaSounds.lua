@@ -372,7 +372,8 @@ ScubaSounds_PlayerNames = {
     [Dahhart] = {"Dahhart"},
     [Nacho] = {"Nachô"},
     [Scharf] = {"Bostwain", "Hotassrandy", "Swabiton", "Frostwain"},
-    [Nips] = {"Nips", "Lx", "Px"}
+    [Nips] = {"Nips", "Lx", "Px"},
+    [Uncletouches] = {"Cuckletonn"}
 }
 
 ScubaSounds_DeathSoundMap = {
