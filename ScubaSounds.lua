@@ -265,6 +265,13 @@ ScubaSounds_SoundInfo = {
         timeout = nil,
         alwaysPlays = false
     },
+    ["Owow"] = {
+        extension = "wav",
+        duration = 2,
+        canOverlapSelf = false,
+        timeout = nil,
+        alwaysPlays = false
+    },
     ["RecklessnessPoggers"] = {
         extension = "wav",
         duration = 1,
@@ -356,6 +363,7 @@ local Dahhart = "Dahhart"
 local Nacho = "Nacho"
 local Scharf = "Scharf"
 local Nips = "Nips"
+local Keyteor = "Keyteor"
 ScubaSounds_PlayerNames = {
     [Jackson] = {"Grandmasterb", "Gaymasterb", "Combyobeard"},
     [Nigel] = {"Nigelsworth", "Nigel"},
@@ -373,7 +381,8 @@ ScubaSounds_PlayerNames = {
     [Nacho] = {"Nachô"},
     [Scharf] = {"Bostwain", "Hotassrandy", "Swabiton", "Frostwain"},
     [Nips] = {"Nips", "Lx", "Px"},
-    [Uncletouches] = {"Cuckletonn"}
+    [Uncletouches] = {"Cuckletonn"},
+    [Keyteor] = {"Keytor", "Seiken"}
 }
 
 ScubaSounds_DeathSoundMap = {
@@ -393,7 +402,8 @@ ScubaSounds_DeathSoundMap = {
     [Dahhart] = {"Dahhart", "ThanksDahfart"},
     [Nacho] = {"Goofy"},
     [Scharf] = {"How"},
-    [Nips] = {"CopCuties"}
+    [Nips] = {"CopCuties"},
+    [Keyteor] = {"Owow"}
 }
 
 ScubaSounds_BigItemIds = { -- quest rewards
