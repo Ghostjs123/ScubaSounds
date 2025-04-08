@@ -625,17 +625,22 @@ ScubaSounds_FeignDeathBuffId = 5384
 -- Debuffs
 ScubaSounds_LivingBombDebuffId = 20475
 ScubaSounds_FlameBuffetDebuffId = 23341
-ScubaSounds_BurningAdrenalineDebuffId = 23620
+ScubaSounds_BurningAdrenalineDebuffId = 18173
 -- Spells
 ScubaSounds_AnkhSpellId = 20608
 ScubaSounds_RecklessnessSpellId = 1719
 ScubaSounds_GeddonAoeSpellId = 19695
 ScubaSounds_ChromaggusBreathSpellIds = {
-    [23310] = true, -- Time Lapse
-    [23312] = true, -- Corrosive Acid
-    [23313] = true, -- Ignite Flesh
-    [23314] = true, -- Incinerate
-    [23315] = true -- Frost Burn
+    [23308] = true, -- Incinerate
+    [23309] = true, -- Incinerate
+    [23310] = true, -- Time Lapse 
+    [23312] = true, -- Time Lapse 
+    [23313] = true, -- Corrosive Acid
+    [23314] = true, -- Corrosive Acid
+    [23315] = true, -- Ignite Flesh
+    [23316] = true, -- Ignite Flesh
+    [23187] = true, -- Frost Burn
+    [23189] = true -- Frost Burn
 }
 -- Zones
 ScubaSounds_WarsongZoneId = 3277
@@ -667,6 +672,7 @@ ScubaSounds_PrintFormat = "|c00f7f26c%s|r"
 ScubaSounds_NumBagSlots = 4
 ScubaSounds_PlayOutsideRaid = "Play outside of raid"
 ScubaSounds_DeathSoundsOutsideRaid = "Death sounds outside raid"
+ScubaSounds_InBattlegrounds = " in battlegrounds"
 
 -- State
 ScubaSounds_EndBossSoundPlayed = false
@@ -1074,28 +1080,63 @@ function ScubaSounds:ShowOptions()
     end
 end
 
-function ScubaSounds:NewCheckBox(parent, option, xOffset, yOffset)
-    local f = CreateFrame("CheckButton", nil, parent, "UICheckButtonTemplate")
-    f:SetPoint("TOPLEFT", xOffset, yOffset)
-    f:SetFrameStrata("MEDIUM")
-    f:SetScript("OnClick", function(self)
-        ScubaSounds_Options[option] = f:GetChecked()
-        if ScubaSounds_Options[option] then
-            ScubaSounds:SendMessage(option .. " enabled")
+function ScubaSounds:NewCheckBox(parent, soundOrOption, xOffset, yOffset)
+    -- New sound was added or addon loading for the first time ever
+    if ScubaSounds_Options[soundOrOption] == nil then
+        ScubaSounds_Options[soundOrOption] = true
+    end
+    if ScubaSounds_Options[soundOrOption .. ScubaSounds_InBattlegrounds] == nil then
+        ScubaSounds_Options[soundOrOption .. ScubaSounds_InBattlegrounds] = true
+    end
+
+    local isSound = ScubaSounds_SoundInfo[soundOrOption] ~= nil
+
+    -- Enable / Disable
+    local checkbox1 = CreateFrame("CheckButton", nil, parent, "UICheckButtonTemplate")
+    checkbox1:SetPoint("TOPLEFT", xOffset, yOffset)
+    checkbox1:SetFrameStrata("MEDIUM")
+    checkbox1:SetScript("OnClick", function(self)
+        ScubaSounds_Options[soundOrOption] = checkbox1:GetChecked()
+        if ScubaSounds_Options[soundOrOption] then
+            ScubaSounds:SendMessage(soundOrOption .. " enabled")
         else
-            ScubaSounds:SendMessage(option .. " disabled")
+            ScubaSounds:SendMessage(soundOrOption .. " disabled")
         end
     end)
-    -- New sound was added or addon loading for the first time ever
-    if ScubaSounds_Options[option] == nil then
-        ScubaSounds_Options[option] = true
-    end
-    f:SetChecked(ScubaSounds_Options[option])
+    checkbox1:SetScript("OnEnter", function(self) 
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetText("Enabled", 255, 255, 0, 1, 1)
+        GameTooltip:Show()
+    end)
+    checkbox1:SetChecked(ScubaSounds_Options[soundOrOption])
+    local checkboxForText = checkbox1
 
-    f.text = f:CreateFontString(nil, "BORDER", "GameFontNormal")
-    f.text:SetJustifyH("RIGHT")
-    f.text:SetPoint("TOPLEFT", f, "TOPRIGHT", 0, -9)
-    f.text:SetText(option)
+    -- Enable in battlegrounds / Disable in battlegrounds
+    if isSound then
+        local checkbox2 = CreateFrame("CheckButton", nil, checkbox1, "UICheckButtonTemplate")
+        checkbox2:SetPoint("TOPLEFT", 26, 0)
+        checkbox2:SetFrameStrata("MEDIUM")
+        checkbox2:SetScript("OnClick", function(self)
+            ScubaSounds_Options[soundOrOption .. ScubaSounds_InBattlegrounds] = checkbox2:GetChecked()
+            if ScubaSounds_Options[soundOrOption .. ScubaSounds_InBattlegrounds] then
+                ScubaSounds:SendMessage(soundOrOption .. " enabled" .. ScubaSounds_InBattlegrounds)
+            else
+                ScubaSounds:SendMessage(soundOrOption .. " disabled" .. ScubaSounds_InBattlegrounds)
+            end
+        end)
+        checkbox2:SetScript("OnEnter", function(self) 
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip:SetText("Enabled In Battlegrounds", 255, 255, 0, 1, 1)
+            GameTooltip:Show()
+        end)
+        checkbox2:SetChecked(ScubaSounds_Options[soundOrOption .. ScubaSounds_InBattlegrounds])
+        checkboxForText = checkbox2
+    end
+
+    checkboxForText.text = checkboxForText:CreateFontString(nil, "BORDER", "GameFontNormal")
+    checkboxForText.text:SetJustifyH("RIGHT")
+    checkboxForText.text:SetPoint("TOPLEFT", checkboxForText, "TOPRIGHT", 0, -9)
+    checkboxForText.text:SetText(soundOrOption)
 end
 
 function ScubaSounds:ShouldPlay(sound)
@@ -1103,6 +1144,14 @@ function ScubaSounds:ShouldPlay(sound)
     if ScubaSounds_Options[sound] == false then
         -- NOTE: ScubaSounds_Options[sound] == nil if fresh saved vars
         return false
+    end
+
+    -- Sound is disabled in battlegrounds in /ss options
+    local isInInstance, instanceType = IsInInstance()
+    if isInInstance and instanceType == "pvp" then
+        if not ScubaSounds_Options[sound .. ScubaSounds_InBattlegrounds] then
+            return false
+        end
     end
 
     if ScubaSounds_SoundInfo[sound].alwaysPlays then
