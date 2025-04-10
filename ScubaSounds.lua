@@ -118,6 +118,13 @@ ScubaSounds_SoundInfo = {
         timeout = 1,
         alwaysPlays = false
     },
+    ["Discord"] = {
+        extension = "wav",
+        duration = 1,
+        canOverlapSelf = true,
+        timeout = 1,
+        alwaysPlays = false
+    },
     ["Downer"] = {
         extension = "wav",
         duration = 3,
@@ -188,6 +195,13 @@ ScubaSounds_SoundInfo = {
         timeout = 10,
         alwaysPlays = false
     },
+    ["Keyboard"] = {
+        extension = "wav",
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = 1,
+        alwaysPlays = false
+    },
     ["KyakPenis"] = {
         extension = "wav",
         duration = 1,
@@ -214,7 +228,21 @@ ScubaSounds_SoundInfo = {
         duration = 6,
         canOverlapSelf = false,
         timeout = nil,
-        alwaysPlays = true
+        alwaysPlays = false
+    },
+    ["Minecraft"] = {
+        extension = "wav",
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = nil,
+        alwaysPlays = false
+    },
+    ["Money"] = {
+        extension = "wav",
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = 1,
+        alwaysPlays = false
     },
     ["MongolianTechno"] = {
         extension = "mp3",
@@ -351,69 +379,84 @@ ScubaSounds_SoundInfo = {
     }
 }
 
-local Jackson = "Jackson"
-local Nigel = "Nigel"
+local Arenthis = "Arenthis"
+local Chaka = "Chaka"
+local Dahhart = "Dahhart"
+local Doppel = "Doppel"
+local Device = "Device"
 local Fahb = "Fahb"
-local Starrs = "Starrs"
+local Germanicus = "Germanicus"
+local Hellexus = "Hellexus"
+local Jackson = "Jackson"
 local Kaymon = "Kaymon"
-local Vitoli = "Vitoli"
+local Keyteor = "Keyteor"
+local Laak = "Laak"
+local Leaflix = "Leaflix"
+local Nacho = "Nacho"
+local Nigel = "Nigel"
+local Nips = "Nips"
+local Scharf = "Scharf"
 local Sevvy = "Sevvy"
 local Sleeby = "Sleeby"
-local Sweatyhong = "Sweatyhong"
-local Uncletouches = "Uncletouches"
-local Arenthis = "Arenthis"
-local Vimy = "Vimy"
+local Starrs = "Starrs"
 local Stud = "Stud"
-local Chaka = "Chaka"
-local Leaflix = "Leaflix"
-local Dahhart = "Dahhart"
-local Nacho = "Nacho"
-local Scharf = "Scharf"
-local Nips = "Nips"
-local Keyteor = "Keyteor"
-local Germanicus = "Germanicus"
+local Sweatyhaung = "Sweatyhong"
+local Uncletouches = "Uncletouches"
+local Vimy = "Vimy"
+local Vitoli = "Vitoli"
 ScubaSounds_PlayerNames = {
-    [Jackson] = {"Grandmasterb", "Gaymasterb", "Combyobeard"},
-    [Nigel] = {"Nigelsworth", "Nigel"},
+    [Arenthis] = {"Arenthis"},
+    [Chaka] = {"Chaka", "Chakaog"},
+    [Dahhart] = {"Dahhart"},
+    [Device] = {"Device"},
+    [Doppel] = {"Doppel"},
     [Fahb] = {"Fahbulous", "Resistofcofc", "Theemus", "Magev", "Resistofc"},
-    [Starrs] = {"Starrs"},
+    [Germanicus] = {"Germanicus"},
+    [Hellexus] = {"Hellexus"},
+    [Jackson] = {"Grandmasterb", "Gaymasterb", "Combyobeard"},
     [Kaymon] = {"Kaymon"},
-    [Vitoli] = {"Vitoli", "Uglyvit"},
+    [Keyteor] = {"Keytor", "Seiken"},
+    [Laak] = {"Laak"},
+    [Leaflix] = {"Leaflix"},
+    [Nacho] = {"Nachô"},
+    [Nigel] = {"Nigelsworth", "Nigel"},
+    [Nips] = {"Nips", "Lx", "Px"},
+    [Scharf] = {"Bostwain", "Hotassrandy", "Swabiton", "Frostwain"},
     [Sevvy] = {"Sevvy", "Blowies"},
     [Sleeby] = {"Sleeby"},
-    [Vimy] = {"Vimy"},
+    [Starrs] = {"Starrs"},
     [Stud] = {"Bitcoins"},
-    [Chaka] = {"Chaka", "Chakaog"},
-    [Leaflix] = {"Leaflix"},
-    [Dahhart] = {"Dahhart"},
-    [Nacho] = {"Nachô"},
-    [Scharf] = {"Bostwain", "Hotassrandy", "Swabiton", "Frostwain"},
-    [Nips] = {"Nips", "Lx", "Px"},
+    [Sweatyhaung] = {"Sweatyhaung"},
     [Uncletouches] = {"Cuckletonn"},
-    [Keyteor] = {"Keytor", "Seiken"},
-    [Germanicus] = {"Germanicus"}
+    [Vimy] = {"Vimy"},
+    [Vitoli] = {"Vitoli", "Uglyvit"}
 }
 
 ScubaSounds_DeathSoundMap = {
-    [Kaymon] = {"BreakingNews"},
-    [Fahb] = {"Fahb"},
-    [Sweatyhong] = {"IgnisDeath", "AriseSoldiers", "Burn"},
-    [Uncletouches] = {"BallsATug"},
     [Arenthis] = {"ImRetarded"},
-    [Vimy] = {"ImRetarded"},
-    [Starrs] = {"KyakPenis"},
-    [Sleeby] = {"NorthScream"},
-    [Sevvy] = {"SevvyLove"},
-    [Vitoli] = {"VitoliSuxDix"},
-    [Stud] = {"Ryan"},
     [Chaka] = {"LegoYoda"},
-    [Leaflix] = {"ANewRecord"},
     [Dahhart] = {"Dahhart", "ThanksDahfart"},
-    [Nacho] = {"Goofy"},
-    [Scharf] = {"How"},
-    [Nips] = {"CopCuties"},
+    [Device] = {"Keyboard"},
+    [Doppel] = {"Discord"},
+    [Fahb] = {"Fahb"},
+    [Germanicus] = {"Nein"},
+    [Hellexus] = {"Money"},
+    [Jackson] = {"Cavern"},
+    [Kaymon] = {"BreakingNews"},
     [Keyteor] = {"Owow"},
-    [Germanicus] = {"Nein"}
+    [Laak] = {"Minecraft"},
+    [Leaflix] = {"ANewRecord"},
+    [Nacho] = {"Goofy"},
+    [Nips] = {"CopCuties"},
+    [Scharf] = {"How"},
+    [Sevvy] = {"SevvyLove"},
+    [Sleeby] = {"NorthScream"},
+    [Starrs] = {"KyakPenis"},
+    [Stud] = {"Ryan"},
+    [Sweatyhaung] = {"IgnisDeath", "AriseSoldiers", "Burn"},
+    [Uncletouches] = {"BallsATug"},
+    [Vimy] = {"ImRetarded"},
+    [Vitoli] = {"VitoliSuxDix"}
 }
 
 ScubaSounds_BigItemIds = { -- quest rewards
@@ -662,7 +705,6 @@ C_ChatInfo.RegisterAddonMessagePrefix(ScubaSounds_ADDON_PREFIX)
 ScubaSounds_LegendaryReceivedCommand = "LEGENDARYRECEIVED"
 ScubaSounds_GzNigelCommand = "GZNIGEL"
 ScubaSounds_GzNigelSenders = {"Aloha", "Stavis", "Zarix", "Fahbulous"}
-ScubaSounds_PlayDeathSoundCommand = "PLAYDEATHSOUND"
 
 -- Saved variables
 ScubaSounds_Options = {}
@@ -671,7 +713,7 @@ ScubaSounds_Options = {}
 ScubaSounds_PrintFormat = "|c00f7f26c%s|r"
 ScubaSounds_NumBagSlots = 4
 ScubaSounds_PlayOutsideRaid = "Play outside of raid"
-ScubaSounds_DeathSoundsOutsideRaid = "Death sounds outside raid"
+ScubaSounds_DisableSounds = "Disable Sounds"
 ScubaSounds_InBattlegrounds = " in battlegrounds"
 
 -- State
@@ -735,6 +777,7 @@ function ScubaSounds_OnEvent(self, event, arg1, arg2, arg3)
         ScubaSounds:HandleAddonMessage(arg1, arg2)
     elseif event == "PLAYER_ENTERING_WORLD" then
         ScubaSounds:HandleEnteringWorld(arg1, arg2)
+        ScubaSounds:UnregisterEventListeners()
     elseif event == "GUILD_ROSTER_UPDATE" then
         ScubaSounds:HandleGuildRosterUpdate(arg1)
     elseif event == "UI_ERROR_MESSAGE" then
@@ -993,10 +1036,6 @@ function ScubaSounds:HandleAddonMessage(prefix, message)
             ScubaSounds:SendMessage(playerName .. " received item: " .. itemLink)
         elseif command == ScubaSounds_GzNigelCommand then
             SendChatMessage("gz nigel", "WHISPER", nil, playerName)
-        elseif command == ScubaSounds_PlayDeathSoundCommand and ScubaSounds_Options[ScubaSounds_DeathSoundsOutsideRaid] then
-            if not ScubaSounds:IsPlayerInGroup(playerName) then
-                ScubaSounds:PlaySound(ScubaSounds:SelectRandom(ScubaSounds_DeathSoundMap[playerName]))
-            end
         end
     end
 end
@@ -1070,7 +1109,31 @@ function ScubaSounds:BuildOptionsFrame()
     count = count + 1
     local xOffset = 14 + 200 * (count % 2)
     local yOffset = -9 - 23 * math.floor(count / 2)
-    ScubaSounds:NewCheckBox(parent, ScubaSounds_DeathSoundsOutsideRaid, xOffset, yOffset)
+    ScubaSounds:NewCheckBox(parent, ScubaSounds_DisableSounds, xOffset, yOffset)
+end
+
+function ScubaSounds:UnregisterEventListeners()
+    if ScubaSounds_Options[ScubaSounds_DisableSounds] then
+        -- Only want events related to HelloThere
+        ScubaSounds_EventFrame = CreateFrame("Frame")
+        ScubaSounds_EventFrame:UnregisterEvent("ADDON_LOADED")
+        ScubaSounds_EventFrame:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+        ScubaSounds_EventFrame:UnregisterEvent("UNIT_AURA")
+        ScubaSounds_EventFrame:UnregisterEvent("UNIT_HEALTH")
+        ScubaSounds_EventFrame:UnregisterEvent("UNIT_HEALTH_FREQUENT")
+        ScubaSounds_EventFrame:UnregisterEvent("ZONE_CHANGED")
+        ScubaSounds_EventFrame:UnregisterEvent("ZONE_CHANGED_NEW_AREA")
+        ScubaSounds_EventFrame:UnregisterEvent("ZONE_CHANGED_INDOORS")
+        ScubaSounds_EventFrame:UnregisterEvent("PLAYER_ENTERING_WORLD")
+        ScubaSounds_EventFrame:UnregisterEvent("TRADE_SHOW")
+        ScubaSounds_EventFrame:UnregisterEvent("TRADE_ACCEPT_UPDATE")
+        ScubaSounds_EventFrame:UnregisterEvent("TRADE_CLOSED")
+        ScubaSounds_EventFrame:UnregisterEvent("PLAYER_LOGIN")
+        ScubaSounds_EventFrame:UnregisterEvent("GUILD_ROSTER_UPDATE")
+        ScubaSounds_EventFrame:UnregisterEvent("UI_ERROR_MESSAGE")
+        ScubaSounds_EventFrame:UnregisterEvent("UPDATE_BATTLEFIELD_SCORE")
+        -- Omitted CHAT_MSG_LOOT/CHAT_MSG_ADDON
+    end
 end
 
 function ScubaSounds:ShowOptions()
@@ -1083,7 +1146,11 @@ end
 function ScubaSounds:NewCheckBox(parent, soundOrOption, xOffset, yOffset)
     -- New sound was added or addon loading for the first time ever
     if ScubaSounds_Options[soundOrOption] == nil then
-        ScubaSounds_Options[soundOrOption] = true
+        if soundOrOption == ScubaSounds_DisableSounds then
+            ScubaSounds_Options[soundOrOption] = false
+        else
+            ScubaSounds_Options[soundOrOption] = true
+        end
     end
     if ScubaSounds_Options[soundOrOption .. ScubaSounds_InBattlegrounds] == nil then
         ScubaSounds_Options[soundOrOption .. ScubaSounds_InBattlegrounds] = true
@@ -1140,6 +1207,10 @@ function ScubaSounds:NewCheckBox(parent, soundOrOption, xOffset, yOffset)
 end
 
 function ScubaSounds:ShouldPlay(sound)
+    if ScubaSounds_Options[ScubaSounds_DisableSounds] then
+        return false
+    end
+
     -- Sound is disabled in /ss options
     if ScubaSounds_Options[sound] == false then
         -- NOTE: ScubaSounds_Options[sound] == nil if fresh saved vars
@@ -1175,18 +1246,8 @@ function ScubaSounds:ShouldPlay(sound)
     return true
 end
 
--- /script C_ChatInfo.SendAddonMessage(ScubaSounds_ADDON_PREFIX, ScubaSounds_PlayDeathSoundCommand .. ":Starrs", "GUILD")
 function ScubaSounds:PlaySound(sound)
     if ScubaSounds:ShouldPlay(sound) then
-        local playerName = UnitName("player")
-        local trueName = ScubaSounds:GetTruePlayerName(playerName)
-        if trueName ~= nil then
-            if ScubaSounds_DeathSoundMap[playerName] ~= nil and ScubaSounds:IsInClassicRaid() then
-                C_ChatInfo.SendAddonMessage(ScubaSounds_ADDON_PREFIX,
-                    ScubaSounds_PlayDeathSoundCommand .. ":" .. trueName, "GUILD")
-            end
-        end
-
         -- Play the sound
         PlaySoundFile("Interface/Addons/ScubaSounds/Sounds/" .. sound .. "." .. ScubaSounds_SoundInfo[sound].extension,
             "Master")
