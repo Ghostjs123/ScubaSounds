@@ -726,7 +726,6 @@ ScubaSounds_SoundsOnTimeout = {}
 ScubaSounds_ActiveAuras = {}
 ScubaSounds_HelloTheresInTheLastMinute = 0
 ScubaSounds_PreviousGuildMemberCount = nil
-ScubaSounds_FeignDeaths = {}
 ScubaSounds_InBattleground = false
 
 -- Setup timers
@@ -794,16 +793,6 @@ function ScubaSounds:HandleCombatLogEvent()
     -- Event based parameters (12 - rest)
     local eventBasedParams = {select(12, CombatLogGetCurrentEventInfo())}
 
-    if subEvent == "SPELL_AURA_APPLIED" then
-        if eventBasedParams[1] == ScubaSounds_FeignDeathBuffId then
-            ScubaSounds_FeignDeaths[destGUID] = true
-        end
-    elseif subEvent == "SPELL_AURA_REMOVED" then
-        if eventBasedParams[1] == ScubaSounds_FeignDeathBuffId then
-            ScubaSounds_FeignDeaths[destGUID] = false
-        end
-    end
-
     if subEvent == "UNIT_DIED" then
         ScubaSounds:HandleUnitDeath(destFlags, destName, destGUID, eventBasedParams[1])
     elseif subEvent == "SPELL_RESURRECT" then
@@ -856,14 +845,10 @@ function ScubaSounds:HandleUnitDeath(destFlags, destName, destGUID, environmenta
         end
     end
 
-    if ScubaSounds_FeignDeaths[destGUID] then
-        return
-    end
-
     -- Sounds for the individual. Return after PlaySound
     local trueName = ScubaSounds:GetTruePlayerName(destName)
     if trueName ~= nil then
-        if ScubaSounds_DeathSoundMap[trueName] ~= nil then
+        if ScubaSounds_DeathSoundMap[trueName] ~= nil and not UnitIsFeignDeath(destName) then
             ScubaSounds:PlaySound(ScubaSounds:SelectRandom(ScubaSounds_DeathSoundMap[trueName]))
             return
         end
