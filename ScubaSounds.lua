@@ -307,11 +307,25 @@ ScubaSounds_SoundInfo = {
         timeout = nil,
         alwaysPlays = false
     },
+    ["Pathetic"] = {
+        extension = "wav",
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = nil,
+        alwaysPlays = false
+    },
     ["RecklessnessPoggers"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
         timeout = 60,
+        alwaysPlays = false
+    },
+    ["RetardAlert"] = {
+        extension = "wav",
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = nil,
         alwaysPlays = false
     },
     ["RightToJail"] = {
@@ -380,6 +394,7 @@ ScubaSounds_SoundInfo = {
 }
 
 local Arenthis = "Arenthis"
+local Brutezy = "Brutezy"
 local Chaka = "Chaka"
 local Dahhart = "Dahhart"
 local Doppel = "Doppel"
@@ -404,8 +419,10 @@ local Sweatyhaung = "Sweatyhong"
 local Uncletouches = "Uncletouches"
 local Vimy = "Vimy"
 local Vitoli = "Vitoli"
+local Zarix = "Zarix"
 ScubaSounds_PlayerNames = {
     [Arenthis] = {"Arenthis"},
+    [Brutezy] = {"Brutezy"},
     [Chaka] = {"Chaka", "Chakaog"},
     [Dahhart] = {"Dahhart"},
     [Device] = {"Device"},
@@ -429,11 +446,13 @@ ScubaSounds_PlayerNames = {
     [Sweatyhaung] = {"Sweatyhaung"},
     [Uncletouches] = {"Cuckletonn"},
     [Vimy] = {"Vimy"},
-    [Vitoli] = {"Vitoli", "Uglyvit"}
+    [Vitoli] = {"Vitoli", "Uglyvit"},
+    [Zarix] = {"Yellowfilth"}
 }
 
 ScubaSounds_DeathSoundMap = {
     [Arenthis] = {"ImRetarded"},
+    [Brutezy] = {"RetardAlert"},
     [Chaka] = {"LegoYoda"},
     [Dahhart] = {"Dahhart", "ThanksDahfart"},
     [Device] = {"Keyboard"},
@@ -456,7 +475,8 @@ ScubaSounds_DeathSoundMap = {
     [Sweatyhaung] = {"IgnisDeath", "AriseSoldiers", "Burn"},
     [Uncletouches] = {"BallsATug"},
     [Vimy] = {"ImRetarded"},
-    [Vitoli] = {"VitoliSuxDix"}
+    [Vitoli] = {"VitoliSuxDix"},
+    [Zarix] = {"Pathetic"}
 }
 
 ScubaSounds_BigItemIds = { -- quest rewards
