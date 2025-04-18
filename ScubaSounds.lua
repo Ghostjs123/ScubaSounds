@@ -38,77 +38,77 @@ ScubaSounds_SoundInfo = {
         extension = "mp3",
         duration = 2,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["63KCrit"] = {
         extension = "mp3",
         duration = 4,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["ANewRecord"] = {
         extension = "wav",
         duration = 2,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["AriseSoldiers"] = {
         extension = "ogg",
         duration = 3,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["BallsATug"] = {
         extension = "wav",
         duration = 2,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["BonVoyagePussy"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["BreakingNews"] = {
         extension = "wav",
         duration = 5,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["Burn"] = {
         extension = "ogg",
         duration = 2,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["Cavern"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["CopCuties"] = {
         extension = "wav",
         duration = 4,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["Dahhart"] = {
         extension = "mp3",
         duration = 3,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["Deleted"] = {
@@ -143,14 +143,14 @@ ScubaSounds_SoundInfo = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["Goofy"] = {
         extension = "wav",
         duration = 2,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["HeLipped"] = {
@@ -164,28 +164,28 @@ ScubaSounds_SoundInfo = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["How"] = {
         extension = "wav",
         duration = 3,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["IgnisDeath"] = {
         extension = "ogg",
         duration = 4,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["ImRetarded"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["IWasChosen"] = {
@@ -206,14 +206,14 @@ ScubaSounds_SoundInfo = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["LegoYoda"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["LotrFlee"] = {
@@ -227,14 +227,14 @@ ScubaSounds_SoundInfo = {
         extension = "mp3",
         duration = 6,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["Minecraft"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["Money"] = {
@@ -255,63 +255,63 @@ ScubaSounds_SoundInfo = {
         extension = "wav",
         duration = 2,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["NorthScream"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["NowThatsALottaDmg"] = {
         extension = "wav",
         duration = 2,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["OhBabyATriple"] = {
         extension = "mp3",
         duration = 4,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["OhTheBear"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = true,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["Omg"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["OnceYouGoShaq"] = {
         extension = "wav",
         duration = 3,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["Owow"] = {
         extension = "wav",
         duration = 2,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["Pathetic"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["RecklessnessPoggers"] = {
@@ -325,21 +325,21 @@ ScubaSounds_SoundInfo = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["RightToJail"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["Ryan"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["ScreamingSheep"] = {
@@ -353,7 +353,7 @@ ScubaSounds_SoundInfo = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["SuperSaiyan"] = {
@@ -367,21 +367,21 @@ ScubaSounds_SoundInfo = {
         extension = "mp3",
         duration = 1,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["VitoliSuxDix"] = {
         extension = "wav",
         duration = 2,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["Warsong"] = {
         extension = "mp3",
         duration = 5,
         canOverlapSelf = false,
-        timeout = nil,
+        timeout = 1,
         alwaysPlays = false
     },
     ["YouHaveNoMana"] = {
@@ -1212,6 +1212,12 @@ function ScubaSounds:NewCheckBox(parent, soundOrOption, xOffset, yOffset)
 end
 
 function ScubaSounds:ShouldPlay(sound)
+    -- Trying to order by most freqently to return false to reduce lag
+    -- On timeout
+    if ScubaSounds_SoundsOnTimeout[sound] then
+        return false
+    end
+
     if ScubaSounds_Options[ScubaSounds_DisableSounds] then
         return false
     end
@@ -1240,11 +1246,6 @@ function ScubaSounds:ShouldPlay(sound)
 
     -- Sound is playing and can overlap
     if ScubaSounds_CurrentlyPlayingSounds[sound] and ScubaSounds_SoundInfo[sound].canOverlapSelf then
-        return false
-    end
-
-    -- On timeout
-    if ScubaSounds_SoundsOnTimeout[sound] then
         return false
     end
 
