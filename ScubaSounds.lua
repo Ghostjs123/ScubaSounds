@@ -38,358 +38,307 @@ ScubaSounds_SoundInfo = {
         extension = "mp3",
         duration = 2,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["63KCrit"] = {
         extension = "mp3",
         duration = 4,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["ANewRecord"] = {
         extension = "wav",
         duration = 2,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["AriseSoldiers"] = {
         extension = "ogg",
         duration = 3,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["BallsATug"] = {
         extension = "wav",
         duration = 2,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["BonVoyagePussy"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["BreakingNews"] = {
         extension = "wav",
         duration = 5,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["Burn"] = {
         extension = "ogg",
         duration = 2,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["Cavern"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["CopCuties"] = {
         extension = "wav",
         duration = 4,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["Dahhart"] = {
         extension = "mp3",
         duration = 3,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["Deleted"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = true,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["Discord"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = true,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["Downer"] = {
         extension = "wav",
         duration = 3,
         canOverlapSelf = false,
-        timeout = 2,
-        alwaysPlays = false
+        timeout = 2
     },
     ["DoYouSeeMyMana"] = {
         extension = "wav",
         duration = 2,
         canOverlapSelf = false,
-        timeout = 300,
-        alwaysPlays = false
+        timeout = 300
     },
     ["Fahb"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["Goofy"] = {
         extension = "wav",
         duration = 2,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["HeLipped"] = {
         extension = "wav",
         duration = 2,
         canOverlapSelf = false,
-        timeout = 6,
-        alwaysPlays = false
+        timeout = 6
     },
     ["HelloThere"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["How"] = {
         extension = "wav",
         duration = 3,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["IgnisDeath"] = {
         extension = "ogg",
         duration = 4,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["ImRetarded"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["IWasChosen"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = 10,
-        alwaysPlays = false
+        timeout = 10
     },
     ["Keyboard"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["KyakPenis"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["LegoYoda"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["LotrFlee"] = {
         extension = "wav",
         duration = 7,
         canOverlapSelf = false,
-        timeout = 120,
-        alwaysPlays = false
+        timeout = 120
     },
     ["MagesCancer"] = {
         extension = "mp3",
         duration = 6,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["Minecraft"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["Money"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["MongolianTechno"] = {
         extension = "mp3",
         duration = 22,
         canOverlapSelf = false,
-        timeout = 60,
-        alwaysPlays = false
+        timeout = 60
     },
     ["Nein"] = {
         extension = "wav",
         duration = 2,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["NorthScream"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["NowThatsALottaDmg"] = {
         extension = "wav",
         duration = 2,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["OhBabyATriple"] = {
         extension = "mp3",
         duration = 4,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["OhTheBear"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = true,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["Omg"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["OnceYouGoShaq"] = {
         extension = "wav",
         duration = 3,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["Owow"] = {
         extension = "wav",
         duration = 2,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["Pathetic"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["RecklessnessPoggers"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = 60,
-        alwaysPlays = false
+        timeout = 60
     },
     ["RetardAlert"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["RightToJail"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["Ryan"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["ScreamingSheep"] = {
         extension = "mp3",
         duration = 2,
         canOverlapSelf = false,
-        timeout = 300,
-        alwaysPlays = false
+        timeout = 300
     },
     ["SevvyLove"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["SuperSaiyan"] = {
         extension = "wav",
         duration = 19,
         canOverlapSelf = false,
-        timeout = 60,
-        alwaysPlays = false
+        timeout = 60
     },
     ["ThanksDahfart"] = {
         extension = "mp3",
         duration = 1,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["VitoliSuxDix"] = {
         extension = "wav",
         duration = 2,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["Warsong"] = {
         extension = "mp3",
         duration = 5,
         canOverlapSelf = false,
-        timeout = 1,
-        alwaysPlays = false
+        timeout = 1
     },
     ["YouHaveNoMana"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = 300,
-        alwaysPlays = false
+        timeout = 300
     }
 }
 
@@ -1234,10 +1183,6 @@ function ScubaSounds:ShouldPlay(sound)
         if not ScubaSounds_Options[sound .. ScubaSounds_InBattlegrounds] then
             return false
         end
-    end
-
-    if ScubaSounds_SoundInfo[sound].alwaysPlays then
-        return true
     end
 
     if not ScubaSounds:IsInClassicRaid() and ScubaSounds_Options[ScubaSounds_PlayOutsideRaid] == false then
