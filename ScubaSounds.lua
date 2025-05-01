@@ -112,6 +112,12 @@ ScubaSounds_SoundInfo = {
         canOverlapSelf = true,
         timeout = 1
     },
+    ["Divine"] = {
+        extension = "ogg",
+        duration = 1,
+        canOverlapSelf = true,
+        timeout = 1
+    },
     ["Downer"] = {
         extension = "wav",
         duration = 3,
@@ -126,6 +132,18 @@ ScubaSounds_SoundInfo = {
     },
     ["Fahb"] = {
         extension = "wav",
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = 1
+    },
+    ["Failure"] = {
+        extension = "mp3",
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = 1
+    },
+    ["Frenchie"] = {
+        extension = "ogg",
         duration = 1,
         canOverlapSelf = false,
         timeout = 1
@@ -274,6 +292,12 @@ ScubaSounds_SoundInfo = {
         canOverlapSelf = false,
         timeout = 1
     },
+    ["Rat"] = {
+        extension = "ogg",
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = 1
+    },
     ["RecklessnessPoggers"] = {
         extension = "wav",
         duration = 1,
@@ -339,10 +363,17 @@ ScubaSounds_SoundInfo = {
         duration = 1,
         canOverlapSelf = false,
         timeout = 300
+    },
+    ["YourSoulIsMine"] = {
+        extension = "ogg",
+        duration = 2,
+        canOverlapSelf = false,
+        timeout = 1
     }
 }
 
 local Arenthis = "Arenthis"
+local Beaten = "Beaten"
 local Brutezy = "Brutezy"
 local Chaka = "Chaka"
 local Dahhart = "Dahhart"
@@ -371,6 +402,7 @@ local Vitoli = "Vitoli"
 local Zarix = "Zarix"
 ScubaSounds_PlayerNames = {
     [Arenthis] = {"Arenthis"},
+    [Beaten] = {"Bbofire", "Vbc"},
     [Brutezy] = {"Brutezy"},
     [Chaka] = {"Chaka", "Chakaog"},
     [Dahhart] = {"Dahhart"},
@@ -401,6 +433,7 @@ ScubaSounds_PlayerNames = {
 
 ScubaSounds_DeathSoundMap = {
     [Arenthis] = {"ImRetarded"},
+    [Beaten] = {"Divine"},
     [Brutezy] = {"RetardAlert"},
     [Chaka] = {"LegoYoda"},
     [Dahhart] = {"Dahhart", "ThanksDahfart"},
@@ -413,7 +446,7 @@ ScubaSounds_DeathSoundMap = {
     [Kaymon] = {"BreakingNews"},
     [Keyteor] = {"Owow"},
     [Laak] = {"Minecraft"},
-    [Leaflix] = {"ANewRecord"},
+    [Leaflix] = {"ANewRecord", "Failure", "Rat"},
     [Nacho] = {"Goofy"},
     [Nips] = {"CopCuties"},
     [Scharf] = {"How"},
@@ -423,7 +456,7 @@ ScubaSounds_DeathSoundMap = {
     [Stud] = {"Ryan"},
     [Sweatyhaung] = {"IgnisDeath", "AriseSoldiers", "Burn"},
     [Uncletouches] = {"BallsATug"},
-    [Vimy] = {"ImRetarded"},
+    [Vimy] = {"Frenchie"},
     [Vitoli] = {"VitoliSuxDix"},
     [Zarix] = {"Pathetic"}
 }
@@ -462,6 +495,7 @@ ScubaSounds_BigItemIds = { -- quest rewards
 12361, -- Blue Sapphire
 13468, -- Black Lotus
 7080, -- Essence of Water
+7082, -- Essence of Air
 19024, -- Arena Grand Master
 1404, -- Tidal Charm
 23007, -- Piglet's Collar
@@ -640,6 +674,7 @@ ScubaSounds_FlameBuffetDebuffId = 23341
 ScubaSounds_BurningAdrenalineDebuffId = 18173
 -- Spells
 ScubaSounds_AnkhSpellId = 20608
+ScubaSounds_SoulStoneSpellId = 20707
 ScubaSounds_RecklessnessSpellId = 1719
 ScubaSounds_GeddonAoeSpellId = 19695
 ScubaSounds_ChromaggusBreathSpellIds = {
@@ -693,7 +728,8 @@ ScubaSounds_IsFirstLogin = true
 ScubaSounds_CurrentlyPlayingSounds = {}
 ScubaSounds_SoundsOnTimeout = {}
 ScubaSounds_ActiveAuras = {}
-ScubaSounds_HelloTheresInTheLastMinute = 0
+ScubaSounds_RecentHelloTheresCount = 0
+ScubaSounds_RecentDeathSoundsCount = 0
 ScubaSounds_PreviousGuildMemberCount = nil
 ScubaSounds_InBattleground = false
 
@@ -774,13 +810,7 @@ function ScubaSounds:HandleCombatLogEvent()
     elseif subEvent == "ENVIRONMENTAL_DAMAGE" then
         ScubaSounds:HandleDamage(sourceGUID, destGUID, eventBasedParams[2], 0, false, -1)
     elseif subEvent == "SPELL_CAST_SUCCESS" and eventBasedParams[1] == ScubaSounds_GeddonAoeSpellId then
-        ScubaSounds:PlaySound("LotrFlee")
-    elseif subEvent == "SPELL_CAST_SUCCESS" and eventBasedParams[1] == ScubaSounds_RecklessnessSpellId then
-        if sourceFlags and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_RAID) ~= 0 then
-            if select(2, UnitClass(sourceName)) == "WARRIOR" then
-                ScubaSounds:PlaySound("RecklessnessPoggers")
-            end
-        end
+        ScubaSounds:HandleSpellCast(sourceGUID, sourceName, sourceFlags, eventBasedParams[1])
     end
 end
 
@@ -818,7 +848,7 @@ function ScubaSounds:HandleUnitDeath(destFlags, destName, destGUID, environmenta
     local trueName = ScubaSounds:GetTruePlayerName(destName)
     if trueName ~= nil then
         if ScubaSounds_DeathSoundMap[trueName] ~= nil and not UnitIsFeignDeath(destName) then
-            ScubaSounds:PlaySound(ScubaSounds:SelectRandom(ScubaSounds_DeathSoundMap[trueName]))
+            ScubaSounds:PlayDeathSoundFor(trueName)
             return
         end
     end
@@ -906,6 +936,20 @@ function ScubaSounds:HandleDamage(sourceGUID, destGUID, amount, critical, overki
     end
 end
 
+function ScubaSounds:HandleSpellCast(sourceGUID, sourceName, sourceFlags, spellId)
+    if spellId == ScubaSounds_GeddonAoeSpellId then
+        ScubaSounds:PlaySound("LotrFlee")
+    elseif spellId == ScubaSounds_RecklessnessSpellId then
+        if sourceFlags and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_RAID) ~= 0 then
+            if select(2, UnitClass(sourceName)) == "WARRIOR" then
+                ScubaSounds:PlaySound("RecklessnessPoggers")
+            end
+        end
+    elseif spellId == ScubaSounds_SoulStoneSpellId and sourceGUID == UnitGUID("player") then
+        ScubaSounds:PlaySound("YourSoulIsMine")
+    end
+end
+
 function ScubaSounds:HandleUnitHealth(unit)
     local guid = UnitGUID(unit)
     if guid then
@@ -977,13 +1021,13 @@ function ScubaSounds:HandleAddonMessage(prefix, message)
     if prefix == ScubaSounds_ADDON_PREFIX then
         local command, playerName, itemLink = string.match(message, "(%w+):([^:]+):?(.*)")
         if command == ScubaSounds_LegendaryReceivedCommand then
-            ScubaSounds_HelloTheresInTheLastMinute = ScubaSounds_HelloTheresInTheLastMinute + 1
-            if ScubaSounds_HelloTheresInTheLastMinute == 3 then
-                ScubaSounds_HelloTheresInTheLastMinute = 0
+            ScubaSounds_RecentHelloTheresCount = ScubaSounds_RecentHelloTheresCount + 1
+            if ScubaSounds_RecentHelloTheresCount == 3 then -- in the last minute
+                ScubaSounds_RecentHelloTheresCount = 0
                 ScubaSounds:PlaySound("OhBabyATriple")
             else
-                C_Timer.After(60, function()
-                    ScubaSounds_HelloTheresInTheLastMinute = ScubaSounds_HelloTheresInTheLastMinute - 1
+                C_Timer.After(60, function() -- minute
+                    ScubaSounds_RecentHelloTheresCount = ScubaSounds_RecentHelloTheresCount - 1
                 end)
                 ScubaSounds:PlaySound("HelloThere")
             end
@@ -1024,10 +1068,8 @@ function ScubaSounds:UpdateBattlefieldScore()
     local playerFaction = UnitFactionGroup("player")
     local winner = GetBattlefieldWinner()
     -- 0 = Horde, 1 = Alliance, nil if unknown
-    local win = (winner == 0 and playerFaction == "Horde") or
-                (winner == 1 and playerFaction == "Alliance")
-    local loss = (winner == 0 and playerFaction == "Alliance") or
-                 (winner == 1 and playerFaction == "Horde")
+    local win = (winner == 0 and playerFaction == "Horde") or (winner == 1 and playerFaction == "Alliance")
+    local loss = (winner == 0 and playerFaction == "Alliance") or (winner == 1 and playerFaction == "Horde")
     if win then
         ScubaSounds:PlaySound("MongolianTechno")
     elseif loss then
@@ -1124,7 +1166,7 @@ function ScubaSounds:NewCheckBox(parent, soundOrOption, xOffset, yOffset)
             ScubaSounds:SendMessage(soundOrOption .. " disabled")
         end
     end)
-    checkbox1:SetScript("OnEnter", function(self) 
+    checkbox1:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
         GameTooltip:SetText("Enabled", 255, 255, 0, 1, 1)
         GameTooltip:Show()
@@ -1145,7 +1187,7 @@ function ScubaSounds:NewCheckBox(parent, soundOrOption, xOffset, yOffset)
                 ScubaSounds:SendMessage(soundOrOption .. " disabled" .. ScubaSounds_InBattlegrounds)
             end
         end)
-        checkbox2:SetScript("OnEnter", function(self) 
+        checkbox2:SetScript("OnEnter", function(self)
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
             GameTooltip:SetText("Enabled In Battlegrounds", 255, 255, 0, 1, 1)
             GameTooltip:Show()
@@ -1219,6 +1261,16 @@ function ScubaSounds:PlaySound(sound)
     return false
 end
 -- /script PlaySoundFile("Interface/Addons/ScubaSounds/Sounds/HeLipped.wav", "Master")
+
+function ScubaSounds:PlayDeathSoundFor(name)
+    if ScubaSounds_RecentDeathSoundsCount < 3 then -- 3 sounds / second
+        ScubaSounds_RecentDeathSoundsCount = ScubaSounds_RecentDeathSoundsCount + 1
+        ScubaSounds:PlaySound(ScubaSounds:SelectRandom(ScubaSounds_DeathSoundMap[name]))
+        C_Timer.After(1, function() -- second
+            ScubaSounds_RecentDeathSoundsCount = ScubaSounds_RecentDeathSoundsCount - 1
+        end)
+    end
+end
 
 SLASH_SCUBASOUNDS1 = "/ss"
 SLASH_SCUBASOUNDS2 = "/scubasounds"
