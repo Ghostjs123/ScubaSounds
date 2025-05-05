@@ -238,6 +238,12 @@ ScubaSounds_SoundInfo = {
         canOverlapSelf = false,
         timeout = 60
     },
+    ["MyGlasses"] = {
+        extension = "ogg",
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = 1
+    },
     ["Nein"] = {
         extension = "wav",
         duration = 2,
@@ -402,7 +408,7 @@ local Vitoli = "Vitoli"
 local Zarix = "Zarix"
 ScubaSounds_PlayerNames = {
     [Arenthis] = {"Arenthis"},
-    [Beaten] = {"Bbofire", "Vbc"},
+    [Beaten] = {"Bbofire", "Vbc", "Brotandre", "Bbqspice"},
     [Brutezy] = {"Brutezy"},
     [Chaka] = {"Chaka", "Chakaog"},
     [Dahhart] = {"Dahhart"},
@@ -458,7 +464,7 @@ ScubaSounds_DeathSoundMap = {
     [Uncletouches] = {"BallsATug"},
     [Vimy] = {"Frenchie"},
     [Vitoli] = {"VitoliSuxDix"},
-    [Zarix] = {"Pathetic"}
+    [Zarix] = {"MyGlasses"}
 }
 
 ScubaSounds_BigItemIds = { -- quest rewards
