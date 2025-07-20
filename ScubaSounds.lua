@@ -12,6 +12,7 @@ ScubaSounds = {}
 -- OptionsFrame
 ScubaSounds.OptionsCheckboxes = {}
 
+-- Reminder to update UnregisterEventListeners when registering new events
 ScubaSounds_EventFrame = CreateFrame("Frame")
 ScubaSounds_EventFrame:RegisterEvent("ADDON_LOADED")
 ScubaSounds_EventFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
@@ -31,6 +32,7 @@ ScubaSounds_EventFrame:RegisterEvent("PLAYER_LOGIN")
 ScubaSounds_EventFrame:RegisterEvent("GUILD_ROSTER_UPDATE")
 ScubaSounds_EventFrame:RegisterEvent("UI_ERROR_MESSAGE")
 ScubaSounds_EventFrame:RegisterEvent("UPDATE_BATTLEFIELD_SCORE")
+ScubaSounds_EventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
 ScubaSounds_EventFrame:SetScript("OnEvent", ScubaSounds_OnEvent)
 
 ScubaSounds_SoundInfo = {
@@ -44,7 +46,7 @@ ScubaSounds_SoundInfo = {
         extension = "mp3",
         duration = 4,
         canOverlapSelf = false,
-        timeout = 1
+        timeout = 5
     },
     ["ANewRecord"] = {
         extension = "wav",
@@ -61,6 +63,12 @@ ScubaSounds_SoundInfo = {
     ["BallsATug"] = {
         extension = "wav",
         duration = 2,
+        canOverlapSelf = false,
+        timeout = 1
+    },
+    ["BestWarlock"] = {
+        extension = "ogg",
+        duration = 3,
         canOverlapSelf = false,
         timeout = 1
     },
@@ -86,7 +94,13 @@ ScubaSounds_SoundInfo = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
-        timeout = 1
+        timeout = 30
+    },
+    ["ComeOnYouApes"] = {
+        extension = "ogg",
+        duration = 11,
+        canOverlapSelf = false,
+        timeout = 30
     },
     ["CopCuties"] = {
         extension = "wav",
@@ -105,6 +119,12 @@ ScubaSounds_SoundInfo = {
         duration = 1,
         canOverlapSelf = true,
         timeout = 1
+    },
+    ["DisableHisHand"] = {
+        extension = "ogg",
+        duration = 8,
+        canOverlapSelf = true,
+        timeout = 30
     },
     ["Discord"] = {
         extension = "wav",
@@ -250,6 +270,12 @@ ScubaSounds_SoundInfo = {
         canOverlapSelf = false,
         timeout = 1
     },
+    ["NeverGoFullRetard"] = {
+        extension = "ogg",
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = 1
+    },
     ["NorthScream"] = {
         extension = "wav",
         duration = 1,
@@ -332,13 +358,19 @@ ScubaSounds_SoundInfo = {
         extension = "mp3",
         duration = 2,
         canOverlapSelf = false,
-        timeout = 300
+        timeout = 15
     },
     ["SevvyLove"] = {
         extension = "wav",
         duration = 1,
         canOverlapSelf = false,
         timeout = 1
+    },
+    ["Shakira"] = {
+        extension = "ogg",
+        duration = 11,
+        canOverlapSelf = false,
+        timeout = 100
     },
     ["SuperSaiyan"] = {
         extension = "wav",
@@ -364,6 +396,12 @@ ScubaSounds_SoundInfo = {
         canOverlapSelf = false,
         timeout = 1
     },
+    ["WhoAreYou"] = {
+        extension = "ogg",
+        duration = 3,
+        canOverlapSelf = false,
+        timeout = 1
+    },
     ["YouHaveNoMana"] = {
         extension = "wav",
         duration = 1,
@@ -377,18 +415,24 @@ ScubaSounds_SoundInfo = {
         timeout = 1
     }
 }
+ScubaSounds_StarshipTroopersSounds = {"Cavern", "ComeOnYouApes", "DisableHisHand"}
 
 local Arenthis = "Arenthis"
 local Beaten = "Beaten"
 local Brutezy = "Brutezy"
 local Chaka = "Chaka"
+local Cousy = "Cousy"
 local Dahhart = "Dahhart"
 local Doppel = "Doppel"
 local Device = "Device"
 local Fahb = "Fahb"
+local Fishy = "Fishy"
 local Germanicus = "Germanicus"
 local Hellexus = "Hellexus"
+local Hippie = "Hippie"
 local Jackson = "Jackson"
+local Junny = "Junny"
+local Kaemo = "Kaemo"
 local Kaymon = "Kaymon"
 local Keyteor = "Keyteor"
 local Laak = "Laak"
@@ -400,6 +444,7 @@ local Scharf = "Scharf"
 local Sevvy = "Sevvy"
 local Sleeby = "Sleeby"
 local Starrs = "Starrs"
+local Stavis = "Stavis"
 local Stud = "Stud"
 local Sweatyhaung = "Sweatyhong"
 local Uncletouches = "Uncletouches"
@@ -411,13 +456,18 @@ ScubaSounds_PlayerNames = {
     [Beaten] = {"Bbofire", "Vbc", "Brotandre", "Bbqspice"},
     [Brutezy] = {"Brutezy"},
     [Chaka] = {"Chaka", "Chakaog"},
+    [Cousy] = {"Cousy"},
     [Dahhart] = {"Dahhart"},
     [Device] = {"Device"},
     [Doppel] = {"Doppel"},
     [Fahb] = {"Fahbulous", "Resistofcofc", "Theemus", "Magev", "Resistofc"},
+    [Fishy] = {"Fishy"},
     [Germanicus] = {"Germanicus"},
     [Hellexus] = {"Hellexus"},
+    [Hippie] = {"Hippie"},
     [Jackson] = {"Grandmasterb", "Gaymasterb", "Combyobeard"},
+    [Junny] = {"Junny"},
+    [Kaemo] = {"Kaemo"},
     [Kaymon] = {"Kaymon"},
     [Keyteor] = {"Keytor", "Seiken"},
     [Laak] = {"Laak"},
@@ -429,6 +479,7 @@ ScubaSounds_PlayerNames = {
     [Sevvy] = {"Sevvy", "Blowies"},
     [Sleeby] = {"Sleeby"},
     [Starrs] = {"Starrs"},
+    [Stavis] = {"Stavis"},
     [Stud] = {"Bitcoins"},
     [Sweatyhaung] = {"Sweatyhaung"},
     [Uncletouches] = {"Cuckletonn"},
@@ -436,19 +487,28 @@ ScubaSounds_PlayerNames = {
     [Vitoli] = {"Vitoli", "Uglyvit"},
     [Zarix] = {"Yellowfilth"}
 }
+ScubaSounds_PlayerNameToTrueName = {}
+for trueName, otherNames in pairs(ScubaSounds_PlayerNames) do
+    for _, otherName in pairs(otherNames) do
+        ScubaSounds_PlayerNameToTrueName[otherName] = trueName
+    end
+end
 
 ScubaSounds_DeathSoundMap = {
     [Arenthis] = {"ImRetarded"},
     [Beaten] = {"Divine"},
     [Brutezy] = {"RetardAlert"},
     [Chaka] = {"LegoYoda"},
+    [Cousy] = {"BestWarlock"},
     [Dahhart] = {"Dahhart", "ThanksDahfart"},
     [Device] = {"Keyboard"},
     [Doppel] = {"Discord"},
     [Fahb] = {"Fahb"},
     [Germanicus] = {"Nein"},
     [Hellexus] = {"Money"},
+    [Hippie] = {"NeverGoFullRetard"},
     [Jackson] = {"Cavern"},
+    [Junny] = {"WhoAreYou"},
     [Kaymon] = {"BreakingNews"},
     [Keyteor] = {"Owow"},
     [Laak] = {"Minecraft"},
@@ -466,6 +526,7 @@ ScubaSounds_DeathSoundMap = {
     [Vitoli] = {"VitoliSuxDix"},
     [Zarix] = {"MyGlasses"}
 }
+ScubaSounds_DeviceDeathSoundRotation = {Kaemo, Fishy, Stavis} -- only true names here
 
 ScubaSounds_BigItemIds = { -- quest rewards
 18608, -- Benediction
@@ -628,6 +689,10 @@ ScubaSounds_BigItemIds = { -- quest rewards
 21321, -- Red Qiraji Resonating Crystal
 21176 -- Black Qiraji Resonating Crystal
 }
+ScubaSounds_BigItemIdsMap = {}
+for _, id in pairs(ScubaSounds_BigItemIds) do
+    ScubaSounds_BigItemIdsMap[tostring(id)] = true
+end
 
 ScubaSounds_WompWompItemIds = { -- mining stuff
 12364, -- Huge Emerald
@@ -645,6 +710,10 @@ ScubaSounds_WompWompItemIds = { -- mining stuff
 869, -- Dazzling Longsword
 868 -- Ardent Custodian
 }
+ScubaSounds_WompWompItemIdsMap = {}
+for _, id in pairs(ScubaSounds_WompWompItemIds) do
+    ScubaSounds_WompWompItemIdsMap[tostring(id)] = true
+end
 
 ScubaSounds_EndBossIds = { -- Instanced
 11502, -- Rag
@@ -664,10 +733,11 @@ ScubaSounds_EndBossIds = { -- Instanced
 }
 
 -- Units
-ScubaSounds_CoreHoundUnitIds = {11673, -- Ancient Core Hound
-11671, -- Core Hound
-184367, -- Core Hound <Spawn of Magmadar>
-228907 -- Core Hound <Spawn of Magmadar>
+ScubaSounds_CoreHoundUnitIds = {
+    11673, -- Ancient Core Hound
+    11671, -- Core Hound
+    184367, -- Core Hound <Spawn of Magmadar>
+    228907 -- Core Hound <Spawn of Magmadar>
 }
 -- Buffs
 ScubaSounds_MarkOfTheChosenBuffId = 21970
@@ -683,6 +753,8 @@ ScubaSounds_AnkhSpellId = 20608
 ScubaSounds_SoulStoneSpellId = 20707
 ScubaSounds_RecklessnessSpellId = 1719
 ScubaSounds_GeddonAoeSpellId = 19695
+ScubaSounds_SarturaWhirlwindSpellId = 26083
+ScubaSounds_CThunDarkGlareSpellId = 26029
 ScubaSounds_ChromaggusBreathSpellIds = {
     [23308] = true, -- Incinerate
     [23309] = true, -- Incinerate
@@ -699,6 +771,8 @@ ScubaSounds_ChromaggusBreathSpellIds = {
 ScubaSounds_WarsongZoneId = 3277
 ScubaSounds_OnyxiasLairId = 249
 ScubaSounds_AlteracValleyId = 1459
+ScubaSounds_Aq20Id = 509
+ScubaSounds_Aq40Id = 531
 ScubaSounds_RaidIds = {
     [409] = "Molten Core",
     [469] = "Blackwing Lair",
@@ -708,13 +782,30 @@ ScubaSounds_RaidIds = {
     [249] = "Onyxia's Lair",
     [309] = "Zul'Gurub"
 }
+ScubaSounds_RaidZoneNames = {
+    ["Molten Core"] = true,
+    ["Blackwing Lair"] = true,
+    ["Ruins of Ahn'Qiraj"] = true,
+    ["Temple of Ahn'Qiraj"] = true,
+    ["Naxxramas"] = true,
+    ["Onyxia's Lair"] = true,
+    ["Zul'Gurub"] = true
+}
 
 -- Addon message stuff
 ScubaSounds_ADDON_PREFIX = "SSAddonPrefix" -- 16 char limit
 C_ChatInfo.RegisterAddonMessagePrefix(ScubaSounds_ADDON_PREFIX)
 ScubaSounds_LegendaryReceivedCommand = "LEGENDARYRECEIVED"
 ScubaSounds_GzNigelCommand = "GZNIGEL"
-ScubaSounds_GzNigelSenders = {"Aloha", "Stavis", "Zarix", "Fahbulous"}
+ScubaSounds_GzNigelSenders = {
+    ["Aloha"] = true, 
+    ["Stavis"] = true, 
+    ["Zarix"] = true, 
+    ["Fahbulous"] = true,
+    ["Mangan"] = true,
+    ["Kaymon"] = true
+}
+ScubaSounds_CThunCombatCommand = "CTHUNCOMBATSTARTED"
 
 -- Saved variables
 ScubaSounds_Options = {}
@@ -738,6 +829,7 @@ ScubaSounds_RecentHelloTheresCount = 0
 ScubaSounds_RecentDeathSoundsCount = 0
 ScubaSounds_PreviousGuildMemberCount = nil
 ScubaSounds_InBattleground = false
+ScubaSounds_InCombatWithCThun = false
 
 -- Setup timers
 C_Timer.After(5, function()
@@ -758,7 +850,7 @@ function ScubaSounds_OnEvent(self, event, arg1, arg2, arg3)
             local itemLink = GetTradePlayerItemLink(i)
             if itemLink then
                 local _, _, itemQuality = GetItemInfo(itemLink)
-                if itemQuality == 4 and ScubaSounds:HasValue(ScubaSounds_GzNigelSenders, UnitName("player")) then
+                if itemQuality == 4 and ScubaSounds:Contains(ScubaSounds_GzNigelSenders, UnitName("player")) then
                     C_ChatInfo.SendAddonMessage(ScubaSounds_ADDON_PREFIX,
                         ScubaSounds_GzNigelCommand .. ":" .. ScubaSounds_TradePartnerName, "GUILD")
                 end
@@ -792,6 +884,8 @@ function ScubaSounds_OnEvent(self, event, arg1, arg2, arg3)
         ScubaSounds:HandleGuildRosterUpdate(arg1)
     elseif event == "UI_ERROR_MESSAGE" then
         ScubaSounds:HandleUiErrorMessage(arg2)
+    elseif event == "PLAYER_REGEN_DISABLED" then
+        ScubaSounds:HandlePlayerRegenDisabled()
     elseif event == "UPDATE_BATTLEFIELD_SCORE" then
         ScubaSounds:UpdateBattlefieldScore()
     end
@@ -809,13 +903,14 @@ function ScubaSounds:HandleCombatLogEvent()
     elseif subEvent == "SPELL_RESURRECT" then
         ScubaSounds:HandleResurrect(destName, eventBasedParams[1])
     elseif subEvent == "SWING_DAMAGE" then
-        ScubaSounds:HandleDamage(sourceGUID, destGUID, eventBasedParams[1], eventBasedParams[7], eventBasedParams[2])
+        ScubaSounds:HandleDamage(sourceGUID, destGUID, destFlags, eventBasedParams[1], eventBasedParams[7],
+            eventBasedParams[2])
     elseif subEvent == "SPELL_DAMAGE" or subEvent == "RANGE_DAMAGE" then
-        ScubaSounds:HandleDamage(sourceGUID, destGUID, eventBasedParams[4], eventBasedParams[10], eventBasedParams[5],
-            eventBasedParams[1])
+        ScubaSounds:HandleDamage(sourceGUID, destGUID, destFlags, eventBasedParams[4], eventBasedParams[10],
+            eventBasedParams[5], eventBasedParams[1])
     elseif subEvent == "ENVIRONMENTAL_DAMAGE" then
-        ScubaSounds:HandleDamage(sourceGUID, destGUID, eventBasedParams[2], 0, false, -1)
-    elseif subEvent == "SPELL_CAST_SUCCESS" and eventBasedParams[1] == ScubaSounds_GeddonAoeSpellId then
+        ScubaSounds:HandleDamage(sourceGUID, destGUID, destFlags, eventBasedParams[2], 0, false, -1)
+    elseif subEvent == "SPELL_CAST_SUCCESS" then
         ScubaSounds:HandleSpellCast(sourceGUID, sourceName, sourceFlags, eventBasedParams[1])
     end
 end
@@ -853,9 +948,19 @@ function ScubaSounds:HandleUnitDeath(destFlags, destName, destGUID, environmenta
     -- Sounds for the individual. Return after PlaySound
     local trueName = ScubaSounds:GetTruePlayerName(destName)
     if trueName ~= nil then
-        if ScubaSounds_DeathSoundMap[trueName] ~= nil and not UnitIsFeignDeath(destName) then
-            ScubaSounds:PlayDeathSoundFor(trueName)
-            return
+        if not UnitIsFeignDeath(destName) then
+            if ScubaSounds_DeathSoundMap[trueName] ~= nil then
+                ScubaSounds:PlayDeathSoundFor(trueName)
+                return
+            end
+            if ScubaSounds:HasValue(ScubaSounds_DeviceDeathSoundRotation, trueName) then
+                local currentOwner = ScubaSounds_DeviceDeathSoundRotation[ScubaSounds:GetWeekIndex(
+                    ScubaSounds_DeviceDeathSoundRotation)]
+                if trueName == currentOwner then
+                    ScubaSounds:PlaySound("Keyboard")
+                    return
+                end
+            end
         end
     end
 
@@ -915,7 +1020,7 @@ function ScubaSounds:HandleResurrect(destName, spellId)
     end
 end
 
-function ScubaSounds:HandleDamage(sourceGUID, destGUID, amount, critical, overkill, spellId)
+function ScubaSounds:HandleDamage(sourceGUID, destGUID, destFlags, amount, critical, overkill, spellId)
     -- Stuff involving me
     if destGUID == UnitGUID("player") then -- I took the dmg
         if amount >= UnitHealthMax("player") * 0.95 and overkill > 0 then
@@ -937,8 +1042,16 @@ function ScubaSounds:HandleDamage(sourceGUID, destGUID, amount, critical, overki
     local _, _, _, _, _, sourceUnitId = strsplit("-", sourceGUID)
     sourceUnitId = tonumber(sourceUnitId)
 
-    if ScubaSounds:HasValue(ScubaSounds_CoreHoundUnitIds, sourceUnitId) and overkill > 0 then
+    if ScubaSounds:HasValue(ScubaSounds_CoreHoundUnitIds, sourceUnitId) and overkill and overkill > 0 then
         ScubaSounds:PlaySound("OhTheBear")
+        return
+    end
+
+    if spellId == ScubaSounds_CThunDarkGlareSpellId then
+        if bit.band(destFlags, COMBATLOG_OBJECT_TYPE_PLAYER) > 0 and overkill and overkill > 0 then
+            ScubaSounds:PlaySound("Keyboard")
+            return
+        end
     end
 end
 
@@ -953,6 +1066,8 @@ function ScubaSounds:HandleSpellCast(sourceGUID, sourceName, sourceFlags, spellI
         end
     elseif spellId == ScubaSounds_SoulStoneSpellId and sourceGUID == UnitGUID("player") then
         ScubaSounds:PlaySound("YourSoulIsMine")
+    elseif spellId == ScubaSounds_SarturaWhirlwindSpellId then
+        ScubaSounds:PlaySound("ScreamingSheep")
     end
 end
 
@@ -992,13 +1107,21 @@ function ScubaSounds:HandleUnitHealth(unit)
 end
 
 function ScubaSounds:HandleZoneChange()
+    -- Reset any relevant state
+    ScubaSounds_InCombatWithCThun = false
+    -- Zone specific sounds
     local currentZoneId = C_Map.GetBestMapForUnit("player")
-    if currentZoneId == ScubaSounds_WarsongZoneId then
+    local currentZoneName = GetRealZoneText()
+    -- In some cases C_Map.GetBestMapForUnit("player") returns nil so checking zone text as a fallback
+    if currentZoneId == ScubaSounds_WarsongZoneId or currentZoneName == "Warsong Gulch" then
         ScubaSounds:PlaySound("Warsong")
-    elseif currentZoneId == ScubaSounds_OnyxiasLairId then
+    elseif currentZoneId == ScubaSounds_OnyxiasLairId or currentZoneName == "Onyxia's Lair" then
         ScubaSounds:PlaySound("Cavern")
-    elseif currentZoneId == ScubaSounds_AlteracValleyId then
+    elseif currentZoneId == ScubaSounds_AlteracValleyId or currentZoneName == "Alterac Valley" then
         ScubaSounds:PlaySound("RightToJail")
+    elseif currentZoneId == ScubaSounds_Aq40Id or currentZoneName == "Temple of Ahn'Qiraj" or currentZoneId ==
+        ScubaSounds_Aq20Id or currentZoneName == "Ruins of Ahn'Qiraj" then
+        ScubaSounds:PlaySound(ScubaSounds:SelectRandom(ScubaSounds_StarshipTroopersSounds))
     end
 end
 
@@ -1011,13 +1134,15 @@ function ScubaSounds:HandleLoot(lootMessage)
         local itemLink = lootMessage:match("|c%x+|Hitem:.-|h%[.-%]|h|r")
         if itemLink then
             local itemId = ScubaSounds:ItemIdFromItemLink(itemLink)
-            if (itemLink:find("|cffff8000") or ScubaSounds:HasValue(ScubaSounds_BigItemIds, itemId)) and
+            if (itemLink:find("|cffff8000") or ScubaSounds:Contains(ScubaSounds_BigItemIdsMap, tostring(itemId))) and
                 not ScubaSounds:IsItemLinkEnchanted(itemLink) then -- cffff8000 = legendary
                 C_ChatInfo.SendAddonMessage(ScubaSounds_ADDON_PREFIX, ScubaSounds_LegendaryReceivedCommand .. ":" ..
                     playerName .. ":" .. itemLink, "GUILD")
+                    return
             end
-            if ScubaSounds:HasValue(ScubaSounds_WompWompItemIds, itemId) then
+            if ScubaSounds:Contains(ScubaSounds_WompWompItemIdsMap, tostring(itemId)) then
                 ScubaSounds:PlaySound("Downer")
+                return
             end
         end
     end
@@ -1040,6 +1165,9 @@ function ScubaSounds:HandleAddonMessage(prefix, message)
             ScubaSounds:SendMessage(playerName .. " received item: " .. itemLink)
         elseif command == ScubaSounds_GzNigelCommand then
             SendChatMessage("gz nigel", "WHISPER", nil, playerName)
+        elseif command == ScubaSounds_CThunCombatCommand and not ScubaSounds_InCombatWithCThun then
+            ScubaSounds_InCombatWithCThun = true
+            ScubaSounds:PlaySound("Shakira")
         end
     end
 end
@@ -1067,6 +1195,15 @@ end
 function ScubaSounds:HandleUiErrorMessage(errorMessage)
     if errorMessage == ERR_OUT_OF_MANA then
         ScubaSounds:PlaySound(ScubaSounds:SelectRandom({"DoYouSeeMyMana", "YouHaveNoMana"}))
+    end
+end
+
+function ScubaSounds:HandlePlayerRegenDisabled()
+    local name = UnitName("target")
+    if (name == "C'Thun" or name == "Earthborer") and not ScubaSounds_InCombatWithCThun then
+        ScubaSounds_InCombatWithCThun = true
+        ScubaSounds:PlaySound("Shakira")
+        C_ChatInfo.SendAddonMessage(ScubaSounds_ADDON_PREFIX, ScubaSounds_CThunCombatCommand, "GUILD")
     end
 end
 
@@ -1134,6 +1271,7 @@ function ScubaSounds:UnregisterEventListeners()
         ScubaSounds_EventFrame:UnregisterEvent("GUILD_ROSTER_UPDATE")
         ScubaSounds_EventFrame:UnregisterEvent("UI_ERROR_MESSAGE")
         ScubaSounds_EventFrame:UnregisterEvent("UPDATE_BATTLEFIELD_SCORE")
+        ScubaSounds_EventFrame:UnregisterEvent("PLAYER_REGEN_DISABLED")
         -- Omitted CHAT_MSG_LOOT/CHAT_MSG_ADDON
     end
 end
@@ -1369,7 +1507,8 @@ end
 
 function ScubaSounds:IsInClassicRaid()
     local mapID = C_Map.GetBestMapForUnit("player")
-    return ScubaSounds_RaidIds[mapID] ~= nil
+    local zoneName = GetRealZoneText()
+    return ScubaSounds_RaidIds[mapID] ~= nil or ScubaSounds_RaidZoneNames[zoneName] or false
 end
 
 function ScubaSounds:IsPlayerInGroup(playerName)
@@ -1393,15 +1532,7 @@ function ScubaSounds:IsPlayerInGroup(playerName)
 end
 
 function ScubaSounds:GetTruePlayerName(playerName)
-    -- This could be made to be O(1) with a reverse map but idc
-    for trueName, otherNames in pairs(ScubaSounds_PlayerNames) do
-        if ScubaSounds:HasValue(otherNames, playerName) then
-            return trueName
-        end
-    end
-    -- Better than nil
-    local trueName = UnitName(playerName)
-    return trueName or playerName
+    return ScubaSounds_PlayerNameToTrueName[playerName] or UnitName(playerName) or playerName
 end
 
 function ScubaSounds:SelectRandom(list)
@@ -1410,4 +1541,35 @@ function ScubaSounds:SelectRandom(list)
     end
     local index = math.random(1, #list)
     return list[index]
+end
+
+function ScubaSounds:GetWeekIndex(list)
+    local now = time(date("!*t")) -- current UTC timestamp
+    local nowDate = date("!*t", now)
+
+    -- Calculate how many days since last Tuesday (Tuesday = 2 in Lua date)
+    local daysSinceTuesday = (nowDate.wday - 3) % 7 -- 1=Sunday, 2=Monday, 3=Tuesday...
+
+    -- Find the most recent Tuesday at 00:00 UTC
+    local lastTuesday = now - (daysSinceTuesday * 86400)
+    local tuesdayWeek = date("!*t", lastTuesday)
+
+    -- Get ISO-like year and day-of-year of that Tuesday
+    local tuesdayYear = tuesdayWeek.year
+    local jan1 = time({
+        year = tuesdayYear,
+        month = 1,
+        day = 1,
+        hour = 0
+    })
+    local daysSinceJan1 = math.floor((lastTuesday - jan1) / 86400)
+
+    -- Week number since first Tuesday of the year
+    local weekIndex = math.floor(daysSinceJan1 / 7) + 1
+    return (weekIndex - 1) % #list + 1
+end
+-- /script print(ScubaSounds_DeviceDeathSoundRotation[ScubaSounds:GetWeekIndex(ScubaSounds_DeviceDeathSoundRotation)])
+
+function ScubaSounds:Contains(stringSet, str)
+    return stringSet[str] or false
 end
