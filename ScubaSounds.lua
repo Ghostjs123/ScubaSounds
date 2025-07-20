@@ -198,6 +198,12 @@ ScubaSounds_SoundInfo = {
         canOverlapSelf = false,
         timeout = 1
     },
+    ["ImDoingMyPart"] = {
+        extension = "ogg",
+        duration = 21,
+        canOverlapSelf = false,
+        timeout = 30
+    },
     ["ImRetarded"] = {
         extension = "wav",
         duration = 1,
@@ -384,6 +390,12 @@ ScubaSounds_SoundInfo = {
         canOverlapSelf = false,
         timeout = 1
     },
+    ["UnderTheWater"] = {
+        extension = "ogg",
+        duration = 3,
+        canOverlapSelf = false,
+        timeout = 1
+    },
     ["VitoliSuxDix"] = {
         extension = "wav",
         duration = 2,
@@ -415,7 +427,7 @@ ScubaSounds_SoundInfo = {
         timeout = 1
     }
 }
-ScubaSounds_StarshipTroopersSounds = {"Cavern", "ComeOnYouApes", "DisableHisHand"}
+ScubaSounds_StarshipTroopersSounds = {"Cavern", "ComeOnYouApes", "DisableHisHand", "ImDoingMyPart"}
 
 local Arenthis = "Arenthis"
 local Beaten = "Beaten"
@@ -504,6 +516,7 @@ ScubaSounds_DeathSoundMap = {
     [Device] = {"Keyboard"},
     [Doppel] = {"Discord"},
     [Fahb] = {"Fahb"},
+    [Fishy] = {"UnderTheWater"},
     [Germanicus] = {"Nein"},
     [Hellexus] = {"Money"},
     [Hippie] = {"NeverGoFullRetard"},
@@ -526,7 +539,7 @@ ScubaSounds_DeathSoundMap = {
     [Vitoli] = {"VitoliSuxDix"},
     [Zarix] = {"MyGlasses"}
 }
-ScubaSounds_DeviceDeathSoundRotation = {Kaemo, Fishy, Stavis} -- only true names here
+ScubaSounds_DeviceDeathSoundRotation = {Kaemo, Stavis} -- only true names here
 
 ScubaSounds_BigItemIds = { -- quest rewards
 18608, -- Benediction
