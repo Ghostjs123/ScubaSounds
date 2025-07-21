@@ -843,6 +843,7 @@ ScubaSounds_RecentDeathSoundsCount = 0
 ScubaSounds_PreviousGuildMemberCount = nil
 ScubaSounds_InBattleground = false
 ScubaSounds_InCombatWithCThun = false
+ScubaSounds_ShowOptionsOnLoad = false -- for my debugging
 
 -- Setup timers
 C_Timer.After(5, function()
@@ -876,6 +877,9 @@ function ScubaSounds_OnEvent(self, event, arg1, arg2, arg3)
     -- The rest
     if event == "ADDON_LOADED" and arg1 == "ScubaSounds" then
         ScubaSounds:BuildOptionsFrame()
+        if ScubaSounds_ShowOptionsOnLoad then
+            ScubaSounds:ShowOptions()
+        end
     elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
         ScubaSounds:HandleCombatLogEvent()
     elseif event == "UNIT_AURA" then
@@ -1164,6 +1168,7 @@ end
 function ScubaSounds:HandleAddonMessage(prefix, message)
     if prefix == ScubaSounds_ADDON_PREFIX then
         local command, playerName, itemLink = string.match(message, "(%w+):([^:]+):?(.*)")
+        command = command or message -- for messages that send just a command
         if command == ScubaSounds_LegendaryReceivedCommand then
             ScubaSounds_RecentHelloTheresCount = ScubaSounds_RecentHelloTheresCount + 1
             if ScubaSounds_RecentHelloTheresCount == 3 then -- in the last minute
@@ -1235,32 +1240,34 @@ end
 
 function ScubaSounds:BuildOptionsFrame()
     local parent = getglobal("ScubaSoundsOptionsFrame")
+    local numColumns = 3
+    local checkboxHeight = 23
     -- add all of the checkboxes
     local count = 0
     for sound, _ in pairs(ScubaSounds_SoundInfo) do
-        local xOffset = 14 + 200 * (count % 2)
-        local yOffset = -2 - 23 * (math.floor(count / 2) + 1)
+        local xOffset = 200 * (count % numColumns) + 14
+        local yOffset = -2 - checkboxHeight * (math.floor(count / numColumns) + 1)
         ScubaSounds.OptionsCheckboxes[sound] = ScubaSounds:NewCheckBox(parent, sound, xOffset, yOffset)
         count = count + 1
     end
-    parent:SetHeight(40 + (count / 2) * 23)
+    parent:SetHeight(40 + (count / numColumns) * checkboxHeight)
     -- add divider
     local line = parent:CreateTexture(nil, "ARTWORK")
     line:SetColorTexture(1, 0.82, 0, 1)
     line:SetHeight(2)
     line:SetPoint("LEFT", parent, "LEFT", 10, 0)
     line:SetPoint("RIGHT", parent, "RIGHT", -10, 0)
-    line:SetPoint("BOTTOM", parent, "BOTTOM", 0, -5 + 23 * 2)
+    line:SetPoint("BOTTOM", parent, "BOTTOM", 0, checkboxHeight * 2 -7)
     -- add extra options
     local currentHeight = parent:GetHeight()
-    parent:SetHeight(currentHeight + 23 * 2)
-    count = count + 2 + (count % 2)
-    local xOffset = 14 + 200 * (count % 2)
-    local yOffset = -9 - 23 * math.floor(count / 2)
+    parent:SetHeight(currentHeight + checkboxHeight + 15)
+    count = math.floor(count / 3) * 3 + 3
+    local xOffset = 200 * (count % numColumns) + 14
+    local yOffset = -28 - checkboxHeight * math.floor(count / numColumns)
     ScubaSounds:NewCheckBox(parent, ScubaSounds_PlayOutsideRaid, xOffset, yOffset)
     count = count + 1
-    local xOffset = 14 + 200 * (count % 2)
-    local yOffset = -9 - 23 * math.floor(count / 2)
+    local xOffset = 200 * (count % numColumns) + 14
+    local yOffset = -28 - checkboxHeight * math.floor(count / numColumns)
     ScubaSounds:NewCheckBox(parent, ScubaSounds_DisableSounds, xOffset, yOffset)
 end
 
