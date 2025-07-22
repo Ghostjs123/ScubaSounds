@@ -198,6 +198,12 @@ ScubaSounds_SoundInfo = {
         canOverlapSelf = false,
         timeout = 1
     },
+    ["ImBackBaby"] = {
+        extension = "wav",
+        duration = 4,
+        canOverlapSelf = false,
+        timeout = 5
+    },
     ["ImDoingMyPart"] = {
         extension = "ogg",
         duration = 21,
@@ -316,7 +322,7 @@ ScubaSounds_SoundInfo = {
         extension = "wav",
         duration = 3,
         canOverlapSelf = false,
-        timeout = 1
+        timeout = 5
     },
     ["Owow"] = {
         extension = "wav",
@@ -376,7 +382,7 @@ ScubaSounds_SoundInfo = {
         extension = "ogg",
         duration = 11,
         canOverlapSelf = false,
-        timeout = 100
+        timeout = 300
     },
     ["SuperSaiyan"] = {
         extension = "wav",
@@ -454,6 +460,7 @@ local Nigel = "Nigel"
 local Nips = "Nips"
 local Scharf = "Scharf"
 local Sevvy = "Sevvy"
+local Shaq = "Shaq"
 local Sleeby = "Sleeby"
 local Starrs = "Starrs"
 local Stavis = "Stavis"
@@ -489,6 +496,7 @@ ScubaSounds_PlayerNames = {
     [Nips] = {"Nips", "Lx", "Px"},
     [Scharf] = {"Bostwain", "Hotassrandy", "Swabiton", "Frostwain"},
     [Sevvy] = {"Sevvy", "Blowies"},
+    [Shaq] = {"Shaquiloheal"},
     [Sleeby] = {"Sleeby"},
     [Starrs] = {"Starrs"},
     [Stavis] = {"Stavis"},
@@ -746,11 +754,10 @@ ScubaSounds_EndBossIds = { -- Instanced
 }
 
 -- Units
-ScubaSounds_CoreHoundUnitIds = {
-    11673, -- Ancient Core Hound
-    11671, -- Core Hound
-    184367, -- Core Hound <Spawn of Magmadar>
-    228907 -- Core Hound <Spawn of Magmadar>
+ScubaSounds_CoreHoundUnitIds = {11673, -- Ancient Core Hound
+11671, -- Core Hound
+184367, -- Core Hound <Spawn of Magmadar>
+228907 -- Core Hound <Spawn of Magmadar>
 }
 -- Buffs
 ScubaSounds_MarkOfTheChosenBuffId = 21970
@@ -762,12 +769,14 @@ ScubaSounds_LivingBombDebuffId = 20475
 ScubaSounds_FlameBuffetDebuffId = 23341
 ScubaSounds_BurningAdrenalineDebuffId = 18173
 -- Spells
-ScubaSounds_AnkhSpellId = 20608
-ScubaSounds_SoulStoneSpellId = 20707
+ScubaSounds_AnkhSpellIds = {20608, 21169}
+ScubaSounds_SoulStoneResurrectionSpellIds = {20764, 20765, 20766, 20767, 20768}
+ScubaSounds_SoulStoneAppliedSpellId = 20707
 ScubaSounds_RecklessnessSpellId = 1719
 ScubaSounds_GeddonAoeSpellId = 19695
 ScubaSounds_SarturaWhirlwindSpellId = 26083
 ScubaSounds_CThunDarkGlareSpellId = 26029
+ScubaSounds_CThunGreenBeamSpellId = 26134
 ScubaSounds_ChromaggusBreathSpellIds = {
     [23308] = true, -- Incinerate
     [23309] = true, -- Incinerate
@@ -811,9 +820,9 @@ C_ChatInfo.RegisterAddonMessagePrefix(ScubaSounds_ADDON_PREFIX)
 ScubaSounds_LegendaryReceivedCommand = "LEGENDARYRECEIVED"
 ScubaSounds_GzNigelCommand = "GZNIGEL"
 ScubaSounds_GzNigelSenders = {
-    ["Aloha"] = true, 
-    ["Stavis"] = true, 
-    ["Zarix"] = true, 
+    ["Aloha"] = true,
+    ["Stavis"] = true,
+    ["Zarix"] = true,
     ["Fahbulous"] = true,
     ["Mangan"] = true,
     ["Kaymon"] = true
@@ -933,35 +942,6 @@ function ScubaSounds:HandleCombatLogEvent()
 end
 
 function ScubaSounds:HandleUnitDeath(destFlags, destName, destGUID, environmentalType)
-    -- Sounds for >1 people. Do not return
-    if ScubaSounds:IsInClassicRaid() then
-        local numRaidMembers = GetNumGroupMembers()
-        if numRaidMembers >= 16 then -- < 20 for split onys
-            local numDead = true
-            local onlyMagesAlive = true
-
-            for i = 1, 40 do
-                local raidUnit = "raid" .. i
-                if UnitExists(raidUnit) then
-                    if UnitIsDeadOrGhost(raidUnit) then
-                        numDead = numDead + 1
-                    elseif select(2, UnitClass("player")) ~= "MAGE" then
-                        onlyMagesAlive = false
-                    end
-                end
-            end
-
-            -- Play sound if all members are dead
-            if numDead <= numRaidMembers / 2 then
-                ScubaSounds:PlaySound("LotrFlee")
-            end
-
-            if onlyMagesAlive then
-                ScubaSounds:PlaySound("DoYouSeeMyMana")
-            end
-        end
-    end
-
     -- Sounds for the individual. Return after PlaySound
     local trueName = ScubaSounds:GetTruePlayerName(destName)
     if trueName ~= nil then
@@ -1032,7 +1012,8 @@ function ScubaSounds:HandlePlayerAura()
 end
 
 function ScubaSounds:HandleResurrect(destName, spellId)
-    if destName == "Shaquiloheal" and spellId == ScubaSounds_AnkhSpellId then
+    if ScubaSounds:HasValue(ScubaSounds_PlayerNames[Shaq], destName) and
+        ScubaSounds:HasValue(ScubaSounds_AnkhSpellIds, spellId) then
         ScubaSounds:PlaySound("OnceYouGoShaq")
     end
 end
@@ -1070,21 +1051,43 @@ function ScubaSounds:HandleDamage(sourceGUID, destGUID, destFlags, amount, criti
             return
         end
     end
+
+    if spellId == ScubaSounds_CThunGreenBeamSpellId and not ScubaSounds_InCombatWithCThun then
+        ScubaSounds_InCombatWithCThun = true
+        ScubaSounds:PlaySound("Shakira")
+        C_ChatInfo.SendAddonMessage(ScubaSounds_ADDON_PREFIX, ScubaSounds_CThunCombatCommand, "GUILD")
+    end
 end
 
 function ScubaSounds:HandleSpellCast(sourceGUID, sourceName, sourceFlags, spellId)
+    -- Sounds that play for everyone
     if spellId == ScubaSounds_GeddonAoeSpellId then
         ScubaSounds:PlaySound("LotrFlee")
-    elseif spellId == ScubaSounds_RecklessnessSpellId then
+        return
+    end
+    if spellId == ScubaSounds_RecklessnessSpellId then
         if sourceFlags and bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_RAID) ~= 0 then
             if select(2, UnitClass(sourceName)) == "WARRIOR" then
                 ScubaSounds:PlaySound("RecklessnessPoggers")
             end
         end
-    elseif spellId == ScubaSounds_SoulStoneSpellId and sourceGUID == UnitGUID("player") then
+        return
+    end
+    if spellId == ScubaSounds_SoulStoneAppliedSpellId and sourceGUID == UnitGUID("player") then
         ScubaSounds:PlaySound("YourSoulIsMine")
-    elseif spellId == ScubaSounds_SarturaWhirlwindSpellId then
+        return
+    end
+    if spellId == ScubaSounds_SarturaWhirlwindSpellId then
         ScubaSounds:PlaySound("ScreamingSheep")
+        return
+    end
+    if ScubaSounds:Contains(ScubaSounds_AnkhSpellIds, spellId) or
+        ScubaSounds:Contains(ScubaSounds_SoulStoneResurrectionSpellIds, spellId) then
+        if ScubaSounds:HasValue(ScubaSounds_PlayerNames[Shaq], sourceName) then
+            ScubaSounds:PlaySound("OnceYouGoShaq")
+        else
+            ScubaSounds:PlaySound("ImBackBaby")
+        end
     end
 end
 
@@ -1155,7 +1158,7 @@ function ScubaSounds:HandleLoot(lootMessage)
                 not ScubaSounds:IsItemLinkEnchanted(itemLink) then -- cffff8000 = legendary
                 C_ChatInfo.SendAddonMessage(ScubaSounds_ADDON_PREFIX, ScubaSounds_LegendaryReceivedCommand .. ":" ..
                     playerName .. ":" .. itemLink, "GUILD")
-                    return
+                return
             end
             if ScubaSounds:Contains(ScubaSounds_WompWompItemIdsMap, tostring(itemId)) then
                 ScubaSounds:PlaySound("Downer")
@@ -1166,27 +1169,30 @@ function ScubaSounds:HandleLoot(lootMessage)
 end
 
 function ScubaSounds:HandleAddonMessage(prefix, message)
-    if prefix == ScubaSounds_ADDON_PREFIX then
-        local command, playerName, itemLink = string.match(message, "(%w+):([^:]+):?(.*)")
-        command = command or message -- for messages that send just a command
-        if command == ScubaSounds_LegendaryReceivedCommand then
-            ScubaSounds_RecentHelloTheresCount = ScubaSounds_RecentHelloTheresCount + 1
-            if ScubaSounds_RecentHelloTheresCount == 3 then -- in the last minute
-                ScubaSounds_RecentHelloTheresCount = 0
-                ScubaSounds:PlaySound("OhBabyATriple")
-            else
-                C_Timer.After(60, function() -- minute
-                    ScubaSounds_RecentHelloTheresCount = ScubaSounds_RecentHelloTheresCount - 1
-                end)
-                ScubaSounds:PlaySound("HelloThere")
-            end
-            ScubaSounds:SendMessage(playerName .. " received item: " .. itemLink)
-        elseif command == ScubaSounds_GzNigelCommand then
-            SendChatMessage("gz nigel", "WHISPER", nil, playerName)
-        elseif command == ScubaSounds_CThunCombatCommand and not ScubaSounds_InCombatWithCThun then
-            ScubaSounds_InCombatWithCThun = true
-            ScubaSounds:PlaySound("Shakira")
+    if prefix ~= ScubaSounds_ADDON_PREFIX then
+        return
+    end
+
+    local command, playerName, itemLink = string.match(message, "(%w+):([^:]+):?(.*)")
+    command = command or message -- for messages that send just a command
+
+    if command == ScubaSounds_LegendaryReceivedCommand then
+        ScubaSounds_RecentHelloTheresCount = ScubaSounds_RecentHelloTheresCount + 1
+        if ScubaSounds_RecentHelloTheresCount == 3 then -- in the last minute
+            ScubaSounds_RecentHelloTheresCount = 0
+            ScubaSounds:PlaySound("OhBabyATriple")
+        else
+            C_Timer.After(60, function() -- minute
+                ScubaSounds_RecentHelloTheresCount = ScubaSounds_RecentHelloTheresCount - 1
+            end)
+            ScubaSounds:PlaySound("HelloThere")
         end
+        ScubaSounds:SendMessage(playerName .. " received item: " .. itemLink)
+    elseif command == ScubaSounds_GzNigelCommand then
+        SendChatMessage("gz nigel", "WHISPER", nil, playerName)
+    elseif command == ScubaSounds_CThunCombatCommand and not ScubaSounds_InCombatWithCThun then
+        ScubaSounds_InCombatWithCThun = true
+        ScubaSounds:PlaySound("Shakira")
     end
 end
 
@@ -1218,7 +1224,7 @@ end
 
 function ScubaSounds:HandlePlayerRegenDisabled()
     local name = UnitName("target")
-    if (name == "C'Thun" or name == "Earthborer") and not ScubaSounds_InCombatWithCThun then
+    if name == "C'Thun" and not ScubaSounds_InCombatWithCThun then
         ScubaSounds_InCombatWithCThun = true
         ScubaSounds:PlaySound("Shakira")
         C_ChatInfo.SendAddonMessage(ScubaSounds_ADDON_PREFIX, ScubaSounds_CThunCombatCommand, "GUILD")
@@ -1257,17 +1263,17 @@ function ScubaSounds:BuildOptionsFrame()
     line:SetHeight(2)
     line:SetPoint("LEFT", parent, "LEFT", 10, 0)
     line:SetPoint("RIGHT", parent, "RIGHT", -10, 0)
-    line:SetPoint("BOTTOM", parent, "BOTTOM", 0, checkboxHeight * 2 -7)
+    line:SetPoint("BOTTOM", parent, "BOTTOM", 0, checkboxHeight * 2 - 7)
     -- add extra options
     local currentHeight = parent:GetHeight()
     parent:SetHeight(currentHeight + checkboxHeight + 15)
     count = math.floor(count / 3) * 3 + 3
     local xOffset = 200 * (count % numColumns) + 14
-    local yOffset = -28 - checkboxHeight * math.floor(count / numColumns)
+    local yOffset = -20 - checkboxHeight * math.floor(count / numColumns)
     ScubaSounds:NewCheckBox(parent, ScubaSounds_PlayOutsideRaid, xOffset, yOffset)
     count = count + 1
     local xOffset = 200 * (count % numColumns) + 14
-    local yOffset = -28 - checkboxHeight * math.floor(count / numColumns)
+    local yOffset = -20 - checkboxHeight * math.floor(count / numColumns)
     ScubaSounds:NewCheckBox(parent, ScubaSounds_DisableSounds, xOffset, yOffset)
 end
 
