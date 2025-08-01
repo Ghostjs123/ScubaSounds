@@ -174,6 +174,12 @@ ScubaSounds_SoundInfo = {
         canOverlapSelf = false,
         timeout = 1
     },
+    ["GreatSuccess"] = {
+        extension = "ogg",
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = 1
+    },
     ["HeLipped"] = {
         extension = "wav",
         duration = 2,
@@ -324,6 +330,12 @@ ScubaSounds_SoundInfo = {
         canOverlapSelf = false,
         timeout = 5
     },
+    ["Oof"] = {
+        extension = "ogg",
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = 1
+    },
     ["Owow"] = {
         extension = "wav",
         duration = 2,
@@ -433,7 +445,7 @@ ScubaSounds_SoundInfo = {
         timeout = 1
     }
 }
-ScubaSounds_StarshipTroopersSounds = {"Cavern", "ComeOnYouApes", "DisableHisHand", "ImDoingMyPart"}
+ScubaSounds_StarshipTroopersSounds = {}
 
 local Arenthis = "Arenthis"
 local Beaten = "Beaten"
@@ -458,6 +470,7 @@ local Leaflix = "Leaflix"
 local Nacho = "Nacho"
 local Nigel = "Nigel"
 local Nips = "Nips"
+local Rizka = "Rizka"
 local Scharf = "Scharf"
 local Sevvy = "Sevvy"
 local Shaq = "Shaq"
@@ -494,6 +507,7 @@ ScubaSounds_PlayerNames = {
     [Nacho] = {"Nachô"},
     [Nigel] = {"Nigelsworth", "Nigel"},
     [Nips] = {"Nips", "Lx", "Px"},
+    [Rizka] = {"Rizka", "Rizkuh"},
     [Scharf] = {"Bostwain", "Hotassrandy", "Swabiton", "Frostwain"},
     [Sevvy] = {"Sevvy", "Blowies"},
     [Shaq] = {"Shaquiloheal"},
@@ -535,7 +549,9 @@ ScubaSounds_DeathSoundMap = {
     [Laak] = {"Minecraft"},
     [Leaflix] = {"ANewRecord", "Failure", "Rat"},
     [Nacho] = {"Goofy"},
+    [Nigel] = {"GreatSuccess"},
     [Nips] = {"CopCuties"},
+    [Rizka] = {"Oof"},
     [Scharf] = {"How"},
     [Sevvy] = {"SevvyLove"},
     [Sleeby] = {"NorthScream"},
@@ -1052,11 +1068,11 @@ function ScubaSounds:HandleDamage(sourceGUID, destGUID, destFlags, amount, criti
         end
     end
 
-    if spellId == ScubaSounds_CThunGreenBeamSpellId and not ScubaSounds_InCombatWithCThun then
-        ScubaSounds_InCombatWithCThun = true
-        ScubaSounds:PlaySound("Shakira")
-        C_ChatInfo.SendAddonMessage(ScubaSounds_ADDON_PREFIX, ScubaSounds_CThunCombatCommand, "GUILD")
-    end
+    -- if spellId == ScubaSounds_CThunGreenBeamSpellId and not ScubaSounds_InCombatWithCThun then
+    --     ScubaSounds_InCombatWithCThun = true
+    --     ScubaSounds:PlaySound("Shakira")
+    --     C_ChatInfo.SendAddonMessage(ScubaSounds_ADDON_PREFIX, ScubaSounds_CThunCombatCommand, "GUILD")
+    -- end
 end
 
 function ScubaSounds:HandleSpellCast(sourceGUID, sourceName, sourceFlags, spellId)
@@ -1141,7 +1157,7 @@ function ScubaSounds:HandleZoneChange()
         ScubaSounds:PlaySound("RightToJail")
     elseif currentZoneId == ScubaSounds_Aq40Id or currentZoneName == "Temple of Ahn'Qiraj" or currentZoneId ==
         ScubaSounds_Aq20Id or currentZoneName == "Ruins of Ahn'Qiraj" then
-        ScubaSounds:PlaySound(ScubaSounds:SelectRandom(ScubaSounds_StarshipTroopersSounds))
+        -- ScubaSounds:PlaySound(ScubaSounds:SelectRandom(ScubaSounds_StarshipTroopersSounds))
     end
 end
 
@@ -1190,10 +1206,10 @@ function ScubaSounds:HandleAddonMessage(prefix, message)
         ScubaSounds:SendMessage(playerName .. " received item: " .. itemLink)
     elseif command == ScubaSounds_GzNigelCommand then
         SendChatMessage("gz nigel", "WHISPER", nil, playerName)
-    elseif command == ScubaSounds_CThunCombatCommand and not ScubaSounds_InCombatWithCThun then
-        ScubaSounds_InCombatWithCThun = true
-        ScubaSounds:PlaySound("Shakira")
     end
+    -- elseif command == ScubaSounds_CThunCombatCommand and not ScubaSounds_InCombatWithCThun then
+    --     ScubaSounds_InCombatWithCThun = true
+    --     ScubaSounds:PlaySound("Shakira")
 end
 
 function ScubaSounds:HandleEnteringWorld(isInitialLogin, isReloadingUI)
@@ -1223,12 +1239,12 @@ function ScubaSounds:HandleUiErrorMessage(errorMessage)
 end
 
 function ScubaSounds:HandlePlayerRegenDisabled()
-    local name = UnitName("target")
-    if name == "C'Thun" and not ScubaSounds_InCombatWithCThun then
-        ScubaSounds_InCombatWithCThun = true
-        ScubaSounds:PlaySound("Shakira")
-        C_ChatInfo.SendAddonMessage(ScubaSounds_ADDON_PREFIX, ScubaSounds_CThunCombatCommand, "GUILD")
-    end
+    -- local name = UnitName("target")
+    -- if name == "C'Thun" and not ScubaSounds_InCombatWithCThun then
+    --     ScubaSounds_InCombatWithCThun = true
+    --     ScubaSounds:PlaySound("Shakira")
+    --     C_ChatInfo.SendAddonMessage(ScubaSounds_ADDON_PREFIX, ScubaSounds_CThunCombatCommand, "GUILD")
+    -- end
 end
 
 function ScubaSounds:UpdateBattlefieldScore()
