@@ -1,9 +1,9 @@
-## Interface: 100200
+## Interface: 16001
 ## Title: ScubaSounds
 ## Version: 1.0
 ## Notes: Sound board addon for Scuba Cops
 ## Author: Kaymon
 ## SavedVariables: ScubaSounds_Options
 
-ScubaSounds.xml
 ScubaSounds.lua
+ScubaSounds.xml

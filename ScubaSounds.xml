@@ -1,7 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
     
-    <Script file="ScubaSounds.lua"/>
     
     <Frame name="ScubaSoundsOptionsFrame" movable="true" parent="UIParent" enableMouse="true" hidden="true" mixin="ScubaSounds,BackdropTemplateMixin" inherits="BackdropTemplate">
         <Size>
@@ -59,7 +58,7 @@
 
         <Frames>
 
-            <Button name="ScubaSoundsOptionsFrameClose" inherits="GameMenuButtonTemplate" text="X">
+            <Button name="ScubaSoundsOptionsFrameClose" inherits="UIPanelButtonTemplate" text="X">
                 <Size>
                     <AbsDimension x="30" y="30"/>
                 </Size>
