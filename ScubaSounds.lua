@@ -10,997 +10,15 @@ local issecretvalue = _G.issecretvalue
 -- Main Addon Namespace & Architecture
 -- =================================================================
 ScubaSounds = ScubaSounds or {}
-ScubaSounds.Data = {}
-ScubaSounds.Audio = {}
+ScubaSounds.Data = ScubaSounds.Data or {} -- SoundInfo.lua, PlayerNames.lua and NotableLoot.lua load first
+ScubaSounds.Audio = ScubaSounds.Audio or {}
 ScubaSounds.Events = {}
 ScubaSounds.State = {}
 ScubaSounds.UI = {}
 
 -- =================================================================
--- Sound Registry
+-- Loot & Skill Chat Patterns
 -- =================================================================
-ScubaSounds.Audio.SoundInfo = {
-    ["5Sunders"] = {
-        extension = "mp3",
-        duration = 2,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["63KCrit"] = {
-        extension = "mp3",
-        duration = 4,
-        canOverlapSelf = false,
-        timeout = 5
-    },
-    ["ANewRecord"] = {
-        extension = "wav",
-        duration = 2,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["AriseSoldiers"] = {
-        extension = "ogg",
-        duration = 3,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["BadMan"] = {
-        extension = "ogg",
-        duration = 3,
-        canOverlapSelf = false,
-        timeout = 1,
-        credit = "Shib"
-    },
-    ["BallsATug"] = {
-        extension = "wav",
-        duration = 2,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["BestWarlock"] = {
-        extension = "ogg",
-        duration = 3,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["BonVoyagePussy"] = {
-        extension = "wav",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["Brando"] = {
-        extension = "ogg",
-        duration = 5,
-        canOverlapSelf = false,
-        timeout = 1,
-        credit = "Shib"
-    },
-    ["BreakingNews"] = {
-        extension = "wav",
-        duration = 5,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["Burn"] = {
-        extension = "ogg",
-        duration = 2,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["Cavern"] = {
-        extension = "wav",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 30
-    },
-    ["ChrisHansen"] = {
-        extension = "ogg",
-        duration = 5,
-        canOverlapSelf = false,
-        timeout = 1,
-        credit = "Shib"
-    },
-    ["ComeOnYouApes"] = {
-        extension = "ogg",
-        duration = 11,
-        canOverlapSelf = false,
-        timeout = 30
-    },
-    ["CopCuties"] = {
-        extension = "wav",
-        duration = 4,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["Dahhart"] = {
-        extension = "mp3",
-        duration = 3,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["Deleted"] = {
-        extension = "wav",
-        duration = 1,
-        canOverlapSelf = true,
-        timeout = 1
-    },
-    ["DisableHisHand"] = {
-        extension = "ogg",
-        duration = 8,
-        canOverlapSelf = true,
-        timeout = 30
-    },
-    ["Discord"] = {
-        extension = "wav",
-        duration = 1,
-        canOverlapSelf = true,
-        timeout = 1
-    },
-    ["Divine"] = {
-        extension = "ogg",
-        duration = 1,
-        canOverlapSelf = true,
-        timeout = 1
-    },
-    ["Dominating"] = {
-        extension = "wav",
-        duration = 2,
-        canOverlapSelf = false,
-        timeout = 1,
-        credit = "Kaymon"
-    },
-    ["Downer"] = {
-        extension = "wav",
-        duration = 3,
-        canOverlapSelf = false,
-        timeout = 2
-    },
-    ["DoYouSeeMyMana"] = {
-        extension = "wav",
-        duration = 2,
-        canOverlapSelf = false,
-        timeout = 300
-    },
-    ["Fahb"] = {
-        extension = "wav",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["Failure"] = {
-        extension = "mp3",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["Frenchie"] = {
-        extension = "ogg",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["Gay1"] = {
-        extension = "ogg",
-        duration = 2,
-        canOverlapSelf = false,
-        timeout = 1,
-        credit = "Shib"
-    },
-    ["Gay2"] = {
-        extension = "ogg",
-        duration = 3,
-        canOverlapSelf = false,
-        timeout = 1,
-        credit = "Shib"
-    },
-    ["Godlike"] = {
-        extension = "wav",
-        duration = 2,
-        canOverlapSelf = false,
-        timeout = 1,
-        credit = "Kaymon"
-    },
-    ["GayFrogs"] = {
-        extension = "ogg",
-        duration = 5,
-        canOverlapSelf = false,
-        timeout = 1,
-        credit = "Shib"
-    },
-    ["GetThisShitOffMe"] = {
-        extension = "ogg",
-        duration = 5,
-        canOverlapSelf = false,
-        timeout = 1,
-        credit = "Shib"
-    },
-    ["Goofy"] = {
-        extension = "wav",
-        duration = 2,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["GreatSuccess"] = {
-        extension = "ogg",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["HeLipped"] = {
-        extension = "wav",
-        duration = 2,
-        canOverlapSelf = false,
-        timeout = 6
-    },
-    ["HelloThere"] = {
-        extension = "wav",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["Horse1"] = {
-        extension = "ogg",
-        duration = 3,
-        canOverlapSelf = false,
-        timeout = 600, -- several checks can report the same training
-        credit = "Shib"
-    },
-    ["Horse2"] = {
-        extension = "ogg",
-        duration = 7,
-        canOverlapSelf = false,
-        timeout = 600, -- several checks can report the same training
-        credit = "Shib"
-    },
-    ["How"] = {
-        extension = "wav",
-        duration = 3,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["IgnisDeath"] = {
-        extension = "ogg",
-        duration = 4,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["Imbecile"] = {
-        extension = "ogg",
-        duration = 4,
-        canOverlapSelf = false,
-        timeout = 1,
-        credit = "Shib"
-    },
-    ["ImBackBaby"] = {
-        extension = "wav",
-        duration = 4,
-        canOverlapSelf = false,
-        timeout = 5
-    },
-    ["ImDoingMyPart"] = {
-        extension = "ogg",
-        duration = 21,
-        canOverlapSelf = false,
-        timeout = 30
-    },
-    ["ImRetarded"] = {
-        extension = "wav",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["IWasChosen"] = {
-        extension = "wav",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 10
-    },
-    ["Keyboard"] = {
-        extension = "wav",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["KillingSpree"] = {
-        extension = "wav",
-        duration = 2,
-        canOverlapSelf = false,
-        timeout = 1,
-        credit = "Kaymon"
-    },
-    ["KyakPenis"] = {
-        extension = "wav",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["LambSauce"] = {
-        extension = "ogg",
-        duration = 3,
-        canOverlapSelf = false,
-        timeout = 1,
-        credit = "Shib"
-    },
-    ["LegoYoda"] = {
-        extension = "wav",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["LookLook"] = {
-        extension = "ogg",
-        duration = 5,
-        canOverlapSelf = false,
-        timeout = 1,
-        credit = "Shib"
-    },
-    ["LotrFlee"] = {
-        extension = "wav",
-        duration = 7,
-        canOverlapSelf = false,
-        timeout = 120
-    },
-    ["MagesCancer"] = {
-        extension = "mp3",
-        duration = 6,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["Minecraft"] = {
-        extension = "wav",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["Money"] = {
-        extension = "wav",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["MongolianTechno"] = {
-        extension = "mp3",
-        duration = 22,
-        canOverlapSelf = false,
-        timeout = 60
-    },
-    ["Mental"] = {
-        extension = "ogg",
-        duration = 3,
-        canOverlapSelf = false,
-        timeout = 1,
-        credit = "Shib"
-    },
-    ["MyGlasses"] = {
-        extension = "ogg",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["NoLife"] = {
-        extension = "ogg",
-        duration = 4,
-        canOverlapSelf = false,
-        timeout = 1,
-        credit = "Shib"
-    },
-    ["Nein"] = {
-        extension = "wav",
-        duration = 2,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["NeverGoFullRetard"] = {
-        extension = "ogg",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["NorthScream"] = {
-        extension = "wav",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["OhBabyATriple"] = {
-        extension = "mp3",
-        duration = 4,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["OhTheBear"] = {
-        extension = "wav",
-        duration = 1,
-        canOverlapSelf = true,
-        timeout = 1,
-        credit = "Kaymon"
-    },
-    ["Omg"] = {
-        extension = "wav",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["OnceYouGoShaq"] = {
-        extension = "wav",
-        duration = 3,
-        canOverlapSelf = false,
-        timeout = 5
-    },
-    ["NowThatsALottaDmg"] = {
-        extension = "wav",
-        duration = 2,
-        canOverlapSelf = false,
-        timeout = 1,
-        credit = "Kaymon"
-    },
-    ["Oof"] = {
-        extension = "ogg",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["Owow"] = {
-        extension = "wav",
-        duration = 2,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["Pathetic"] = {
-        extension = "wav",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["Rampage"] = {
-        extension = "wav",
-        duration = 2,
-        canOverlapSelf = false,
-        timeout = 1,
-        credit = "Kaymon"
-    },
-    ["Rat"] = {
-        extension = "ogg",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["RecklessnessPoggers"] = {
-        extension = "wav",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 60
-    },
-    ["RetardAlert"] = {
-        extension = "wav",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["RightToJail"] = {
-        extension = "wav",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["Ryan"] = {
-        extension = "wav",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["ScreamingSheep"] = {
-        extension = "mp3",
-        duration = 2,
-        canOverlapSelf = false,
-        timeout = 15
-    },
-    ["SevvyLove"] = {
-        extension = "wav",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["Shakira"] = {
-        extension = "ogg",
-        duration = 11,
-        canOverlapSelf = false,
-        timeout = 300
-    },
-    ["SuperSaiyan"] = {
-        extension = "wav",
-        duration = 19,
-        canOverlapSelf = false,
-        timeout = 60
-    },
-    ["ThanksDahfart"] = {
-        extension = "mp3",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["UnderTheWater"] = {
-        extension = "ogg",
-        duration = 3,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["Unstoppable"] = {
-        extension = "wav",
-        duration = 2,
-        canOverlapSelf = false,
-        timeout = 1,
-        credit = "Kaymon"
-    },
-    ["Vampire"] = {
-        extension = "ogg",
-        duration = 2,
-        canOverlapSelf = false,
-        timeout = 1,
-        credit = "Shib"
-    },
-    ["VitoliSuxDix"] = {
-        extension = "wav",
-        duration = 2,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["Warsong"] = {
-        extension = "mp3",
-        duration = 5,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["WhoAreYou"] = {
-        extension = "ogg",
-        duration = 3,
-        canOverlapSelf = false,
-        timeout = 1
-    },
-    ["Wizard1"] = {
-        extension = "ogg",
-        duration = 3,
-        canOverlapSelf = false,
-        timeout = 1,
-        credit = "Shib"
-    },
-    ["Wizard2"] = {
-        extension = "ogg",
-        duration = 3,
-        canOverlapSelf = false,
-        timeout = 1,
-        credit = "Shib"
-    },
-    ["YouHaveNoMana"] = {
-        extension = "wav",
-        duration = 1,
-        canOverlapSelf = false,
-        timeout = 300
-    },
-    ["YourSoulIsMine"] = {
-        extension = "ogg",
-        duration = 2,
-        canOverlapSelf = false,
-        timeout = 1
-    }
-}
-
--- =================================================================
--- Player Name Mappings
--- =================================================================
-local Arenthis = "Arenthis"
-local Beaten = "Beaten"
-local Bobmoney = "Bobmoney"
-local Brutezy = "Brutezy"
-local Chaka = "Chaka"
-local Cousy = "Cousy"
-local Dahhart = "Dahhart"
-local Doppel = "Doppel"
-local Device = "Device"
-local Fahb = "Fahb"
-local Fishy = "Fishy"
-local Germanicus = "Germanicus"
-local Hellexus = "Hellexus"
-local Hippie = "Hippie"
-local Jackson = "Jackson"
-local Junny = "Junny"
-local Kaemo = "Kaemo"
-local Kaymon = "Kaymon"
-local Keyteor = "Keyteor"
-local Laak = "Laak"
-local Leaflix = "Leaflix"
-local Nacho = "Nacho"
-local Nigel = "Nigel"
-local Nips = "Nips"
-local Rizka = "Rizka"
-local Scharf = "Scharf"
-local Sevvy = "Sevvy"
-local Shaq = "Shaq"
-local Sleeby = "Sleeby"
-local Starrs = "Starrs"
-local Stavis = "Stavis"
-local Stud = "Stud"
-local Sweatyhaung = "Sweatyhong"
-local Uncletouches = "Uncletouches"
-local Vimy = "Vimy"
-local Vitoli = "Vitoli"
-local Zarix = "Zarix"
-
-ScubaSounds.Data.PlayerNames = {
-    [Arenthis] = {"Arenthis"},
-    [Beaten] = {"Bbofire", "Vbc", "Brotandre", "Bbqspice"},
-    [Bobmoney] = {"Bobmoney"},
-    [Brutezy] = {"Brutezy"},
-    [Chaka] = {"Chaka", "Chakaog"},
-    [Cousy] = {"Cousy"},
-    [Dahhart] = {"Dahhart"},
-    [Device] = {"Device"},
-    [Doppel] = {"Doppel"},
-    [Fahb] = {"Fahbulous", "Resistofcofc", "Theemus", "Magev", "Resistofc"},
-    [Fishy] = {"Fishy", "Caprademon"},
-    [Germanicus] = {"Germanicus"},
-    [Hellexus] = {"Hellexus"},
-    [Hippie] = {"Hippie"},
-    [Jackson] = {"Grandmasterb", "Gaymasterb", "Combyobeard"},
-    [Junny] = {"Junny"},
-    [Kaemo] = {"Kaemo"},
-    [Kaymon] = {"Kaymon"},
-    [Keyteor] = {"Keytor", "Seiken"},
-    [Laak] = {"Laak"},
-    [Leaflix] = {"Leaflix"},
-    [Nacho] = {"Nachô"},
-    [Nigel] = {"Nigelsworth", "Nigel"},
-    [Nips] = {"Nips", "Lx", "Px"},
-    [Rizka] = {"Rizka", "Rizkuh"},
-    [Scharf] = {"Bostwain", "Hotassrandy", "Swabiton", "Frostwain"},
-    [Sevvy] = {"Sevvy", "Blowies"},
-    [Shaq] = {"Shaquiloheal"},
-    [Sleeby] = {"Sleeby"},
-    [Starrs] = {"Starrs"},
-    [Stavis] = {"Stavis"},
-    [Stud] = {"Bitcoins"},
-    [Sweatyhaung] = {"Sweatyhaung"},
-    [Uncletouches] = {"Cuckletonn"},
-    [Vimy] = {"Vimy"},
-    [Vitoli] = {"Vitoli", "Uglyvit"},
-    [Zarix] = {"Yellowfilth"}
-}
-
--- Keyed by lowercase name; see ScubaSounds:GetTruePlayerName. A true name can be a character's full Forever name
--- ("First Surname"); it maps to itself so any capitalization matches
-ScubaSounds.Data.PlayerNameToTrueName = {}
-for trueName, otherNames in pairs(ScubaSounds.Data.PlayerNames) do
-    ScubaSounds.Data.PlayerNameToTrueName[strlower(trueName)] = trueName
-    for _, otherName in pairs(otherNames) do
-        ScubaSounds.Data.PlayerNameToTrueName[strlower(otherName)] = trueName
-    end
-end
-
-ScubaSounds.Data.DeathSoundMap = {
-    [Arenthis] = {"ImRetarded"},
-    [Beaten] = {"Divine"},
-    [Brutezy] = {"RetardAlert"},
-    [Chaka] = {"LegoYoda"},
-    [Cousy] = {"BestWarlock"},
-    [Dahhart] = {"Dahhart", "ThanksDahfart"},
-    [Device] = {"Keyboard"},
-    [Doppel] = {"Discord"},
-    [Fahb] = {"Fahb"},
-    [Fishy] = {"UnderTheWater"},
-    [Germanicus] = {"Nein"},
-    [Hellexus] = {"Money"},
-    [Hippie] = {"NeverGoFullRetard"},
-    [Jackson] = {"Cavern"},
-    [Junny] = {"WhoAreYou"},
-    [Kaymon] = {"BreakingNews"},
-    [Keyteor] = {"Owow"},
-    [Laak] = {"Minecraft"},
-    [Leaflix] = {"ANewRecord", "Failure", "Rat"},
-    [Nacho] = {"Goofy"},
-    [Nigel] = {"GreatSuccess"},
-    [Nips] = {"CopCuties"},
-    [Rizka] = {"Oof"},
-    [Scharf] = {"How"},
-    [Sevvy] = {"SevvyLove"},
-    [Sleeby] = {"NorthScream"},
-    [Starrs] = {"KyakPenis"},
-    [Stud] = {"Ryan"},
-    [Sweatyhaung] = {"IgnisDeath", "AriseSoldiers", "Burn"},
-    [Uncletouches] = {"BallsATug"},
-    [Vimy] = {"Frenchie"},
-    [Vitoli] = {"VitoliSuxDix"},
-    [Zarix] = {"MyGlasses"}
-}
-ScubaSounds.Data.DeviceDeathSoundRotation = {Kaemo, Stavis}
-
--- =================================================================
--- Item Lists & Maps
--- =================================================================
--- Items announced when the player gets one (looted, bought, a quest reward or crafted), listed in the Notable
--- Loot tab. Big items send the guild HelloThere message; womp womp items play Downer
-ScubaSounds.Data.NotableLoot = {{
-    id = "big",
-    name = "Big Items",
-    description = "plays HelloThere for the guild",
-    groups = {{
-        name = "Quest Rewards",
-        items = {
-            18608, -- Benediction
-            18713, -- Rhok'delar
-            18707, -- Ancient Rune Etched Stave
-            18714, -- Ancient Sinew Wrapped Lamina
-            18348, -- Quel'Serrar
-            21205, -- Signet Ring of the Bronze Dragonflight (agi)
-            21210, -- Signet Ring of the Bronze Dragonflight (stam/int)
-            21200, -- Signet Ring of the Bronze Dragonflight (str)
-            17333, -- Aqual Quintessence
-            21180, -- Earthstrike
-            21186, -- Rockfury Bracers
-            21025, -- Recipe: Dirge's Kickin' Chimaerok Chops
-            19969, -- Nat Pagle's Extreme Anglin' Boots
-            19970, -- Arcanite Fishing Pole
-            19971, -- High Test Eternium Fishing Line
-            19972, -- Lucky Fishing Hat
-            19979, -- Hook of the Master Angler
-            19491, -- Amulet of the Darkmoon
-            19426, -- Orb of the Darkmoon
-            19287, -- Darkmoon Card: Heroism
-            19288, -- Darkmoon Card: Blue Dragon
-            19289, -- Darkmoon Card: Maelstrom
-            19290, -- Darkmoon Card: Twisting Nether
-        }
-    }, {
-        name = "Crafted",
-        items = {
-            12640, -- Lionheart Helm
-            18168, -- Force Reactive Disk
-            17193, -- Sulfuron Hammer
-            16022, -- Arcanite Dragonling
-            14152, -- Robe of the Archmage
-            14154, -- Truefaith Vestments
-            14153, -- Robe of the Void
-        }
-    }, {
-        name = "Out in the World",
-        items = {
-            12363, -- Arcane Crystal
-            12361, -- Blue Sapphire
-            13468, -- Black Lotus
-            7080, -- Essence of Water
-            7082, -- Essence of Air
-            19024, -- Arena Grand Master
-            18706, -- Arena Master (12 are turned in for Arena Grand Master)
-            1404, -- Tidal Charm
-            23007, -- Piglet's Collar
-            23015, -- Rat Cage
-            23002, -- Turtle Box
-            23022, -- Curmudgeon's Payoff
-        }
-    }, {
-        name = "World Drop Epics",
-        items = {
-            2243, -- Hand of Edward the Odd
-            811, -- Axe of the Deep Woods
-            871, -- Flurry Axe
-            1728, -- Teebu's Blazing Longsword
-            2244, -- Krol Blade
-            14555, -- Alcor's Sunrazor
-            873, -- Staff of Jordan
-            2291, -- Kang the Decapitator
-            943, -- Warden Staff
-            944, -- Elemental Mage Staff
-            812, -- Glowing Brightwood Staff
-            2100, -- Precisely Calibrated Boomstick
-            1168, -- Skullflame Shield
-            2246, -- Myrmidon's Signet
-            942, -- Freezing Band
-            14551, -- Edgemaster's Handguards
-            14553, -- Sash of Mercy
-            14554, -- Cloudkeeper Legplates
-        }
-    }, {
-        name = "World Boss Items",
-        items = {
-            19132, -- Crystal Adorned Crown
-            18208, -- Drape of Benediction
-            18541, -- Puissant Cape
-            18547, -- Unmelting Ice Girdle
-            18545, -- Leggings of Arcane Supremacy
-            19131, -- Snowblind Shoes
-            19130, -- Cold Snap
-            17070, -- Fang of the Mystics
-            18202, -- Eskhandar's Left Claw
-            18542, -- Typhoon
-            18704, -- Mature Blue Dragon Sinew
-            18546, -- Infernal Headcage
-            17111, -- Blazefury Medallion
-            18204, -- Eskhandar's Pelt
-            19135, -- Blacklight Bracer
-            18544, -- Doomhide Gauntlets
-            19134, -- Flayed Doomguard Belt
-            19133, -- Fel Infused Leggings
-            18543, -- Ring of Entropy
-            17112, -- Empyrean Demolisher
-            17113, -- Amberseal Keeper
-            18665, -- Eye of Shadow
-            20628, -- Deviate Growth Cap
-            20626, -- Black Bark Wristbands
-            20630, -- Gauntlets of the Shining Light
-            20625, -- Belt of the Dark Bog
-            20627, -- Dark Heart Pants
-            20629, -- Malignant Footguards
-            20579, -- Green Dragonskin Cloak
-            20615, -- Dragonspur Wraps
-            20616, -- Dragonbone Wristguards
-            20618, -- Gloves of Delusional Power
-            20617, -- Ancient Corroded Leggings
-            20619, -- Acid Inscribed Greaves
-            20582, -- Trance Stone
-            20644, -- Nightmare Engulfed Object
-            20600, -- Malfurion's Signet Ring
-            20580, -- Hammer of Bestial Fury
-            20581, -- Staff of Rampant Growth
-            20623, -- Circlet of Restless Dreams
-            20622, -- Dragonheart Necklace
-            20624, -- Ring of the Unliving
-            20621, -- Boots of the Endless Moor
-            20599, -- Polished Ironwood Crossbow
-            20633, -- Unnatural Leather Spaulders
-            20631, -- Mendicant's Slippers
-            20634, -- Boots of Fright
-            20632, -- Mindtear Band
-            20577, -- Nightmare Blade
-            20637, -- Acid Inscribed Pauldrons
-            20635, -- Jade Inlaid Vestments
-            20638, -- Leggings of the Demented Mind
-            20639, -- Strangely Glyphed Legplates
-            20636, -- Hibernation Crystal
-            20578, -- Emerald Dragonfang
-        }
-    }, {
-        name = "Dungeon Items",
-        items = {
-            12811, -- Righteous Orb
-            11737, -- Libram of Voracity
-            11733, -- Libram of Constitution
-            18333, -- Libram of Focus
-            12940, -- Dal'Rend's Sacred Charge
-            11815, -- Hand of Justice
-            13143, -- Mark of the Dragon Lord
-            11684, -- Ironfoe
-            11808, -- Circle of Flame
-            11726, -- Savage Gladiator Chain
-            9372, -- Sul'thraze the Lasher (combined from Jang'thraze and Sang'thraze, Zul'Farrak)
-            17780, -- Blade of Eternal Darkness
-            12871, -- Chromatic Carapace
-            12590, -- Felstriker
-            12731, -- Pristine Hide of the Beast
-            12592, -- Blackblade of Shahram
-            18538, -- Treant's Bane
-            13314, -- Alanna's Embrace
-            13937, -- Headmaster's Charge
-            13505, -- Runeblade of Baron Rivendare
-            13353, -- Book of the Dead
-            18401, -- Nostro's Compendium of Dragon Slaying
-        }
-    }, {
-        name = "Level 40 Mounts",
-        items = {
-            5655, -- Chestnut Mare Bridle
-            2414, -- Pinto Bridle
-            5656, -- Brown Horse Bridle
-            8632, -- Reins of the Spotted Frostsaber
-            8629, -- Reins of the Striped Nightsaber
-            8631, -- Reins of the Striped Frostsaber
-            274706, -- Reins of the Striped Dawnsaber
-            5864, -- Gray Ram
-            5872, -- Brown Ram
-            5873, -- White Ram
-            8563, -- Red Mechanostrider
-            13321, -- Green Mechanostrider
-            8595, -- Blue Mechanostrider
-            13322, -- Unpainted Mechanostrider
-            274930, -- Umber Galestrider (Skyborne, both factions)
-            269683, -- Stormy Galestrider (Skyborne, both factions)
-            269681, -- Empyrean Galestrider (Skyborne, both factions)
-            269682, -- Regal Galestrider (Skyborne, both factions; may be a reputation reward)
-        }
-    }, {
-        name = "Level 60 Mounts",
-        items = {
-            -- Alliance vendor mounts
-            18776, -- Swift Palomino
-            18778, -- Swift White Steed
-            18777, -- Swift Brown Steed
-            18766, -- Reins of the Swift Frostsaber
-            18767, -- Reins of the Swift Mistsaber
-            18902, -- Reins of the Swift Stormsaber
-            18785, -- Swift White Ram
-            18786, -- Swift Brown Ram
-            18787, -- Swift Gray Ram
-            18773, -- Swift White Mechanostrider
-            18772, -- Swift Green Mechanostrider
-            18774, -- Swift Yellow Mechanostrider
-            274933, -- Swift Umber Galestrider (Skyborne, both factions)
-            269678, -- Swift Stormy Galestrider (Skyborne, both factions)
-            269671, -- Swift Empyrean Galestrider (Skyborne, both factions)
-            269673, -- Swift Regal Galestrider (Skyborne, both factions; may be a reputation reward)
-            -- Horde vendor mounts
-            18796, -- Horn of the Swift Brown Wolf
-            18798, -- Horn of the Swift Gray Wolf
-            18797, -- Horn of the Swift Timber Wolf
-            13334, -- Green Skeletal Warhorse
-            18791, -- Purple Skeletal Warhorse
-            18794, -- Great Brown Kodo
-            18795, -- Great Gray Kodo
-            18793, -- Great White Kodo
-            18788, -- Swift Blue Raptor
-            18789, -- Swift Olive Raptor
-            18790, -- Swift Orange Raptor
-            -- PvP rank 11 mounts
-            18241, -- Black War Steed Bridle
-            18242, -- Reins of the Black War Tiger
-            18243, -- Black Battlestrider
-            18244, -- Black War Ram
-            18245, -- Horn of the Black War Wolf
-            18248, -- Red Skeletal Warhorse
-            18247, -- Black War Kodo
-            18246, -- Whistle of the Black War Raptor
-            -- Alterac Valley mounts
-            19030, -- Stormpike Battle Charger
-            19029, -- Horn of the Frostwolf Howler
-            -- Raid drops
-            13335, -- Deathcharger's Reins
-            19872, -- Swift Razzashi Raptor
-            19902, -- Swift Zulian Tiger
-            21321, -- Red Qiraji Resonating Crystal
-            21176, -- Black Qiraji Resonating Crystal
-        }
-    }}
-}, {
-    id = "womp",
-    name = "Womp Womp Items",
-    description = "plays Downer",
-    groups = {{
-        name = "Mining",
-        items = {
-            12364, -- Huge Emerald
-            12800, -- Azerothian Diamond
-            12799, -- Large Opal
-        }
-    }, {
-        name = "Bad World Drop Epics",
-        items = {
-            1981, -- Icemail Jerkin
-            867, -- Gloves of Holy Might
-            1315, -- Lei of Lilies
-            1447, -- Ring of Saviors
-            1204, -- The Green Tower
-            1169, -- Blackskull Shield
-            1982, -- Nightblade
-            2915, -- Taran Icebreaker
-            869, -- Dazzling Longsword
-            868, -- Ardent Custodian
-        }
-    }}
-}}
-
--- Lookup maps for the loot check, built from the lists above
-ScubaSounds.Data.BigItemIdsMap = {}
-ScubaSounds.Data.WompWompItemIdsMap = {}
-local notableLootMaps = {
-    big = ScubaSounds.Data.BigItemIdsMap,
-    womp = ScubaSounds.Data.WompWompItemIdsMap
-}
-for _, list in ipairs(ScubaSounds.Data.NotableLoot) do
-    for _, group in ipairs(list.groups) do
-        for _, id in ipairs(group.items) do
-            notableLootMaps[list.id][tostring(id)] = true
-        end
-    end
-end
-
 -- Turns a GlobalStrings format like "You receive loot: %sx%d." into an anchored Lua pattern. With capture, %s and %d
 -- become captures
 local function FormatToPattern(format, capture)
@@ -1024,8 +42,23 @@ ScubaSounds.Data.CraftedByPattern = FormatToPattern(ITEM_CREATED_BY) -- "<Made b
 -- Riding skill chat lines: "Your skill in %s has increased to %d." and "You have gained the %s skill."
 ScubaSounds.Data.SkillRankUpPattern = FormatToPattern(SKILL_RANK_UP, true)
 ScubaSounds.Data.SkillGainedPattern = FormatToPattern(ERR_SKILL_GAINED_S, true)
+-- Roll chat lines: "%s rolls %d (%d-%d)" from /roll, and "Need Roll - %d for %s by %s" (and Greed) from loot rolls
+ScubaSounds.Data.RandomRollPattern = FormatToPattern(RANDOM_ROLL_RESULT, true)
+ScubaSounds.Data.LootRollPatterns = {}
+for _, format in ipairs({LOOT_ROLL_ROLLED_NEED, LOOT_ROLL_ROLLED_GREED}) do
+    table.insert(ScubaSounds.Data.LootRollPatterns, FormatToPattern(format, true))
+end
+-- Roll sounds: the number rolled -> its sound. /rolls only count on the normal 1-100 range
+ScubaSounds.Data.RollSounds = {
+    [67] = "67",
+    [69] = "Nice",
+    [100] = "StoleThatShit"
+}
 
 ScubaSounds.Data.BloodOfHeroesItemId = 12938
+-- First potion bought from a vendor, once per character
+ScubaSounds.Data.ConsumableItemClass = 0 -- Enum.ItemClass.Consumable
+ScubaSounds.Data.PotionItemSubclass = 1 -- Enum.ItemConsumableSubclass.Potion
 
 -- =================================================================
 -- Encounter & Unit IDs
@@ -1048,15 +81,11 @@ ScubaSounds.Data.FeignDeathBuffId = 5384
 
 -- Debuffs
 ScubaSounds.Data.LivingBombDebuffId = 20475
-ScubaSounds.Data.FlameBuffetDebuffId = 23341
-ScubaSounds.Data.BurningAdrenalineDebuffId = 18173
 
 -- Spells
 ScubaSounds.Data.SoulStoneResurrectionSpellIds = {20707, 20762, 20763, 20764, 20765}
 ScubaSounds.Data.SoulStoneAppliedSpellId = 20707
 ScubaSounds.Data.RecklessnessSpellId = 1719
-ScubaSounds.Data.GeddonAoeSpellId = 19695
-ScubaSounds.Data.SarturaWhirlwindSpellId = 26083
 -- Riding skills learned from the trainer. Matched by ID or by name in case Forever's IDs differ
 ScubaSounds.Data.ApprenticeRidingSpellId = 33388
 ScubaSounds.Data.ApprenticeRidingSpellName = "Apprentice Riding"
@@ -1074,6 +103,11 @@ ScubaSounds.Data.BearFormDeathWindow = 2 -- seconds; dying drops the form, so le
 -- Matched by ID or by name in case Forever's ID differs
 ScubaSounds.Data.BasicCampfireSpellId = 818
 ScubaSounds.Data.BasicCampfireSpellName = "Basic Campfire"
+-- Taming: a Tame Beast cast, then a pet we haven't seen within the window. Matched by ID or name like the spells above
+ScubaSounds.Data.TameBeastSpellId = 1515
+ScubaSounds.Data.TameBeastSpellName = "Tame Beast"
+ScubaSounds.Data.TameWindow = 25 -- seconds; the channel takes about 20
+ScubaSounds.Data.CatFamilyName = "Cat" -- UnitCreatureFamily for lions, tigers, panthers, lynxes and nightsabers
 -- Camping: resting emotes near a campfire earn its buffs. Matched by ID or name like the spells above
 ScubaSounds.Data.CampfireNearbySpellId = 1283391
 ScubaSounds.Data.CampfireNearbyName = "Campfire Nearby"
@@ -1099,43 +133,99 @@ ScubaSounds.Data.MinWipeGroupSize = 5
 
 -- Kill streaks: each player killing blow within the window of the last one goes up a level
 ScubaSounds.Data.KillStreakWindow = 10 -- seconds
+ScubaSounds.Data.SkyborneRaceName = "Skyborne" -- Forever's new race, matched against both race names, ignoring case
 ScubaSounds.Data.KillStreakSounds = {"KillingSpree", "Rampage", "Dominating", "Unstoppable", "Godlike"} -- from 2 kills
 
 -- Equipment
 ScubaSounds.Data.ShirtSlot = INVSLOT_BODY or 4
 ScubaSounds.Data.ShirtRemovedDelay = 0.5 -- seconds the slot must stay empty
 ScubaSounds.Data.RangedSlot = INVSLOT_RANGED or 18
+-- Dazed off a mount: the Dazed debuff on you right after the mount goes. If debuffs are secret (combat), an in-combat
+-- dismount you didn't cause counts too
+ScubaSounds.Data.DazedSpellId = 1604
+ScubaSounds.Data.DazedSpellName = "Dazed"
+ScubaSounds.Data.DazedCheckDelay = 0.2 -- seconds after the mount goes, so the debuff has landed
+ScubaSounds.Data.OwnDismountWindow = 1 -- seconds after a /dismount, cancelled buff or cast start that a dismount is ours
+ScubaSounds.Data.RingSlots = {
+    [INVSLOT_FINGER1 or 11] = true,
+    [INVSLOT_FINGER2 or 12] = true
+}
+ScubaSounds.Data.BagSlots = {} -- inventory slots of the four equippable bags
+for bag = 1, NUM_BAG_SLOTS or 4 do
+    local toInventoryId = C_Container and C_Container.ContainerIDToInventoryID or ContainerIDToInventoryID
+    ScubaSounds.Data.BagSlots[toInventoryId and toInventoryId(bag) or 19 + bag] = true
+end
+-- A character's first one of these plays once ever (see CheckFirstEquip)
+-- Main weapon: the wand for classes that can use one, the ranged weapon for hunters, else the main hand
+ScubaSounds.Data.MainHandSlot = INVSLOT_MAINHAND or 16
+ScubaSounds.Data.WandClasses = {
+    MAGE = true,
+    PRIEST = true,
+    WARLOCK = true
+}
+ScubaSounds.Data.RangedMainClasses = {
+    HUNTER = true
+}
+ScubaSounds.Data.GreenQuality = 2 -- Enum.ItemQuality.Uncommon; better counts too
+-- slots: the slots to look in (a table, or a function returning one); qualifies(slot, itemId): optional item check
+ScubaSounds.Data.FirstEquips = {
+    ring = {
+        slots = ScubaSounds.Data.RingSlots,
+        event = "FirstRingEquipped"
+    },
+    bag = {
+        slots = ScubaSounds.Data.BagSlots,
+        event = "FirstBagEquipped"
+    },
+    weapon = {
+        slots = function()
+            local _, class = UnitClass("player")
+            local data = ScubaSounds.Data
+            if data.WandClasses[class] or data.RangedMainClasses[class] then
+                return {
+                    [data.RangedSlot] = true
+                }
+            end
+            return {
+                [data.MainHandSlot] = true
+            }
+        end,
+        qualifies = function(slot, itemId)
+            local data = ScubaSounds.Data
+            local _, class = UnitClass("player")
+            local quality = GetInventoryItemQuality("player", slot)
+            if issecretvalue(quality) or not quality or quality < data.GreenQuality then
+                return false
+            end
+            return not data.WandClasses[class] or ScubaSounds:IsWand(itemId)
+        end,
+        event = "FirstGreenWeaponEquipped"
+    }
+}
 ScubaSounds.Data.WandForgetDelay = 0.5 -- seconds the ranged slot must stay empty before the last wand is forgotten
 ScubaSounds.Data.WeaponItemClass = 2 -- Enum.ItemClass.Weapon
 ScubaSounds.Data.WandItemSubclass = 19 -- Enum.ItemWeaponSubclass.Wand
 
+-- Gold milestones, once per account. guild: every guild member hears it and you post chat in guild chat. Ascending
+ScubaSounds.Data.GoldMilestones = {{
+    gold = 100,
+    sound = "Moneyx6"
+}, {
+    gold = 1000,
+    sound = "RichBitch",
+    guild = true,
+    chat = "1000g"
+}, {
+    gold = 5000,
+    sound = "SameTime",
+    guild = true,
+    chat = "5000g"
+}}
+ScubaSounds.Data.CopperPerGold = 10000
+
 -- Leveling
 ScubaSounds.Data.MaxLevel = 60
 ScubaSounds.Data.PetLevelUpWithPlayerWindow = 2 -- seconds; a pet leveling with you (warlock demons) counts once
-
--- Level-up jingles, kept in Sounds/LevelUp. Sound -> duration in seconds
-ScubaSounds.Data.LevelUpSounds = {
-    Diablo2LevelUp = 2,
-    FF7Victory = 4,
-    GoldenSunVictory = 5,
-    Mario1Up = 1,
-    MarioPowerUp = 1,
-    PokemonLevelUp = 3,
-    RuneScapeLevelUp = 3,
-    SkyrimSkillUp = 4,
-    Warcraft3LevelUp = 3,
-    ZeldaItemGet = 2
-}
-for sound, duration in pairs(ScubaSounds.Data.LevelUpSounds) do
-    ScubaSounds.Audio.SoundInfo[sound] = {
-        extension = "ogg",
-        duration = duration,
-        canOverlapSelf = false,
-        timeout = 1,
-        credit = "Jujewmagic",
-        folder = "LevelUp"
-    }
-end
 
 -- Red error messages for lacking an item, by GetGameMessageInfo name (any the client lacks just never match)
 ScubaSounds.Data.MissingItemErrors = {
@@ -1150,10 +240,16 @@ ScubaSounds.Data.MissingItemErrors = {
 ScubaSounds.Data.MissingItemCooldown = 300 -- seconds
 
 -- Bobmoney prank: his first press of his first new /startattack macro types this in guild chat, once ever
-ScubaSounds.Data.StartAttackPrankTarget = Bobmoney
 ScubaSounds.Data.StartAttackCommand = "/startattack"
 ScubaSounds.Data.StartAttackPrankMessage = "tartattack"
 ScubaSounds.Data.MacrosLoadedDelay = 10 -- seconds after entering the world
+
+-- Sitting over a dead player. Sit presses come from the sit/stand keybind (no chat emote) and /sit
+ScubaSounds.Data.LoginBaselineDelay = 5 -- seconds after entering the world for the inventory to finish loading
+ScubaSounds.Data.SitSpamCount = 6 -- presses...
+ScubaSounds.Data.SitSpamWindow = 5 -- ...within this many seconds
+ScubaSounds.Data.SitSpamCooldown = 30 -- seconds before it can count again
+ScubaSounds.Data.SitSpamRange = 3 -- CheckInteractDistance index: duel range, about 10 yards
 
 -- Critters
 ScubaSounds.Data.CritterCreatureTypeId = 8
@@ -1162,12 +258,11 @@ ScubaSounds.Data.FrogNameWords = {"frog", "toad"} -- matched case-insensitively 
 ScubaSounds.Data.MurlocNameWord = "murloc" -- matched case-insensitively in the creature's name
 ScubaSounds.Data.WipeCheckDelays = {0.5, 2, 5}
 
--- Zones
-ScubaSounds.Data.WarsongZoneId = 3277
-ScubaSounds.Data.OnyxiasLairId = 249
-ScubaSounds.Data.AlteracValleyId = 1459
-ScubaSounds.Data.Aq20Id = 509
-ScubaSounds.Data.Aq40Id = 531
+-- Zones, by GetInstanceInfo's instance ID (not C_Map's UI map IDs, which differ). Zone names are the fallback
+ScubaSounds.Data.WarsongInstanceId = 489
+ScubaSounds.Data.OnyxiasLairInstanceId = 249
+ScubaSounds.Data.AlteracValleyInstanceId = 30
+ScubaSounds.Data.ZoneEnteredDelay = 2 -- seconds after zoning, so the loading screen is gone and the zone has updated
 ScubaSounds.Data.RaidIds = {
     [409] = "Molten Core",
     [469] = "Blackwing Lair",
@@ -1194,28 +289,47 @@ ScubaSounds_ADDON_PREFIX = "SSAddonPrefix" -- 16 char limit
 C_ChatInfo.RegisterAddonMessagePrefix(ScubaSounds_ADDON_PREFIX)
 ScubaSounds_LegendaryReceivedCommand = "LEGENDARYRECEIVED"
 ScubaSounds_GzNigelCommand = "GZNIGEL"
--- Character or true names
-ScubaSounds_GzNigelSenders = {
-    ["Aloha"] = true,
-    [Stavis] = true,
-    [Zarix] = true,
-    ["Fahbulous"] = true,
-    ["Mangan"] = true,
-    [Kaymon] = true
-}
 ScubaSounds_CThunCombatCommand = "CTHUNCOMBATSTARTED"
 ScubaSounds_RelayCommand = "RELAY"
+ScubaSounds_SitSpamCommand = "TBAG" -- whispered to the dead player
+-- First discoveries, posted in guild chat. Group-wide ones (wipes, boss kills) come from the group leader alone, unnamed
+ScubaSounds.Data.DiscoveryMessage = "%s discovered a sound: %s (%s tab)" -- name, sound, options tab
+ScubaSounds.Data.GroupDiscoveryMessage = "The %s discovered a sound: %s (%s tab)" -- "raid" or "group"
+-- Receivers with the addon turn "<sound> (<tab> tab)" at the end of either message into a clickable link: click
+-- previews the sound, shift-click opens that options tab. Links can't be sent in chat, so this happens on arrival
+ScubaSounds.Data.DiscoveryLinkPattern = "^(.- discovered a sound: )(%w+) %((.-) tab%)$"
+-- /ss whisper <player> <sound>, linked the same way (on both ends of the whisper)
+ScubaSounds.Data.WhisperSoundMessage = "Have a listen: %s (%s tab)" -- sound, options tab
+ScubaSounds.Data.WhisperLinkPattern = "^(Have a listen: )(%w+) %((.-) tab%)$"
+ScubaSounds.Data.DiscoveryLinkType = "scubasounds"
+-- Spell link blue, which players already know to click, after the options window's play button
+ScubaSounds.Data.DiscoveryLinkColor = "ff71d5ff"
+ScubaSounds.Data.DiscoveryLinkIcon = "|TInterface\\Buttons\\UI-SpellbookIcon-NextPage-Up:0|t"
+-- After logging in, a chat summary of what the guild discovered while you were away (delay set with the sync timings)
+ScubaSounds.Data.NewDiscoveriesPerLine = 2
+ScubaSounds.Data.RecentPlaysKept = 10 -- /ss recent
+ScubaSounds.Data.BlockedChatRetry = 5 -- seconds between tries while guild chat is locked down
+ScubaSounds.Data.BlockedChatGiveUp = 3600 -- seconds
 -- Guild broadcasts: COMMAND:<player>:key=value;key=value. Info for building on later, clients ignore unknown commands
 ScubaSounds_DiedCommand = "DIED"
 ScubaSounds_MaxLevelCommand = "LEVEL60" -- every guild member plays the max level sound
+ScubaSounds_GoldMilestoneCommand = "GOLD" -- GOLD:<player>:g=<gold>, every guild member plays that milestone's sound
 ScubaSounds.GuildEvents = {} -- receive hooks: ScubaSounds.GuildEvents[command] = function(self, playerName, fields)
 -- Sound stats. Every login asks the guild which sounds they've heard; replies are whispered back.
--- STATS:<character>:v=<version>;<sound>=<first heard>;... (also sent to the guild live, the first time a character
--- hears a sound)
+-- STATS:<character>:v=<version>;<sound>=<first heard>;@<trigger ID>=<first heard>;... (also sent to the guild live,
+-- the first time a character hears a sound or trigger)
 ScubaSounds_StatsRequestCommand = "STATSREQ"
 ScubaSounds_StatsCommand = "STATS"
 ScubaSounds.Data.StatsRequestDelay = 10 -- seconds after logging in, once the guild channel is up
 ScubaSounds.Data.StatsReplyDelay = 30 -- seconds; replies are spread out so the guild doesn't answer at once
+-- The login discoveries summary waits for the whole sync: the request, every reply's random wait, and a few seconds for
+-- the last replies to arrive (they may queue behind other traffic)
+ScubaSounds.Data.NewDiscoveriesDelay = ScubaSounds.Data.StatsRequestDelay + ScubaSounds.Data.StatsReplyDelay + 5
+-- FIRSTS:<player>:v=<version>;<sound>=<first heard>,<name>;@<trigger ID>=<first heard>,<name>
+-- The earliest discoverer each client knows of, passed along in sync replies so it reaches players who were never online
+-- at the same time as the discoverer. Only about this many online guildmates send it per sync; they mostly agree
+ScubaSounds_FirstsCommand = "FIRSTS"
+ScubaSounds.Data.FirstsRepliesWanted = 5
 ScubaSounds.Data.MaxAddonMessageLength = 255
 ScubaSounds.Data.MaxRelayRetries = 120 -- seconds, long enough to outlast a boss encounter
 ScubaSounds.Data.RetryableSendResults = { -- Enum.SendAddonMessageResult
@@ -1224,7 +338,8 @@ ScubaSounds.Data.RetryableSendResults = { -- Enum.SendAddonMessageResult
     [11] = true -- AddOnMessageLockdown
 }
 ScubaSounds.Data.RelayedFields = { -- context fields sent with a relay, beside the sender's name
-    spellId = true
+    spellId = true,
+    sound = true -- the sound the sender picked, so the group hears the same one
 }
 
 -- =================================================================
@@ -1240,33 +355,6 @@ ScubaSounds_PlayOutsideRaid = "Play outside of raid"
 ScubaSounds_DisableSounds = "Disable Sounds"
 ScubaSounds_SendGuildMessages = "Send messages in guild" -- chat players can read ("ding", "gz nigel"); addon messages always go out
 
--- Options UI layout
-local OPTIONS_WIDTH = 730
-local COLUMNS = 3
-local COLUMN_WIDTH = 232
-local ROW_HEIGHT = 23
-local GRID_LEFT = 17
-local GRID_TOP = -74
-local GRID_SCROLL_TOP = -72 -- sound grids scroll from just under the separator
-local DEFAULT_VISIBLE_ROWS = 13 -- the window grows to fit the tallest tab up to this many rows, then tabs scroll
-local NAME_COLOR = {1, 0.82, 0}
-local NAME_DISABLED_COLOR = {0.6, 0.54, 0.29}
-local LABEL_COLOR = {1, 1, 1}
-local DISABLED_COLOR = {0.5, 0.5, 0.5}
-local TAB_ROW_SPACING = 4 -- tabs wrap onto a second row under the window when they don't fit
-local LOOT_COLUMNS = 3
-local LOOT_HEADER_HEIGHT = 24
-local LOOT_ITEM_HEIGHT = 28
-local LOOT_ICON_SIZE = 24
-local LOOT_INDENT = 18
-local STATS_COLUMNS = { -- x offset and width of each Stats tab column
-    sound = {0, 200},
-    tab = {205, 150},
-    first = {360, 230},
-    plays = {595, 75}
-}
-local QUESTION_MARK_ICON = 134400 -- INV_Misc_QuestionMark, for an ID the client doesn't know
-
 -- Options tabs. Every trigger belongs to one of these
 ScubaSounds.Data.Categories = {{
     id = "PlayerDeaths",
@@ -1276,7 +364,7 @@ ScubaSounds.Data.Categories = {{
     name = "Other Deaths"
 }, {
     id = "Party",
-    name = "Party"
+    name = "Party/Raid"
 }, {
     id = "PvP",
     name = "PvP"
@@ -1284,19 +372,21 @@ ScubaSounds.Data.Categories = {{
     id = "Loot",
     name = "Loot & Guild"
 }, {
-    id = "NotableLoot",
-    name = "Notable Loot",
-    notableLoot = true -- lists ScubaSounds.Data.NotableLoot instead of sounds
-}, {
     id = "Misc",
     name = "Misc"
 }, {
     id = "LevelUps",
-    name = "Level Ups"
+    name = "Level Ups",
+    petToggle = true -- a third toggle: whether pet level ups play too
 }, {
     id = "Unused",
     name = "Unused",
     unused = true
+}, {
+    id = "NotableLoot",
+    name = "Notable Loot",
+    notableLoot = true, -- lists ScubaSounds.Data.NotableLoot instead of sounds
+    newTabRow = true -- starts the second row of tabs, with Stats and Options after it
 }}
 
 -- =================================================================
@@ -1305,7 +395,7 @@ ScubaSounds.Data.Categories = {{
 -- Always registered: /ss off only stops sounds playing, so state tracking, relays and guild messages keep working.
 -- Addons have no combat log on Forever; UNIT_DIED and UNIT_SPELLCAST_SUCCEEDED replace it
 ScubaSounds.Data.WowEvents = {"ADDON_LOADED", "PLAYER_DEAD", "ENCOUNTER_START", "ENCOUNTER_END", "CHAT_MSG_ADDON",
-                              "CHAT_MSG_LOOT", "UNIT_DIED", "UNIT_SPELLCAST_SUCCEEDED", "RESURRECT_REQUEST",
+                              "CHAT_MSG_LOOT", "UNIT_DIED", "RESURRECT_REQUEST",
                               "PLAYER_ALIVE", "ZONE_CHANGED", "ZONE_CHANGED_NEW_AREA",
                               "ZONE_CHANGED_INDOORS", "PLAYER_ENTERING_WORLD", "TRADE_SHOW", "TRADE_ACCEPT_UPDATE",
                               "TRADE_CLOSED", "PLAYER_LOGIN", "GUILD_ROSTER_UPDATE", "UI_ERROR_MESSAGE",
@@ -1313,7 +403,8 @@ ScubaSounds.Data.WowEvents = {"ADDON_LOADED", "PLAYER_DEAD", "ENCOUNTER_START", 
                               "PLAYER_EQUIPMENT_CHANGED", "LEARNED_SPELL_IN_SKILL_LINE", "MAIL_SHOW", "MAIL_CLOSED",
                               "CHAT_MSG_SKILL", "PLAYER_TARGET_CHANGED", "UPDATE_MOUSEOVER_UNIT",
                               "NAME_PLATE_UNIT_ADDED", "PLAYER_REGEN_ENABLED", "PLAYER_LEVEL_UP", "UPDATE_MACROS",
-                              "UNIT_LEVEL", "UNIT_PET", "UNIT_DISPLAYPOWER",
+                              "UNIT_LEVEL", "UNIT_PET", "CHAT_MSG_SYSTEM", "PLAYER_MONEY", "BAG_UPDATE",
+                              "PET_STABLE_SHOW", "PET_STABLE_CLOSED", "UNIT_DISPLAYPOWER",
                               "GROUP_ROSTER_UPDATE", "PLAYER_UNGHOST", "UNIT_HEALTH"}
 -- Unit tokens for you and your group, so the frequent unit events can skip everything else with one lookup
 ScubaSounds.Data.GroupUnitTokens = {
@@ -1327,6 +418,8 @@ for i = 1, MAX_RAID_MEMBERS or 40 do
 end
 -- Addon events where only the first matching trigger plays
 ScubaSounds.Data.ExclusiveEvents = {
+    PetTamed = true,
+    PlayerKilled = true,
     PlayerDied = true,
     SelfResurrected = true,
     WandEquipped = true
@@ -1340,6 +433,7 @@ ScubaSounds.Audio.Timeouts = {}
 ScubaSounds.State.IsTradingWithNigel = false
 ScubaSounds.State.TradePartnerName = nil
 ScubaSounds.State.IsFirstLogin = true
+ScubaSounds.State.LastZoneKey = nil -- the zone ZoneEntered last fired for, so both zoning events count once
 ScubaSounds.State.ActiveAuras = {}
 ScubaSounds.State.RecentHelloTheresCount = 0
 ScubaSounds.State.RecentDeathSoundsCount = 0
@@ -1349,6 +443,14 @@ ScubaSounds.State.KillStreak = 0
 ScubaSounds.State.LastKillTime = nil
 ScubaSounds.State.LastEmoteToken = nil
 ScubaSounds.State.LastEmoteTime = 0
+ScubaSounds.State.SitPresses = {} -- GetTime() of recent sit presses
+ScubaSounds.State.LastSitSpam = 0
+ScubaSounds.State.WasMounted = false
+-- First-equip and gold milestone events are ignored until gear and gold already there at login have been silently
+-- counted; bag updates and money changes can fire while logging in, before PLAYER_ENTERING_WORLD
+ScubaSounds.State.LoginBaselineDone = false
+ScubaSounds.State.StableOpen = false -- the stable master's window
+ScubaSounds.State.LastOwnDismountAction = 0 -- GetTime() of a /dismount, cancelled buff or cast start
 ScubaSounds.State.HasShirt = nil -- unknown until entering the world
 ScubaSounds.State.LastWandLink = nil
 ScubaSounds.State.RangedChangeCount = 0
@@ -1361,6 +463,7 @@ ScubaSounds.State.MacrosLoaded = false
 ScubaSounds.State.PetGuid = nil -- the current pet and its level, to tell a pet leveling from a new pet
 ScubaSounds.State.PetLevel = nil
 ScubaSounds.State.LastPlayerLevelUp = 0
+ScubaSounds.State.TameBeastCastAt = nil -- GetTime() of the last Tame Beast cast, until a pet comes of it
 ScubaSounds.State.BearDruids = {} -- GUID -> true while a group druid is in a bear form
 ScubaSounds.State.LeftBearFormAt = {} -- GUID -> GetTime() they last left one
 ScubaSounds.State.PlayerInBearForm = false -- kept as it was at death until you're alive again
@@ -1388,11 +491,15 @@ ScubaSounds.Data.RelayedEvents = {} -- addon events group members may relay to u
 --   when(ctx): optional condition on the event's context. ctx.relayedBy is set when a group member relayed it
 --   relay: true or function(ctx). Tell the group when it matches here, so they hear it too
 --   together: relay first and play once the message is out, so the group hears it at the same moment
+--   groupDiscovery: nobody in particular sets it off (a wipe, a boss kill), so the group leader announces its first
+--     discovery, without a name
 --   hasChance: the options UI shows a chance-to-play box for it
 --   defaultChance: percent chance before the player changes it (default 100)
 --   cooldown: seconds after the trigger plays before it can play again, whichever of its sounds played
---   secret: the options tooltip says "New in Forever" until someone in the guild has heard one of its sounds, then
---     shows its text. New sounds are secret unless they join an existing trigger whose condition is already known
+--   noRepeat: how many of its other sounds must play before one repeats (remembered across sessions)
+--   newInForever: a sound new in Forever. Every trigger's text stays hidden until someone in the guild has heard one of
+--     its sounds; until then the tooltip says "New in Forever" for these and "Still a secret" for the older ones.
+--     New sounds get it unless they join an existing trigger whose condition is already known
 --   textArgs: values for the %s / %d in its text
 -- Trigger texts are base64 so skimming the file doesn't spoil the secret ones
 
@@ -1429,15 +536,13 @@ local function AddTrigger(id, category, text, sounds, options)
         when = options.when,
         relay = options.relay,
         together = options.together,
+        groupDiscovery = options.groupDiscovery,
         hasChance = options.hasChance,
         defaultChance = options.defaultChance,
         cooldown = options.cooldown,
-        secret = options.secret
+        noRepeat = options.noRepeat,
+        newInForever = options.newInForever
     }
-    -- Secret texts stay encoded until revealed
-    if not trigger.secret then
-        trigger.text = ScubaSounds:TriggerText(trigger)
-    end
     table.insert(ScubaSounds.Data.Triggers, trigger)
     ScubaSounds.Data.TriggersById[id] = trigger
     ScubaSounds.Data.Listeners[trigger.on] = ScubaSounds.Data.Listeners[trigger.on] or {}
@@ -1459,7 +564,7 @@ AddTrigger("OneShotDeath", "OtherDeaths", "WW91IG9yIGEgZ3JvdXAgbWVtYmVyIGRpZXMgZ
     when = function(death)
         return death.isOneShot and not death.isFeigning
     end,
-    secret = true
+    newInForever = true
 })
 
 local deathNames = {}
@@ -1501,7 +606,7 @@ AddTrigger("DruidTankDeath", "OtherDeaths", "QSBkcnVpZCB0YW5rIGluIHlvdXIgZ3JvdXA
     when = function(death)
         return death.isDruidTank
     end,
-    secret = true
+    newInForever = true
 })
 
 AddTrigger("LavaDeath", "OtherDeaths", "QSBncm91cCBtZW1iZXIgZGllcyB0byBsYXZhIG91dHNpZGUgb2YgY29tYmF0", {"Omg"}, {
@@ -1514,12 +619,12 @@ AddTrigger("FrogKilled", "OtherDeaths", "WW91IGtpbGwgYSBmcm9nIG9yIHRvYWQ=", {"Ga
     when = function(critter)
         return critter.isFrog
     end,
-    secret = true
+    newInForever = true
 })
 
 AddTrigger("MurlocKilled", "OtherDeaths", "WW91IGtpbGwgYSBtdXJsb2MgZm9yIHRoZSBmaXJzdCB0aW1lIChvbmNlIHBlciBhY2NvdW50KQ==", {"GayFrogs"}, {
     on = "MurlocKilled",
-    secret = true
+    newInForever = true
 })
 
 AddTrigger("CritterKilled", "OtherDeaths", "WW91IGtpbGwgYSBjcml0dGVy", {"BadMan"}, {
@@ -1527,7 +632,13 @@ AddTrigger("CritterKilled", "OtherDeaths", "WW91IGtpbGwgYSBjcml0dGVy", {"BadMan"
     when = function(critter)
         return not critter.isFrog
     end,
-    secret = true
+    newInForever = true
+})
+
+AddTrigger("SitSpam", "OtherDeaths", "WW91IHNwYW0gc2l0IG9uIGEgZGVhZCBndWlsZG1hdGUgb3IgZ3JvdXBtYXRlLCBvciBvbmUgZG9lcyBpdCB0byB5b3U=", {"Nelson"}, {
+    on = "SitSpam",
+    cooldown = Data.SitSpamCooldown,
+    newInForever = true
 })
 
 -- =================================================================
@@ -1536,7 +647,7 @@ AddTrigger("CritterKilled", "OtherDeaths", "WW91IGtpbGwgYSBjcml0dGVy", {"BadMan"
 AddTrigger("OnyxiaZoneIn", "Party", "RW50ZXJpbmcgT255eGlhJ3MgTGFpcg==", {"Cavern"}, {
     on = "ZoneEntered",
     when = function(zone)
-        return zone.mapId == Data.OnyxiasLairId or ScubaSounds:EqualsIgnoreCase(zone.zoneName, "Onyxia's Lair")
+        return zone.instanceId == Data.OnyxiasLairInstanceId or ScubaSounds:EqualsIgnoreCase(zone.zoneName, "Onyxia's Lair")
     end
 })
 
@@ -1554,7 +665,7 @@ AddTrigger("Lip", "Party", "QSBncm91cCBtZW1iZXIgZHJpbmtzIGEgTGltaXRlZCBJbnZ1bG5l
 AddTrigger("ShaqSelfRes", "Party", "U2hhcSB1c2VzIGEgc291bHN0b25lIG9yIEFua2g=", {"OnceYouGoShaq"}, {
     on = "SelfResurrected",
     when = function(res)
-        return ScubaSounds:GetTruePlayerName(res.sourceName) == Shaq
+        return ScubaSounds:GetTruePlayerName(res.sourceName) == Data.TrueNames.Shaq
     end,
     relay = true
 })
@@ -1578,23 +689,10 @@ AddTrigger("MarkOfTheChosen", "Party", "WW91IGdldCBNYXJrIG9mIHRoZSBDaG9zZW4=", {
     end
 })
 
-AddTrigger("GeddonInferno", "Party", "QmFyb24gR2VkZG9uIGNhc3RzIEluZmVybm8=", {"LotrFlee"}, {
-    on = "SpellCast",
-    when = function(cast)
-        return cast.spellId == Data.GeddonAoeSpellId
-    end
-})
-
-AddTrigger("FlameBuffet", "Party", "WW91IHJlYWNoIDggc3RhY2tzIG9mIEZsYW1lIEJ1ZmZldA==", {"LotrFlee"}, {
-    on = "PlayerAurasChanged",
-    when = function()
-        return ScubaSounds:HasDebuff("player", Data.FlameBuffetDebuffId, 8)
-    end
-})
-
 AddTrigger("EndBossKill", "Party", "QW4gZW5kIGJvc3MgZGllczogUmFnbmFyb3MsIE9ueXhpYSwgTmVmYXJpYW4sIEhha2thciwgQydUaHVuIG9yIEtlbCdUaHV6YWQ=",
     {"MongolianTechno"}, {
         on = "EncounterEnded",
+        groupDiscovery = true,
         when = function(encounter)
             if encounter.success ~= 1 then
                 return false
@@ -1617,8 +715,9 @@ AddTrigger("Recklessness", "Party", "QSByYWlkIHdhcnJpb3IgdXNlcyBSZWNrbGVzc25lc3M
     relay = true
 })
 
-AddTrigger("GroupWipe", "Party", "WW91ciBncm91cCBvZiA1KyB3aXBlcw==", {"ScreamingSheep"}, {
+AddTrigger("GroupWipe", "Party", "WW91ciBncm91cCBvZiA1KyB3aXBlcw==", {"ScreamingSheep", "LotrFlee"}, {
     on = "GroupWiped",
+    groupDiscovery = true,
     when = function(wipe)
         -- Whoever detects it first relays; the rest ignore their own detection and later relays
         if wipe.relayedBy then
@@ -1630,20 +729,6 @@ AddTrigger("GroupWipe", "Party", "WW91ciBncm91cCBvZiA1KyB3aXBlcw==", {"Screaming
         return true
     end,
     together = true
-})
-
-AddTrigger("SarturaWhirlwind", "Party", "UHJpbmNlc3MgU2FydHVyYSBjYXN0cyBXaGlybHdpbmQ=", {"ScreamingSheep"}, {
-    on = "SpellCast",
-    when = function(cast)
-        return cast.spellId == Data.SarturaWhirlwindSpellId
-    end
-})
-
-AddTrigger("BurningAdrenaline", "Party", "WW91IGdldCBCdXJuaW5nIEFkcmVuYWxpbmUgKFZhZWxhc3RyYXN6KQ==", {"SuperSaiyan"}, {
-    on = "PlayerAurasChanged",
-    when = function()
-        return ScubaSounds:HasDebuff("player", Data.BurningAdrenalineDebuffId)
-    end
 })
 
 AddTrigger("Soulstone", "Party", "WW91IGNhc3QgU291bHN0b25lIG9uIHNvbWVvbmU=", {"YourSoulIsMine"}, {
@@ -1658,6 +743,7 @@ AddTrigger("Soulstone", "Party", "WW91IGNhc3QgU291bHN0b25lIG9uIHNvbWVvbmU=", {"Y
 -- =================================================================
 AddTrigger("BattlegroundLoss", "PvP", "WW91ciBiYXR0bGVncm91bmQgaXMgbG9zdA==", {"Downer"}, {
     on = "BattlegroundEnded",
+    groupDiscovery = true,
     when = function(battleground)
         return not battleground.won
     end
@@ -1665,6 +751,7 @@ AddTrigger("BattlegroundLoss", "PvP", "WW91ciBiYXR0bGVncm91bmQgaXMgbG9zdA==", {"
 
 AddTrigger("BattlegroundWin", "PvP", "WW91ciBiYXR0bGVncm91bmQgaXMgd29u", {"MongolianTechno"}, {
     on = "BattlegroundEnded",
+    groupDiscovery = true,
     when = function(battleground)
         return battleground.won
     end
@@ -1673,31 +760,41 @@ AddTrigger("BattlegroundWin", "PvP", "WW91ciBiYXR0bGVncm91bmQgaXMgd29u", {"Mongo
 AddTrigger("AlteracValley", "PvP", "RW50ZXJpbmcgQWx0ZXJhYyBWYWxsZXk=", {"RightToJail"}, {
     on = "ZoneEntered",
     when = function(zone)
-        return zone.mapId == Data.AlteracValleyId or ScubaSounds:EqualsIgnoreCase(zone.zoneName, "Alterac Valley")
+        return zone.instanceId == Data.AlteracValleyInstanceId or
+                   ScubaSounds:EqualsIgnoreCase(zone.zoneName, "Alterac Valley")
     end
 })
 
 AddTrigger("WarsongGulch", "PvP", "RW50ZXJpbmcgV2Fyc29uZyBHdWxjaA==", {"Warsong"}, {
     on = "ZoneEntered",
     when = function(zone)
-        return zone.mapId == Data.WarsongZoneId or ScubaSounds:EqualsIgnoreCase(zone.zoneName, "Warsong Gulch")
+        return zone.instanceId == Data.WarsongInstanceId or ScubaSounds:EqualsIgnoreCase(zone.zoneName, "Warsong Gulch")
     end
 })
 
+-- PlayerKilled is exclusive: one sound per kill, the rarer kill streak ahead of the Skyborne kill
 for level, sound in ipairs(Data.KillStreakSounds) do
     local kills = level + 1
     local isLast = level == #Data.KillStreakSounds
     local text = isLast and "WW91IGdldCAlZCBvciBtb3JlIHBsYXllciBraWxscyBpbiBhIHJvdywgZWFjaCB3aXRoaW4gJWQgc2Vjb25kcyBvZiB0aGUgbGFzdA==" or
                      "WW91IGdldCAlZCBwbGF5ZXIga2lsbHMgaW4gYSByb3csIGVhY2ggd2l0aGluICVkIHNlY29uZHMgb2YgdGhlIGxhc3Q="
     AddTrigger("KillStreak:" .. level, "PvP", text, {sound}, {
-        on = "KillStreak",
+        on = "PlayerKilled",
         textArgs = {kills, Data.KillStreakWindow},
         when = function(streak)
             return streak.kills == kills or (isLast and streak.kills > kills)
         end,
-        secret = true
+        newInForever = true
     })
 end
+
+AddTrigger("SkyborneKill", "PvP", "WW91IGxhbmQgdGhlIGtpbGxpbmcgYmxvdyBvbiBhIFNreWJvcm5lIHBsYXllcg==", {"ImBlue"}, {
+    on = "PlayerKilled",
+    when = function(kill)
+        return kill.isSkyborne
+    end,
+    newInForever = true
+})
 
 -- =================================================================
 -- Triggers: Loot & Guild
@@ -1727,13 +824,43 @@ AddTrigger("BigLootTriple", "Loot", "VGhlIGd1aWxkIGxvb3RzIDMgYmlnIGl0ZW1zIHdpdGh
     end
 })
 
+AddTrigger("FirstPotionBought", "Loot", "WW91IGJ1eSB5b3VyIGZpcnN0IHBvdGlvbiBmcm9tIGEgdmVuZG9yIChvbmNlIHBlciBjaGFyYWN0ZXIp", {"PotionSeller"}, {
+    on = "FirstPotionBought",
+    newInForever = true
+})
+
 AddTrigger("BloodOfHeroesLooted", "Loot", "WW91IGxvb3QgQmxvb2Qgb2YgSGVyb2Vz", {"Vampire"}, {
     on = "LootReceived",
     when = function(loot)
         return loot.itemId == Data.BloodOfHeroesItemId
     end,
-    secret = true
+    newInForever = true
 })
+
+-- One trigger per milestone, so each reveals on its own
+for _, milestone in ipairs(Data.GoldMilestones) do
+    AddTrigger("Gold:" .. milestone.gold, "Loot", milestone.guild and "QSBndWlsZCBtZW1iZXIgcmVhY2hlcyAlZCBnb2xkIChvbmNlIHBlciBhY2NvdW50KQ==" or "WW91IHJlYWNoICVkIGdvbGQgKG9uY2UgcGVyIGFjY291bnQp",
+        {milestone.sound}, {
+            on = "GoldMilestone",
+            when = function(gold)
+                return gold.gold == milestone.gold
+            end,
+            textArgs = {milestone.gold},
+            newInForever = true
+        })
+end
+
+-- One trigger per number, so each reveals on its own
+for number, sound in pairs(Data.RollSounds) do
+    AddTrigger("Roll:" .. number, "Loot", "WW91IHJvbGwgYSAlZA==", {sound}, {
+        on = "Rolled",
+        when = function(roll)
+            return roll.roll == number
+        end,
+        textArgs = {number},
+        newInForever = true
+    })
+end
 
 -- =================================================================
 -- Triggers: Misc
@@ -1758,7 +885,7 @@ AddTrigger("DrinkWater", "Misc", "WW91IGRyaW5rIHdhdGVy", {"Brando"}, {
     end,
     hasChance = true,
     defaultChance = 1,
-    secret = true
+    newInForever = true
 })
 
 AddTrigger("HugOrKiss", "Misc", "WW91IC9odWcgb3IgL2tpc3Mgc29tZW9uZQ==", {"Gay1", "Gay2"}, {
@@ -1766,12 +893,64 @@ AddTrigger("HugOrKiss", "Misc", "WW91IC9odWcgb3IgL2tpc3Mgc29tZW9uZQ==", {"Gay1",
     when = function(emote)
         return emote.token == "HUG" or emote.token == "KISS"
     end,
-    secret = true
+    newInForever = true
+})
+
+-- PetTamed is exclusive, so a cat's sound plays instead of the general one
+AddTrigger("CatTamed", "Misc", "WW91IHRhbWUgYSBjYXQ=", {"NiceKitty"}, {
+    on = "PetTamed",
+    when = function(tame)
+        return tame.isCat
+    end,
+    newInForever = true
+})
+
+AddTrigger("PetTamed", "Misc", "WW91IHRhbWUgYSBiZWFzdA==", {"GoodBoy1"}, {
+    on = "PetTamed",
+    newInForever = true
+})
+
+AddTrigger("Lick", "Misc", "WW91IC9saWNr", {"Lick"}, {
+    on = "EmotePerformed",
+    when = function(emote)
+        return emote.token == "LICK"
+    end,
+    hasChance = true,
+    defaultChance = 10,
+    newInForever = true
+})
+
+AddTrigger("PetStabled", "Misc", "WW91IHN0YWJsZSB5b3VyIHBldA==", {"ShowDog"}, {
+    on = "PetStabled",
+    newInForever = true
+})
+
+AddTrigger("Dance", "Misc", "WW91IC9kYW5jZQ==", {"FuckMeHard"}, {
+    on = "EmotePerformed",
+    when = function(emote)
+        return emote.token == "DANCE"
+    end,
+    newInForever = true
+})
+
+AddTrigger("FirstGreenWeaponEquipped", "Misc", "WW91IGVxdWlwIHlvdXIgZmlyc3QgZ3JlZW4gb3IgYmV0dGVyIG1haW4gd2VhcG9uIChvbmNlIHBlciBjaGFyYWN0ZXIp", {"Weapons"}, {
+    on = "FirstGreenWeaponEquipped",
+    newInForever = true
+})
+
+AddTrigger("FirstBagEquipped", "Misc", "WW91IGVxdWlwIHlvdXIgZmlyc3QgYmFnIChvbmNlIHBlciBjaGFyYWN0ZXIp", {"Bag"}, {
+    on = "FirstBagEquipped",
+    newInForever = true
+})
+
+AddTrigger("FirstRingEquipped", "Misc", "WW91IGVxdWlwIHlvdXIgZmlyc3QgcmluZyAob25jZSBwZXIgY2hhcmFjdGVyKQ==", {"Precious"}, {
+    on = "FirstRingEquipped",
+    newInForever = true
 })
 
 AddTrigger("ShirtRemoved", "Misc", "WW91IHRha2Ugb2ZmIHlvdXIgc2hpcnQ=", {"GetThisShitOffMe"}, {
     on = "ShirtRemoved",
-    secret = true
+    newInForever = true
 })
 
 AddTrigger("CraftedWandEquipped", "Misc", "WW91IGVxdWlwIGEgY3JhZnRlZCB3YW5kIChvbmUgd2l0aCBhICJNYWRlIGJ5IiBsaW5lKQ==", {"Wizard2"}, {
@@ -1779,18 +958,18 @@ AddTrigger("CraftedWandEquipped", "Misc", "WW91IGVxdWlwIGEgY3JhZnRlZCB3YW5kIChvb
     when = function(wand)
         return wand.isCrafted
     end,
-    secret = true
+    newInForever = true
 })
 
 AddTrigger("WandEquipped", "Misc", "WW91IGVxdWlwIGEgZGlmZmVyZW50IHdhbmQ=", {"Wizard1"}, {
     on = "WandEquipped",
-    secret = true
+    newInForever = true
 })
 
 AddTrigger("ReachedMaxLevel", "Misc", "QSBndWlsZCBtZW1iZXIgcmVhY2hlcyBsZXZlbCAlZA==", {"NoLife"}, {
     on = "ReachedMaxLevel",
     textArgs = {Data.MaxLevel},
-    secret = true
+    newInForever = true
 })
 
 AddTrigger("MissingItem", "Misc", "WW91IHRyeSB0byB1c2Ugc29tZXRoaW5nIHdpdGhvdXQgdGhlIHJlYWdlbnQsIGFtbW8sIHRvdGVtLCB0b29sIG9yIHdhbmQgaXQgbmVlZHMgKGF0IG1vc3Qgb25jZSBldmVyeSAlZCBtaW51dGVzKQ==",
@@ -1798,23 +977,23 @@ AddTrigger("MissingItem", "Misc", "WW91IHRyeSB0byB1c2Ugc29tZXRoaW5nIHdpdGhvdXQgd
     on = "MissingItem",
     textArgs = {Data.MissingItemCooldown / 60},
     cooldown = Data.MissingItemCooldown,
-    secret = true
+    newInForever = true
 })
 
-AddTrigger("Campfire", "Misc", "WW91IGNhc3QgQmFzaWMgQ2FtcGZpcmU=", {"LookLook", "LambSauce"}, {
+AddTrigger("Campfire", "Misc", "WW91IGNhc3QgQmFzaWMgQ2FtcGZpcmU=", {"LookLook", "LambSauce", "BeforeWar"}, {
     on = "SpellCast",
     when = function(cast)
         return cast.isPlayer and (cast.spellId == Data.BasicCampfireSpellId or
                    ScubaSounds:EqualsIgnoreCase(cast.spellName, Data.BasicCampfireSpellName))
     end,
-    secret = true
+    newInForever = true
 })
 
 AddTrigger("CampRest", "Misc", "WW91IHNpdCwgc2xlZXAsIGtuZWVsIG9yIGxpZSBkb3duIGF0IGEgY2FtcGZpcmUgKHRoZSBmaXJzdCB0aW1lIGF0IGVhY2ggb25lKQ==", {"ChrisHansen"}, {
     on = "RestedAtCampfire",
     hasChance = true,
     defaultChance = 5,
-    secret = true
+    newInForever = true
 })
 
 -- =================================================================
@@ -1824,19 +1003,24 @@ local levelUpSounds = {}
 for sound in pairs(Data.LevelUpSounds) do
     table.insert(levelUpSounds, sound)
 end
+table.insert(levelUpSounds, "SuperSaiyan")
 table.sort(levelUpSounds)
-AddTrigger("LevelUp", "LevelUps", "WW91IG9yIHlvdXIgcGV0IGxldmVsIHVwIChyZWFjaGluZyAlZCBwbGF5cyBOb0xpZmUgaW5zdGVhZCk=",
-    levelUpSounds, {
-        on = "LeveledUp",
-        textArgs = {Data.MaxLevel}
-    })
+AddTrigger("LevelUp", "LevelUps", "WW91IG9yIHlvdXIgcGV0IGxldmVsIHVw", levelUpSounds, {
+    on = "LeveledUp",
+    noRepeat = 3
+})
+
+AddTrigger("DazedOffMount", "Misc", "WW91IGdldCBkYXplZCBvZmYgeW91ciBtb3VudA==", {"NoGas"}, {
+    on = "DazedOffMount",
+    newInForever = true
+})
 
 AddTrigger("ApprenticeRiding", "Misc", "WW91IGxlYXJuIEFwcHJlbnRpY2UgcmlkaW5n", {"Horse1"}, {
     on = "RidingLearned",
     when = function(riding)
         return riding.tier == 1
     end,
-    secret = true
+    newInForever = true
 })
 
 AddTrigger("JourneymanRiding", "Misc", "WW91IGxlYXJuIEpvdXJuZXltYW4gcmlkaW5n", {"Horse2"}, {
@@ -1844,12 +1028,12 @@ AddTrigger("JourneymanRiding", "Misc", "WW91IGxlYXJuIEpvdXJuZXltYW4gcmlkaW5n", {
     when = function(riding)
         return riding.tier == 2
     end,
-    secret = true
+    newInForever = true
 })
 
 AddTrigger("BearFormLearned", "Misc", "WW91IGxlYXJuIEJlYXIgRm9ybSBvciBEaXJlIEJlYXIgRm9ybQ==", {"OhTheBear"}, {
     on = "BearFormLearned",
-    secret = true
+    newInForever = true
 })
 
 -- Sounds no trigger plays live in Sounds/Unused and only show in the Unused options tab
@@ -1876,6 +1060,8 @@ end
 -- Only the player's are used, and these fire constantly for every other unit
 ScubaSounds_EventFrame:RegisterUnitEvent("UNIT_COMBAT", "player")
 ScubaSounds_EventFrame:RegisterUnitEvent("UNIT_AURA", "player")
+ScubaSounds_EventFrame:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player")
+ScubaSounds_EventFrame:RegisterUnitEvent("UNIT_SPELLCAST_START", "player")
 
 function ScubaSounds_OnEvent(self, event, ...)
     local handler = ScubaSounds.Events[event]
@@ -1892,7 +1078,7 @@ function ScubaSounds.Events:TRADE_SHOW()
     ScubaSounds.State.TradeOrMailOpen = true
     ScubaSounds.State.TradePartnerName = ScubaSounds:FullName("NPC")
     local partner = ScubaSounds.State.TradePartnerName
-    if partner and ScubaSounds:GetTruePlayerName(partner) == Nigel then
+    if partner and ScubaSounds:GetTruePlayerName(partner) == ScubaSounds.Data.TrueNames.Nigel then
         ScubaSounds.State.IsTradingWithNigel = true
     else
         ScubaSounds.State.IsTradingWithNigel = false
@@ -1907,8 +1093,8 @@ function ScubaSounds.Events:TRADE_ACCEPT_UPDATE()
                 local _, _, itemQuality = GetItemInfo(itemLink)
                 if itemQuality == 4 and ScubaSounds:IsGzNigelSender() then
                     if IsInGuild() then
-                        C_ChatInfo.SendAddonMessage(ScubaSounds_ADDON_PREFIX, ScubaSounds_GzNigelCommand .. ":" ..
-                            ScubaSounds.State.TradePartnerName, "GUILD")
+                        ScubaSounds:SendGuildMessage(ScubaSounds_GzNigelCommand .. ":" ..
+                                                         ScubaSounds.State.TradePartnerName)
                     end
                 end
             end
@@ -1941,6 +1127,11 @@ function ScubaSounds.Events:ADDON_LOADED(addonName)
         ScubaSounds:InitOptions()
         ScubaSounds:HookEmotes()
         ScubaSounds:HookMacroUse()
+        ScubaSounds:SetUpDiscoveryLinks()
+        ScubaSounds:SetUpWhisperNameCompletion()
+        ScubaSounds:HookDismounts()
+        ScubaSounds:SetUpInputFocusRelease()
+        ScubaSounds:HookMerchantBuys()
         ScubaSounds:BuildOptionsFrame()
         if ScubaSounds.State.ShowOptionsOnLoad then
             ScubaSounds:ShowOptions()
@@ -2084,12 +1275,10 @@ function ScubaSounds.Events:ENCOUNTER_END(encounterID, encounterName, difficulty
     })
 end
 
--- Other players' casts are secret, so only the player's own casts (relayed to the group) and boss casts are handled
+-- Other players' and bosses' casts are secret, so only the player's own casts are handled (relayed to the group
+-- where a trigger needs it)
 function ScubaSounds.Events:UNIT_SPELLCAST_SUCCEEDED(unitTarget, castGUID, spellId)
-    if issecretvalue(spellId) or issecretvalue(unitTarget) then
-        return
-    end
-    if not (unitTarget == "player" or unitTarget:find("^boss%d")) then
+    if issecretvalue(spellId) or unitTarget ~= "player" then
         return
     end
     local sourceName = ScubaSounds:FullName(unitTarget)
@@ -2097,6 +1286,10 @@ function ScubaSounds.Events:UNIT_SPELLCAST_SUCCEEDED(unitTarget, castGUID, spell
         return
     end
     local spellName = C_Spell.GetSpellName(spellId)
+    if spellId == ScubaSounds.Data.TameBeastSpellId or
+        (not issecretvalue(spellName) and ScubaSounds:EqualsIgnoreCase(spellName, ScubaSounds.Data.TameBeastSpellName)) then
+        ScubaSounds.State.TameBeastCastAt = GetTime()
+    end
     ScubaSounds:Fire("SpellCast", {
         spellId = spellId,
         spellName = not issecretvalue(spellName) and spellName or nil,
@@ -2126,7 +1319,7 @@ function ScubaSounds.Events:PARTY_KILL(attackerGUID, targetGUID)
         ScubaSounds:HandleCritterKill(nil)
         ScubaSounds:HandleMurlocKill(nil)
     elseif targetGUID and targetGUID:find("^Player%-") then
-        ScubaSounds:HandlePlayerKill()
+        ScubaSounds:HandlePlayerKill(targetGUID)
     elseif targetGUID then
         ScubaSounds:HandleCritterKill(targetGUID)
         ScubaSounds:HandleMurlocKill(targetGUID)
@@ -2166,8 +1359,38 @@ end
 -- A new or different pet only updates what's remembered; the same pet gaining a level plays
 function ScubaSounds.Events:UNIT_PET(unit)
     if unit == "player" then
+        local previousGuid = ScubaSounds.State.PetGuid
         ScubaSounds:RememberPet()
+        ScubaSounds:CheckPetTamed(previousGuid)
+        -- The active pet going away with the stable window open means it went into the stable
+        local guid = UnitGUID("pet")
+        if ScubaSounds.State.StableOpen and previousGuid and not issecretvalue(guid) and not guid then
+            ScubaSounds:Fire("PetStabled")
+        end
     end
+end
+
+function ScubaSounds.Events:PET_STABLE_SHOW()
+    ScubaSounds.State.StableOpen = true
+end
+
+function ScubaSounds.Events:PET_STABLE_CLOSED()
+    ScubaSounds.State.StableOpen = false
+end
+
+-- A pet we haven't seen, right after a Tame Beast cast, was just tamed. Summoning or reviving one has no cast before it
+function ScubaSounds:CheckPetTamed(previousGuid)
+    local state = ScubaSounds.State
+    local guid = UnitGUID("pet")
+    if not state.TameBeastCastAt or issecretvalue(guid) or not guid or guid == previousGuid or
+        GetTime() - state.TameBeastCastAt > ScubaSounds.Data.TameWindow then
+        return
+    end
+    state.TameBeastCastAt = nil
+    local family = UnitCreatureFamily("pet")
+    ScubaSounds:Fire("PetTamed", {
+        isCat = not issecretvalue(family) and ScubaSounds:EqualsIgnoreCase(family, ScubaSounds.Data.CatFamilyName)
+    })
 end
 
 function ScubaSounds.Events:UNIT_LEVEL(unit)
@@ -2178,7 +1401,8 @@ function ScubaSounds.Events:UNIT_LEVEL(unit)
     ScubaSounds:RememberPet()
     local state = ScubaSounds.State
     if state.PetGuid and state.PetGuid == previousGuid and previousLevel and state.PetLevel > previousLevel and
-        GetTime() - state.LastPlayerLevelUp > ScubaSounds.Data.PetLevelUpWithPlayerWindow then
+        GetTime() - state.LastPlayerLevelUp > ScubaSounds.Data.PetLevelUpWithPlayerWindow and
+        ScubaSounds_Options.Categories.LevelUps.petLevelUps then
         ScubaSounds:Fire("LeveledUp")
     end
 end
@@ -2223,6 +1447,44 @@ end
 
 function ScubaSounds.Events:CHAT_MSG_LOOT(lootMessage)
     ScubaSounds:HandleLoot(lootMessage)
+    ScubaSounds:HandleRollMessage(lootMessage)
+end
+
+function ScubaSounds.Events:CHAT_MSG_SYSTEM(message)
+    ScubaSounds:HandleRollMessage(message)
+end
+
+-- Your own /roll 1-100 or Need/Greed roll. Fires Rolled with the number
+function ScubaSounds:HandleRollMessage(message)
+    if issecretvalue(message) or type(message) ~= "string" then
+        return
+    end
+    local data = ScubaSounds.Data
+    local roll, rollerName
+    local name, number, low, high = message:match(data.RandomRollPattern)
+    if name and tonumber(low) == 1 and tonumber(high) == 100 then
+        roll, rollerName = tonumber(number), name
+    else
+        for _, pattern in ipairs(data.LootRollPatterns) do
+            local lootRoll, _, byName = message:match(pattern)
+            if lootRoll then
+                roll, rollerName = tonumber(lootRoll), byName
+                break
+            end
+        end
+    end
+    if roll and ScubaSounds:IsOwnName(rollerName) then
+        ScubaSounds:Fire("Rolled", {
+            roll = roll
+        })
+    end
+end
+
+-- Chat lines may name you by full name or first name
+function ScubaSounds:IsOwnName(name)
+    local firstName = UnitName("player")
+    return ScubaSounds:EqualsIgnoreCase(name, ScubaSounds:FullName("player")) or
+               (not issecretvalue(firstName) and ScubaSounds:EqualsIgnoreCase(name, firstName))
 end
 
 function ScubaSounds.Events:CHAT_MSG_ADDON(prefix, message, channel, sender)
@@ -2231,15 +1493,31 @@ end
 
 function ScubaSounds.Events:PLAYER_ENTERING_WORLD(isInitialLogin, isReloadingUI)
     ScubaSounds.State.HasShirt = ScubaSounds:HasShirt()
+    ScubaSounds:CountLoginBaseline()
+    if not ScubaSounds.State.LoginBaselineDone then
+        -- Once more after the inventory has loaded (it may not be readable yet on a fresh login), then allow plays
+        C_Timer.After(ScubaSounds.Data.LoginBaselineDelay, function()
+            ScubaSounds:CountLoginBaseline()
+            ScubaSounds.State.LoginBaselineDone = true
+        end)
+    end
     ScubaSounds:RememberPet()
     local rangedSlot = ScubaSounds.Data.RangedSlot
     if ScubaSounds:IsWand(GetInventoryItemID("player", rangedSlot)) then
         ScubaSounds.State.LastWandLink = GetInventoryItemLink("player", rangedSlot)
     end
     ScubaSounds:HandleEnteringWorld(isInitialLogin, isReloadingUI)
+    if not isReloadingUI then -- a /reload isn't entering the zone
+        ScubaSounds:HandleZoneChange()
+    end
     if isInitialLogin or isReloadingUI then
+        ScubaSounds:SnapshotDiscoveries()
         C_Timer.After(ScubaSounds.Data.StatsRequestDelay, function()
             ScubaSounds:RequestStats()
+            ScubaSounds:PushOwnStats()
+        end)
+        C_Timer.After(ScubaSounds.Data.NewDiscoveriesDelay, function()
+            ScubaSounds:ReportNewDiscoveries()
         end)
     end
     ScubaSounds.Events:GROUP_ROSTER_UPDATE()
@@ -2262,6 +1540,55 @@ function ScubaSounds.Events:PLAYER_EQUIPMENT_CHANGED(equipmentSlot)
         ScubaSounds:HandleShirtChange()
     elseif equipmentSlot == ScubaSounds.Data.RangedSlot then
         ScubaSounds:HandleRangedChange()
+    end
+    for kind in pairs(ScubaSounds.Data.FirstEquips) do
+        if ScubaSounds:FirstEquipSlots(kind)[equipmentSlot] then
+            ScubaSounds:CheckFirstEquip(kind, true)
+        end
+    end
+end
+
+function ScubaSounds:FirstEquipSlots(kind)
+    local slots = ScubaSounds.Data.FirstEquips[kind].slots
+    return type(slots) == "function" and slots() or slots
+end
+
+-- Equipping a bag may only show up as a bag update
+function ScubaSounds.Events:BAG_UPDATE(bagId)
+    if not issecretvalue(bagId) and bagId and bagId >= 1 and bagId <= (NUM_BAG_SLOTS or 4) then
+        ScubaSounds:CheckFirstEquip("bag", true)
+    end
+end
+
+-- A character's first ring (or bag, ...) plays once ever. One already equipped when this is first checked counts as
+-- done, silently
+-- Gear and gold we already have count as done, silently
+function ScubaSounds:CountLoginBaseline()
+    for kind in pairs(ScubaSounds.Data.FirstEquips) do
+        ScubaSounds:CheckFirstEquip(kind, false)
+    end
+    ScubaSounds:CheckGoldMilestones(false)
+end
+
+function ScubaSounds:CheckFirstEquip(kind, canPlay)
+    if canPlay and not ScubaSounds.State.LoginBaselineDone then
+        return -- still logging in; the baseline will count this silently
+    end
+    local character = ScubaSounds:FullName("player")
+    local done = ScubaSounds_Options.FirstEquipDone[kind]
+    if not character or done[character] then
+        return
+    end
+    local firstEquip = ScubaSounds.Data.FirstEquips[kind]
+    for slot in pairs(ScubaSounds:FirstEquipSlots(kind)) do
+        local itemId = GetInventoryItemID("player", slot)
+        if itemId and not issecretvalue(itemId) and (not firstEquip.qualifies or firstEquip.qualifies(slot, itemId)) then
+            done[character] = true
+            if canPlay then
+                ScubaSounds:Fire(firstEquip.event)
+            end
+            return
+        end
     end
 end
 
@@ -2464,6 +1791,7 @@ function ScubaSounds:HasCampfireNearby()
 end
 
 function ScubaSounds:HandlePlayerAura()
+    ScubaSounds:CheckDismount()
     if ScubaSounds.State.RestedAtThisCampfire and not ScubaSounds:HasCampfireNearby() then
         ScubaSounds.State.RestedAtThisCampfire = false -- left the campfire
     end
@@ -2541,6 +1869,9 @@ function ScubaSounds:HookEmotes()
             token = token
         })
         ScubaSounds:HandleCampRestEmote(token)
+        if token == "SIT" then
+            ScubaSounds:HandleSitPress()
+        end
     end
     if DoEmote then
         hooksecurefunc("DoEmote", onEmote)
@@ -2548,6 +1879,58 @@ function ScubaSounds:HookEmotes()
     if C_ChatInfo.PerformEmote then
         hooksecurefunc(C_ChatInfo, "PerformEmote", onEmote)
     end
+    -- The sit/stand keybind skips the emote functions
+    if SitStandOrDescendStart then
+        hooksecurefunc("SitStandOrDescendStart", function()
+            ScubaSounds:HandleSitPress()
+        end)
+    end
+end
+
+-- Enough sit presses in a row over a dead guildmate or groupmate: Nelson here, and whispered to them
+function ScubaSounds:HandleSitPress()
+    local data, state = ScubaSounds.Data, ScubaSounds.State
+    local now = GetTime()
+    local recent = {}
+    for _, pressedAt in ipairs(state.SitPresses) do
+        if now - pressedAt <= data.SitSpamWindow then
+            table.insert(recent, pressedAt)
+        end
+    end
+    table.insert(recent, now)
+    state.SitPresses = recent
+    if #recent < data.SitSpamCount or now - state.LastSitSpam < data.SitSpamCooldown then
+        return
+    end
+    local victim = ScubaSounds:FindDeadPlayerNearby()
+    if not victim then
+        return
+    end
+    state.LastSitSpam = now
+    state.SitPresses = {}
+    ScubaSounds:SendAddonMessage(ScubaSounds_SitSpamCommand .. ":" .. ScubaSounds:FullName("player"), "WHISPER", victim,
+        nil, nil, "ALERT")
+    ScubaSounds:Fire("SitSpam")
+end
+
+-- Your target or mouseover, else a group member: a dead, friendly player within about 10 yards. Their full name
+function ScubaSounds:FindDeadPlayerNearby()
+    local units = {"target", "mouseover"}
+    for _, unit in ipairs(ScubaSounds:GroupUnits()) do
+        table.insert(units, unit)
+    end
+    for _, unit in ipairs(units) do
+        local ok, isMatch = pcall(function()
+            return UnitExists(unit) and UnitIsPlayer(unit) and not UnitIsUnit(unit, "player") and
+                       UnitIsFriend("player", unit) and UnitIsDeadOrGhost(unit) and
+                       CheckInteractDistance(unit, ScubaSounds.Data.SitSpamRange)
+        end)
+        -- Any of these may be secret (or blocked) in combat; that counts as no
+        if ok and not issecretvalue(isMatch) and isMatch then
+            return ScubaSounds:FullName(unit)
+        end
+    end
+    return nil
 end
 
 -- A wand going into the ranged slot that differs from the last wand there. Taking one off doesn't count. The last
@@ -2743,7 +2126,7 @@ function ScubaSounds:NpcIdFromGuid(guid)
     return tonumber(npcId)
 end
 
-function ScubaSounds:HandlePlayerKill()
+function ScubaSounds:HandlePlayerKill(targetGUID)
     local now = GetTime()
     local lastKill = ScubaSounds.State.LastKillTime
     if lastKill and now - lastKill <= ScubaSounds.Data.KillStreakWindow and ScubaSounds.State.KillStreak > 0 then
@@ -2752,8 +2135,12 @@ function ScubaSounds:HandlePlayerKill()
         ScubaSounds.State.KillStreak = 1
     end
     ScubaSounds.State.LastKillTime = now
-    ScubaSounds:Fire("KillStreak", {
-        kills = ScubaSounds.State.KillStreak
+    local _, _, localizedRace, race = GetPlayerInfoByGUID(targetGUID)
+    local skyborne = ScubaSounds.Data.SkyborneRaceName
+    ScubaSounds:Fire("PlayerKilled", {
+        kills = ScubaSounds.State.KillStreak,
+        isSkyborne = (not issecretvalue(localizedRace) and ScubaSounds:EqualsIgnoreCase(localizedRace, skyborne)) or
+            (not issecretvalue(race) and ScubaSounds:EqualsIgnoreCase(race, skyborne))
     })
 end
 
@@ -2835,14 +2222,26 @@ function ScubaSounds:TriggerWipe()
     ScubaSounds:Fire("GroupWiped")
 end
 
+-- Called from ZONE_CHANGED_NEW_AREA and PLAYER_ENTERING_WORLD. Either can come first or alone when entering an
+-- instance, and the first can arrive mid loading screen, so this waits a moment and fires once per zone
 function ScubaSounds:HandleZoneChange()
     -- Reset any relevant state
     ScubaSounds.State.InCombatWithCThun = false
-    -- In some cases C_Map.GetBestMapForUnit("player") returns nil, so triggers check zone text as a fallback
-    ScubaSounds:Fire("ZoneEntered", {
-        mapId = C_Map.GetBestMapForUnit("player"),
-        zoneName = GetRealZoneText()
-    })
+    C_Timer.After(ScubaSounds.Data.ZoneEnteredDelay, function()
+        local instanceId = select(8, GetInstanceInfo())
+        local zoneName = GetRealZoneText()
+        instanceId = not issecretvalue(instanceId) and instanceId or nil
+        zoneName = not issecretvalue(zoneName) and zoneName or nil
+        local key = tostring(instanceId) .. ":" .. tostring(zoneName)
+        if key == ScubaSounds.State.LastZoneKey then
+            return
+        end
+        ScubaSounds.State.LastZoneKey = key
+        ScubaSounds:Fire("ZoneEntered", {
+            instanceId = instanceId,
+            zoneName = zoneName
+        })
+    end)
 end
 
 -- Items the player gets from looting, vendors and quest rewards ("You receive item"), and crafting
@@ -2865,8 +2264,8 @@ function ScubaSounds:HandleLoot(lootMessage)
     if (isLegendary or ScubaSounds:Contains(ScubaSounds.Data.BigItemIdsMap, tostring(itemId))) and
         not ScubaSounds:IsItemLinkEnchanted(itemLink) then
         if IsInGuild() then
-            C_ChatInfo.SendAddonMessage(ScubaSounds_ADDON_PREFIX, ScubaSounds_LegendaryReceivedCommand .. ":" ..
-                ScubaSounds:FullName("player") .. ":" .. itemLink, "GUILD")
+            ScubaSounds:SendGuildMessage(ScubaSounds_LegendaryReceivedCommand .. ":" .. ScubaSounds:FullName("player") ..
+                                             ":" .. itemLink, nil, "ALERT")
         end
         return
     end
@@ -2903,7 +2302,8 @@ function ScubaSounds:HandleAddonMessage(prefix, message)
             end)
         end
         ScubaSounds:Fire("GuildBigLoot", {
-            isTriple = isTriple
+            isTriple = isTriple,
+            sourceName = playerName
         })
         ScubaSounds:SendMessage(playerName .. " received item: " .. itemLink)
     elseif command == ScubaSounds_RelayCommand then
@@ -2936,6 +2336,54 @@ function ScubaSounds:SendChat(text, chatType, target)
 end
 
 -- "ding" in guild, the sound here, and a guild-wide addon message so every guild member plays it. Dropped if blocked
+function ScubaSounds.Events:PLAYER_MONEY()
+    ScubaSounds:CheckGoldMilestones(true)
+end
+
+-- Every milestone reached is marked done (account-wide); only the highest new one plays. Gold already there when we
+-- check on entering the world counts as done, silently
+function ScubaSounds:CheckGoldMilestones(canPlay)
+    if canPlay and not ScubaSounds.State.LoginBaselineDone then
+        return -- still logging in; the baseline will count this silently
+    end
+    local money = GetMoney()
+    if issecretvalue(money) or not money then
+        return
+    end
+    local done = ScubaSounds_Options.GoldMilestonesDone
+    local reached
+    for _, milestone in ipairs(ScubaSounds.Data.GoldMilestones) do
+        if not done[milestone.gold] and money >= milestone.gold * ScubaSounds.Data.CopperPerGold then
+            done[milestone.gold] = true
+            reached = milestone
+        end
+    end
+    if not reached or not canPlay then
+        return
+    end
+    local character = ScubaSounds:FullName("player")
+    ScubaSounds:Fire("GoldMilestone", {
+        gold = reached.gold,
+        sourceName = character
+    })
+    if reached.guild and character and IsInGuild() then
+        ScubaSounds:SendGuildMessage(ScubaSounds_GoldMilestoneCommand .. ":" .. character .. ":g=" .. reached.gold, nil,
+            "ALERT")
+        ScubaSounds:SendChatWhenAllowed(reached.chat, "GUILD")
+    end
+end
+
+-- A guild member's 1000g/5000g; ours already played locally
+ScubaSounds.GuildEvents[ScubaSounds_GoldMilestoneCommand] = function(self, playerName, fields)
+    if ScubaSounds:EqualsIgnoreCase(playerName, ScubaSounds:FullName("player")) or type(fields.g) ~= "number" then
+        return
+    end
+    ScubaSounds:Fire("GoldMilestone", {
+        gold = fields.g,
+        sourceName = playerName
+    })
+end
+
 function ScubaSounds:HandleReachedMaxLevel()
     ScubaSounds:Fire("ReachedMaxLevel", {
         sourceName = ScubaSounds:FullName("player")
@@ -2944,25 +2392,33 @@ function ScubaSounds:HandleReachedMaxLevel()
         return
     end
     ScubaSounds:SendChat("ding", "GUILD")
-    C_ChatInfo.SendAddonMessage(ScubaSounds_ADDON_PREFIX,
-        ScubaSounds_MaxLevelCommand .. ":" .. ScubaSounds:FullName("player"), "GUILD")
+    ScubaSounds:SendGuildMessage(ScubaSounds_MaxLevelCommand .. ":" .. ScubaSounds:FullName("player"), nil, "ALERT")
 end
 
 -- Retries through throttling and boss encounter lockdown, then calls onDone (sent or gave up)
-function ScubaSounds:SendGuildMessage(message, onDone)
-    ScubaSounds:SendAddonMessage(message, "GUILD", nil, onDone)
+function ScubaSounds:SendGuildMessage(message, onDone, prio)
+    ScubaSounds:SendAddonMessage(message, "GUILD", nil, onDone, nil, prio)
 end
 
-function ScubaSounds:SendAddonMessage(message, channel, target, onDone)
+-- Every addon message goes through ChatThrottleLib, which paces our traffic together with every other addon that
+-- embeds it. prio: "ALERT" (live sounds), "NORMAL" (sync replies, the default) or "BULK" (login push, FIRSTS).
+-- ChatThrottleLib retries its own throttling but drops channel throttle and lockdown (boss encounters); we resend those
+-- once a second for up to maxRetries seconds (default MaxRelayRetries), then call onDone (sent or gave up)
+function ScubaSounds:SendAddonMessage(message, channel, target, onDone, maxRetries, prio)
     local retries = 0
+    maxRetries = maxRetries or ScubaSounds.Data.MaxRelayRetries
+    -- One queue per destination, so a long report to one player doesn't hold up messages to anyone else
+    local queueName = ScubaSounds_ADDON_PREFIX .. channel .. (target or "")
     local function trySend()
-        local result = C_ChatInfo.SendAddonMessage(ScubaSounds_ADDON_PREFIX, message, channel, target)
-        if ScubaSounds.Data.RetryableSendResults[result] and retries < ScubaSounds.Data.MaxRelayRetries then
-            retries = retries + 1
-            C_Timer.After(1, trySend)
-        elseif onDone then
-            onDone()
-        end
+        ChatThrottleLib:SendAddonMessage(prio or "NORMAL", ScubaSounds_ADDON_PREFIX, message, channel, target, queueName,
+            function(_, didSend, result)
+                if not didSend and ScubaSounds.Data.RetryableSendResults[result] and retries < maxRetries then
+                    retries = retries + 1
+                    C_Timer.After(1, trySend)
+                elseif onDone then
+                    onDone()
+                end
+            end)
     end
     trySend()
 end
@@ -2971,27 +2427,38 @@ end
 -- Sound stats
 -- =================================================================
 -- Called only when a sound actually played here
-function ScubaSounds:RecordSoundHeard(sound)
+function ScubaSounds:RecordSoundHeard(sound, triggerId)
     local character = ScubaSounds:FullName("player")
     if not character then
         return
     end
+    local now = GetServerTime()
     local heard = ScubaSounds_Options.SoundsHeard
     heard[character] = heard[character] or {}
+    local triggersHeard = ScubaSounds_Options.TriggersHeard
+    triggersHeard[character] = triggersHeard[character] or {}
+    local newSound, newTrigger = {}, {}
     local entry = heard[character][sound]
     if not entry then
         entry = {
-            first = GetServerTime(),
+            first = now,
             count = 0
         }
         heard[character][sound] = entry
-        if IsInGuild() then
-            ScubaSounds:SendStatsReport(character, {
-                [sound] = entry
-            }, "GUILD")
-        end
+        newSound[sound] = entry
+        ScubaSounds:NoteEarliest("sounds", sound, character, now)
+    end
+    if not triggersHeard[character][triggerId] then
+        triggersHeard[character][triggerId] = now
+        newTrigger[triggerId] = now
+        ScubaSounds:NoteEarliest("triggers", triggerId, character, now)
     end
     entry.count = entry.count + 1
+    if (next(newSound) or next(newTrigger)) and IsInGuild() then
+        -- Waits out lockdown as long as the discovery chat line does, so guildmates see it found when they see the line
+        ScubaSounds:SendStatsReport(character, newSound, newTrigger, "GUILD", nil, ScubaSounds.Data.BlockedChatGiveUp,
+            "ALERT")
+    end
     ScubaSounds:RefreshStatsPage()
 end
 
@@ -3000,24 +2467,54 @@ function ScubaSounds:RequestStats()
 end
 
 -- First-heard times only, split into as many messages as needed; each one stands alone
-function ScubaSounds:SendStatsReport(character, entries, channel, target)
-    local version = tostring(C_AddOns.GetAddOnMetadata("ScubaSounds", "Version")):gsub("[:;=]", "")
-    local header = ScubaSounds_StatsCommand .. ":" .. character .. ":v=" .. version
-    local sounds = {}
-    for sound in pairs(entries) do
-        table.insert(sounds, sound)
+-- entries: sound -> {first, ...}; triggers: trigger ID -> first heard (sent as "@<trigger ID>")
+function ScubaSounds:SendStatsReport(character, entries, triggers, channel, target, maxRetries, prio)
+    local parts = {}
+    for sound, entry in pairs(entries) do
+        table.insert(parts, ";" .. sound .. "=" .. entry.first)
     end
-    table.sort(sounds)
+    for triggerId, first in pairs(triggers) do
+        table.insert(parts, ";@" .. triggerId:gsub("[;=]", "") .. "=" .. first)
+    end
+    ScubaSounds:SendChunked(ScubaSounds_StatsCommand .. ":" .. character, parts, channel, target, maxRetries, prio)
+end
+
+-- The earliest discoverer we know of for every sound and trigger
+function ScubaSounds:SendFirstsReport(channel, target)
+    local character = ScubaSounds:FullName("player")
+    if not character then
+        return
+    end
+    local parts = {}
+    local function add(prefix, key, earliest)
+        table.insert(parts, ";" .. prefix .. key:gsub("[;=]", "") .. "=" .. earliest.first .. "," ..
+                         earliest.name:gsub("[;=,]", ""))
+    end
+    for sound, earliest in pairs(ScubaSounds_Options.GuildEarliest.sounds) do
+        add("", sound, earliest)
+    end
+    for triggerId, earliest in pairs(ScubaSounds_Options.GuildEarliest.triggers) do
+        add("@", triggerId, earliest)
+    end
+    if #parts > 0 then
+        ScubaSounds:SendChunked(ScubaSounds_FirstsCommand .. ":" .. character, parts, channel, target, nil, "BULK")
+    end
+end
+
+-- <command>:<player>:v=<version>;part;part... split into as many messages as needed, each standing alone
+function ScubaSounds:SendChunked(prefix, parts, channel, target, maxRetries, prio)
+    local version = tostring(C_AddOns.GetAddOnMetadata("ScubaSounds", "Version")):gsub("[:;=]", "")
+    local header = prefix .. ":v=" .. version
+    table.sort(parts)
     local message = header
-    for _, sound in ipairs(sounds) do
-        local part = ";" .. sound .. "=" .. entries[sound].first
+    for _, part in ipairs(parts) do
         if #message + #part > ScubaSounds.Data.MaxAddonMessageLength and message ~= header then
-            ScubaSounds:SendAddonMessage(message, channel, target)
+            ScubaSounds:SendAddonMessage(message, channel, target, nil, maxRetries, prio)
             message = header
         end
         message = message .. part
     end
-    ScubaSounds:SendAddonMessage(message, channel, target)
+    ScubaSounds:SendAddonMessage(message, channel, target, nil, maxRetries, prio)
 end
 
 -- Every character on this account reports, so alts played on before show up too
@@ -3029,12 +2526,81 @@ ScubaSounds.GuildEvents[ScubaSounds_StatsRequestCommand] = function(self, player
     C_Timer.After(math.random() * ScubaSounds.Data.StatsReplyDelay, function()
         local heard = ScubaSounds_Options.SoundsHeard
         for heardBy, entries in pairs(heard) do
-            ScubaSounds:SendStatsReport(heardBy, entries, "WHISPER", playerName)
+            ScubaSounds:SendStatsReport(heardBy, entries, ScubaSounds_Options.TriggersHeard[heardBy] or {}, "WHISPER",
+                playerName)
         end
         if not heard[character] then -- nothing heard yet, but it still shows they have the addon
-            ScubaSounds:SendStatsReport(character, {}, "WHISPER", playerName)
+            ScubaSounds:SendStatsReport(character, {}, {}, "WHISPER", playerName)
+        end
+        local _, online = GetNumGuildMembers()
+        local others = math.max(1, (not issecretvalue(online) and online or 1) - 1)
+        if math.random() < ScubaSounds.Data.FirstsRepliesWanted / others then
+            ScubaSounds:SendFirstsReport("WHISPER", playerName)
         end
     end)
+end
+
+-- Someone's earliest discoverers: keep whichever is earlier, theirs or ours
+ScubaSounds.GuildEvents[ScubaSounds_FirstsCommand] = function(self, playerName, fields)
+    for key, value in pairs(fields) do
+        local first, name = tostring(value):match("^(%d+),(.+)$")
+        if first then
+            local triggerId = key:match("^@(.+)$")
+            if triggerId and ScubaSounds.Data.TriggersById[triggerId] then
+                ScubaSounds:NoteEarliest("triggers", triggerId, name, tonumber(first))
+            elseif not triggerId and ScubaSounds.Audio.SoundInfo[key] then
+                ScubaSounds:NoteEarliest("sounds", key, name, tonumber(first))
+            end
+        end
+    end
+    ScubaSounds:RefreshStatsPage()
+    ScubaSounds:RefreshShownCategoryPage()
+end
+
+function ScubaSounds:NoteEarliest(kind, key, name, first)
+    local earliest = ScubaSounds_Options.GuildEarliest[kind]
+    if not earliest[key] or first < earliest[key].first then
+        earliest[key] = {
+            name = name,
+            first = first
+        }
+    end
+end
+
+-- From what's already saved, so data from before FIRSTS existed counts
+function ScubaSounds:SeedEarliest()
+    local options = ScubaSounds_Options
+    for character, entries in pairs(options.SoundsHeard) do
+        for sound, entry in pairs(entries) do
+            ScubaSounds:NoteEarliest("sounds", sound, character, entry.first)
+        end
+    end
+    for character, triggers in pairs(options.TriggersHeard) do
+        for triggerId, first in pairs(triggers) do
+            ScubaSounds:NoteEarliest("triggers", triggerId, character, first)
+        end
+    end
+    for sound, characters in pairs(options.GuildHeard) do
+        for character, first in pairs(characters) do
+            ScubaSounds:NoteEarliest("sounds", sound, character, first)
+        end
+    end
+    for triggerId, characters in pairs(options.GuildTriggersHeard) do
+        for character, first in pairs(characters) do
+            ScubaSounds:NoteEarliest("triggers", triggerId, character, first)
+        end
+    end
+end
+
+-- Login push: our own plays go to everyone online right away, not only to those who ask
+function ScubaSounds:PushOwnStats()
+    if not IsInGuild() then
+        return
+    end
+    for heardBy, entries in pairs(ScubaSounds_Options.SoundsHeard) do
+        ScubaSounds:SendStatsReport(heardBy, entries, ScubaSounds_Options.TriggersHeard[heardBy] or {}, "GUILD", nil, nil,
+            "BULK")
+    end
 end
 
 ScubaSounds.GuildEvents[ScubaSounds_StatsCommand] = function(self, playerName, fields)
@@ -3042,16 +2608,90 @@ ScubaSounds.GuildEvents[ScubaSounds_StatsCommand] = function(self, playerName, f
     if ScubaSounds_Options.SoundsHeard[playerName] then
         return
     end
-    local guildHeard = ScubaSounds_Options.GuildHeard
-    for sound, first in pairs(fields) do
-        if sound ~= "v" and type(first) == "number" and ScubaSounds.Audio.SoundInfo[sound] then
-            guildHeard[sound] = guildHeard[sound] or {}
-            local known = guildHeard[sound][playerName]
-            guildHeard[sound][playerName] = known and math.min(known, first) or first
+    local function remember(heardBy, key, first)
+        heardBy[key] = heardBy[key] or {}
+        local known = heardBy[key][playerName]
+        heardBy[key][playerName] = known and math.min(known, first) or first
+    end
+    for key, first in pairs(fields) do
+        if type(first) == "number" then
+            local triggerId = key:match("^@(.+)$")
+            if triggerId then
+                if ScubaSounds.Data.TriggersById[triggerId] then
+                    remember(ScubaSounds_Options.GuildTriggersHeard, triggerId, first)
+                    ScubaSounds:NoteEarliest("triggers", triggerId, playerName, first)
+                end
+            elseif ScubaSounds.Audio.SoundInfo[key] then
+                remember(ScubaSounds_Options.GuildHeard, key, first)
+                ScubaSounds:NoteEarliest("sounds", key, playerName, first)
+            end
         end
     end
     ScubaSounds_Options.GuildReporters[playerName] = GetServerTime()
     ScubaSounds:RefreshStatsPage()
+    ScubaSounds:RefreshShownCategoryPage()
+end
+
+-- Someone spammed sit on our body: plays only while we're still dead
+ScubaSounds.GuildEvents[ScubaSounds_SitSpamCommand] = function(self, playerName)
+    local isDead = UnitIsDeadOrGhost("player")
+    if not issecretvalue(isDead) and isDead then
+        ScubaSounds:Fire("SitSpam", {
+            sourceName = playerName
+        })
+    end
+end
+
+-- =================================================================
+-- First discoveries
+-- =================================================================
+-- Whether we set off this event: not a relay, and the death or the action (when it names one) is ours
+function ScubaSounds:IsOwnContext(ctx)
+    ctx = ctx or {}
+    if ctx.relayedBy then
+        return false
+    end
+    if ctx.guid then
+        return ctx.guid == UnitGUID("player")
+    end
+    if ctx.sourceName then
+        return ScubaSounds:IsOwnName(ctx.sourceName)
+    end
+    return true
+end
+
+-- One client posts each first discovery: whoever set it off, or for group-wide ones the group leader
+function ScubaSounds:AnnounceDiscovery(trigger, sound, ctx)
+    local character = ScubaSounds:FullName("player")
+    if not character or not IsInGuild() then
+        return
+    end
+    local data = ScubaSounds.Data
+    -- The tab of the trigger that played, since a sound can be in more than one
+    local tabName = ScubaSounds:CategoryName(trigger.category)
+    if trigger.groupDiscovery and IsInGroup() then
+        if UnitIsGroupLeader("player") then
+            ScubaSounds:SendChatWhenAllowed(data.GroupDiscoveryMessage:format(IsInRaid() and "raid" or "group", sound,
+                tabName), "GUILD")
+        end
+    elseif ScubaSounds:IsOwnContext(ctx) then
+        ScubaSounds:SendChatWhenAllowed(data.DiscoveryMessage:format(character, sound, tabName), "GUILD")
+    end
+end
+
+-- Like SendChat, but waits out a chat lockdown (boss encounters) instead of dropping the message
+function ScubaSounds:SendChatWhenAllowed(text, chatType, target)
+    local waited = 0
+    local function try()
+        if not ScubaSounds_Options[ScubaSounds_SendGuildMessages] or ScubaSounds:SendChat(text, chatType, target) then
+            return
+        end
+        waited = waited + ScubaSounds.Data.BlockedChatRetry
+        if waited < ScubaSounds.Data.BlockedChatGiveUp then
+            C_Timer.After(ScubaSounds.Data.BlockedChatRetry, try)
+        end
+    end
+    try()
 end
 
 -- key=value;key=value. Booleans become 1/0, separators are stripped from values
@@ -3075,14 +2715,14 @@ function ScubaSounds:ParseFields(payload)
 end
 
 -- Guild-wide info, not tied to sounds. fields is a flat table of strings/numbers/booleans
-function ScubaSounds:BroadcastToGuild(command, fields)
+function ScubaSounds:BroadcastToGuild(command, fields, prio)
     if not IsInGuild() then
         return
     end
     fields.t = GetServerTime() -- messages can be delayed by lockdown
     fields.v = C_AddOns.GetAddOnMetadata("ScubaSounds", "Version")
     local message = command .. ":" .. ScubaSounds:FullName("player") .. ":" .. ScubaSounds:EncodeFields(fields)
-    ScubaSounds:SendGuildMessage(message:sub(1, 255))
+    ScubaSounds:SendGuildMessage(message:sub(1, 255), nil, prio)
 end
 
 function ScubaSounds:BroadcastDeath(lastDamage)
@@ -3106,7 +2746,7 @@ function ScubaSounds:BroadcastDeath(lastDamage)
         fields.combat = lastDamage.inCombat
         fields.ago = math.floor((GetTime() - lastDamage.time) * 10) / 10
     end
-    ScubaSounds:BroadcastToGuild(ScubaSounds_DiedCommand, fields)
+    ScubaSounds:BroadcastToGuild(ScubaSounds_DiedCommand, fields, "BULK")
 end
 
 -- =================================================================
@@ -3128,8 +2768,8 @@ function ScubaSounds:RelayToGroup(event, ctx)
     if not IsInGuild() or not IsInGroup() then
         return
     end
-    -- Fails quietly during chat lockdown (boss encounters); the sender still hears it locally
-    C_ChatInfo.SendAddonMessage(ScubaSounds_ADDON_PREFIX, ScubaSounds:EncodeRelay(event, ctx), "GUILD")
+    -- Not retried through chat lockdown (boss encounters); the sender still hears it locally
+    ScubaSounds:SendAddonMessage(ScubaSounds:EncodeRelay(event, ctx), "GUILD", nil, nil, 0, "ALERT")
 end
 
 -- For sounds the group should hear at the same moment: the sender plays only once the message goes out.
@@ -3139,7 +2779,7 @@ function ScubaSounds:RelayToGroupTogether(event, ctx, play)
         play()
         return
     end
-    ScubaSounds:SendGuildMessage(ScubaSounds:EncodeRelay(event, ctx), play)
+    ScubaSounds:SendGuildMessage(ScubaSounds:EncodeRelay(event, ctx), play, "ALERT")
 end
 
 function ScubaSounds:HandleRelay(playerName, payload)
@@ -3209,15 +2849,23 @@ function ScubaSounds:UpdateBattlefieldScore()
 end
 
 -- =================================================================
--- Frontend Options UI
+-- Saved Options and Secrets (the options window is in Options.lua)
 -- =================================================================
 
 function ScubaSounds:InitOptions()
     local options = ScubaSounds_Options
+    -- Sounds turned off, per tab: "<category ID>/<sound>" -> true. A sound in two tabs has a checkbox in each
+    options.SoundsOff = options.SoundsOff or {}
+    -- Older versions saved one on/off per sound; it carries over to every tab the sound is in
     for sound in pairs(ScubaSounds.Audio.SoundInfo) do
-        if options[sound] == nil then
-            options[sound] = true
+        if options[sound] == false then
+            for _, trigger in ipairs(ScubaSounds.Data.Triggers) do
+                if ScubaSounds:HasValue(trigger.sounds, sound) then
+                    options.SoundsOff[trigger.category .. "/" .. sound] = true
+                end
+            end
         end
+        options[sound] = nil
     end
     if options[ScubaSounds_PlayOutsideRaid] == nil then
         options[ScubaSounds_PlayOutsideRaid] = true
@@ -3234,6 +2882,9 @@ function ScubaSounds:InitOptions()
             enabled = true,
             inBattlegrounds = true
         }
+        if category.petToggle and options.Categories[category.id].petLevelUps == nil then
+            options.Categories[category.id].petLevelUps = true
+        end
     end
     options.Chance = options.Chance or {}
     options.KnownCritters = options.KnownCritters or {} -- NPC ID -> is a frog/toad, learned in game
@@ -3247,8 +2898,32 @@ function ScubaSounds:InitOptions()
     -- Other accounts' characters, from their reports: sound -> character -> first heard (server time)
     options.GuildHeard = options.GuildHeard or {}
     options.GuildReporters = options.GuildReporters or {} -- character -> server time of their last report
+    -- Which trigger played, so a sound with two triggers only reveals the one that happened
+    options.TriggersHeard = options.TriggersHeard or {} -- this account: character -> trigger ID -> first heard
+    options.GuildTriggersHeard = options.GuildTriggersHeard or {} -- other accounts: trigger ID -> character -> first heard
+    -- The earliest discoverer known from any source: sounds/triggers -> key -> {name, first}
+    options.GuildEarliest = options.GuildEarliest or {}
+    options.GuildEarliest.sounds = options.GuildEarliest.sounds or {}
+    options.GuildEarliest.triggers = options.GuildEarliest.triggers or {}
+    ScubaSounds:SeedEarliest()
     options.StatsView = options.StatsView or "guild" -- Stats tab: "guild" or "myself"
-    options.VisibleRows = options.VisibleRows or DEFAULT_VISIBLE_ROWS -- /ss rows <n>
+    -- /ss recent: the last sounds played on this account, newest first. {sound, category, time}
+    options.RecentPlays = options.RecentPlays or {}
+    options.VisibleRows = nil -- from the removed /ss rows command
+    options.FirstPotionBought = options.FirstPotionBought or {} -- character -> true once their first one has played
+    options.GoldMilestonesDone = options.GoldMilestonesDone or {} -- gold amount -> true, account-wide
+    -- kind ("ring", "bag") -> character -> true once their first one has counted
+    options.FirstEquipDone = options.FirstEquipDone or {}
+    for kind in pairs(ScubaSounds.Data.FirstEquips) do
+        options.FirstEquipDone[kind] = options.FirstEquipDone[kind] or {}
+    end
+    if options.FirstRingDone then -- saved by the version that only had rings
+        for character in pairs(options.FirstRingDone) do
+            options.FirstEquipDone.ring[character] = true
+        end
+        options.FirstRingDone = nil
+    end
+    options.RecentTriggerSounds = options.RecentTriggerSounds or {} -- noRepeat triggers: ID -> last sounds, newest last
     -- The earlier secrets-only tracking kept per-trigger entries; they become per-sound ones
     for character, entries in pairs(options.SecretsHeard or {}) do
         options.SoundsHeard[character] = options.SoundsHeard[character] or {}
@@ -3281,928 +2956,48 @@ function ScubaSounds:SetSoundsDisabled(disabled)
     ScubaSounds:SendMessage(disabled and "Sounds disabled" or "Sounds enabled")
 end
 
-function ScubaSounds:ShowOptions()
-    ScubaSoundsOptionsFrame:Show()
-    ScubaSounds:SelectOptionsTab(ScubaSounds.UI.SelectedTab or 1)
-end
-
-function ScubaSounds:SelectOptionsTab(index)
-    ScubaSounds.UI.SelectedTab = index
-    PanelTemplates_SetTab(ScubaSoundsOptionsFrame, index)
-    for i, page in ipairs(ScubaSounds.UI.Pages) do
-        page:SetShown(i == index)
-    end
-end
-
--- Triggers in a category, grouped: a trigger with several sounds is one group, single-sound triggers become one
--- row per sound. Items are placed in reading order; a group fills its column for its header plus one row per sound
-function ScubaSounds:LayoutCategory(category)
-    local items = {}
-    if category.unused then
-        for sound in pairs(ScubaSounds.Audio.SoundInfo) do
-            if not ScubaSounds.Data.UsedSounds[sound] then
-                table.insert(items, {
-                    sounds = {sound}
-                })
-            end
-        end
-    else
-        local singles = {}
-        for _, trigger in ipairs(ScubaSounds.Data.Triggers) do
-            if trigger.category == category.id then
-                if #trigger.sounds > 1 then
-                    local sounds = {unpack(trigger.sounds)}
-                    table.sort(sounds, function(a, b)
-                        return strlower(a) < strlower(b)
-                    end)
-                    table.insert(items, {
-                        sounds = sounds,
-                        trigger = trigger
-                    })
-                else
-                    local sound = trigger.sounds[1]
-                    singles[sound] = singles[sound] or {}
-                    if trigger.hasChance then
-                        singles[sound].chanceTrigger = trigger
-                    end
-                end
-            end
-        end
-        for sound, single in pairs(singles) do
-            table.insert(items, {
-                sounds = {sound},
-                chanceTrigger = single.chanceTrigger
-            })
-        end
-        -- A tab that's one group (the whole tab picks one at random, like Level Ups) shows plain rows, no group box
-        if #items == 1 and items[1].trigger then
-            local trigger = items[1].trigger
-            local sounds = items[1].sounds
-            items = {}
-            for i, sound in ipairs(sounds) do
-                table.insert(items, {
-                    sounds = {sound},
-                    chanceTrigger = i == 1 and trigger.hasChance and trigger or nil
-                })
-            end
-        end
-    end
-    table.sort(items, function(a, b)
-        return strlower(a.sounds[1]) < strlower(b.sounds[1])
-    end)
-
-    local occupied = {}
-    local numRows = 0
-    for _, item in ipairs(items) do
-        local span = item.trigger and #item.sounds + 1 or 1
-        local cell = 0
-        while true do
-            local row, col = math.floor(cell / COLUMNS), cell % COLUMNS
-            local free = true
-            for r = row, row + span - 1 do
-                if occupied[r .. ":" .. col] then
-                    free = false
-                    break
-                end
-            end
-            if free then
-                for r = row, row + span - 1 do
-                    occupied[r .. ":" .. col] = true
-                end
-                item.row, item.col, item.span = row, col, span
-                numRows = math.max(numRows, row + span)
-                break
-            end
-            cell = cell + 1
-        end
-    end
-    return items, numRows
-end
-
 -- Secret triggers show "New in Forever" instead of their condition
--- A secret is found once anyone in the guild (or on this account) has heard one of its sounds
-function ScubaSounds:IsTriggerFound(trigger)
-    for _, sound in ipairs(trigger.sounds) do
-        if next(ScubaSounds_Options.GuildHeard[sound] or {}) then
+-- Anyone in the guild (or on this account) has heard it
+function ScubaSounds:IsSoundHeard(sound)
+    if ScubaSounds_Options.GuildEarliest.sounds[sound] or next(ScubaSounds_Options.GuildHeard[sound] or {}) then
+        return true
+    end
+    for _, entries in pairs(ScubaSounds_Options.SoundsHeard) do
+        if entries[sound] then
             return true
-        end
-        for _, entries in pairs(ScubaSounds_Options.SoundsHeard) do
-            if entries[sound] then
-                return true
-            end
         end
     end
     return false
 end
 
+-- A trigger's text reveals once it has played for anyone (any of its sounds); a sound shared with another trigger
+-- doesn't reveal that one. Each sound's name stays green until that sound has been heard
+function ScubaSounds:IsTriggerFound(trigger)
+    if ScubaSounds_Options.GuildEarliest.triggers[trigger.id] or
+        next(ScubaSounds_Options.GuildTriggersHeard[trigger.id] or {}) then
+        return true
+    end
+    for _, triggers in pairs(ScubaSounds_Options.TriggersHeard) do
+        if triggers[trigger.id] then
+            return true
+        end
+    end
+    return false
+end
+
+-- Every trigger, old or new in Forever, stays hidden until found
 function ScubaSounds:IsHiddenSecret(trigger)
-    return trigger.secret and not ScubaSounds:IsTriggerFound(trigger)
-end
-
-function ScubaSounds:GetTriggerTooltipText(trigger, sound)
-    if not trigger.secret then
-        return trigger.text
-    end
-    if not ScubaSounds:IsHiddenSecret(trigger) then
-        return ScubaSounds:TriggerText(trigger)
-    end
-    local credit = ScubaSounds.Audio.SoundInfo[sound].credit
-    return credit and "New in Forever - Credit " .. credit or "New in Forever"
-end
-
-function ScubaSounds:ShowSoundTooltip(owner, sound, category)
-    GameTooltip:SetOwner(owner, "ANCHOR_RIGHT")
-    GameTooltip:AddLine(sound, 1, 1, 1)
-    local showsCredit = false
-    local shownLines = {} -- several secret triggers all read "New in Forever"; say it once
-    local function addLine(text, r, g, b)
-        if not shownLines[text] then
-            shownLines[text] = true
-            GameTooltip:AddLine(text, r, g, b, true)
-        end
-    end
-    local categoryNames = {}
-    for _, c in ipairs(ScubaSounds.Data.Categories) do
-        categoryNames[c.id] = c.name
-    end
-    for _, trigger in ipairs(ScubaSounds.Data.Triggers) do
-        if trigger.category == category.id and ScubaSounds:HasValue(trigger.sounds, sound) then
-            addLine(ScubaSounds:GetTriggerTooltipText(trigger, sound), NAME_COLOR[1], NAME_COLOR[2], NAME_COLOR[3])
-            showsCredit = showsCredit or ScubaSounds:IsHiddenSecret(trigger)
-        end
-    end
-    if category.unused then
-        GameTooltip:AddLine("Not hooked up to anything yet", NAME_COLOR[1], NAME_COLOR[2], NAME_COLOR[3], true)
-    end
-    local credit = ScubaSounds.Audio.SoundInfo[sound].credit
-    if credit and not showsCredit then
-        GameTooltip:AddLine("Credit " .. credit, 1, 1, 1, true)
-    end
-    for _, trigger in ipairs(ScubaSounds.Data.Triggers) do
-        if trigger.category ~= category.id and ScubaSounds:HasValue(trigger.sounds, sound) then
-            addLine("Also in " .. categoryNames[trigger.category] .. ": " ..
-                        ScubaSounds:GetTriggerTooltipText(trigger, sound), 0.66, 0.66, 0.66)
-        end
-    end
-    GameTooltip:Show()
-end
-
-local function ShowOnOffTooltip(checkbox)
-    GameTooltip:SetOwner(checkbox, "ANCHOR_RIGHT")
-    GameTooltip:SetText(checkbox:GetChecked() and "On" or "Off", 1, 1, 1)
-    GameTooltip:Show()
-end
-
--- onToggle(checked) runs on click
-function ScubaSounds:CreateCheckbox(parent, x, y, checked, onToggle)
-    local checkbox = CreateFrame("CheckButton", nil, parent, "UICheckButtonTemplate")
-    checkbox:SetPoint("TOPLEFT", x, y)
-    checkbox:SetChecked(checked)
-    checkbox:SetScript("OnClick", function(self)
-        onToggle(self:GetChecked() and true or false)
-        if GameTooltip:IsOwned(self) then
-            ShowOnOffTooltip(self)
-        end
-    end)
-    checkbox:SetScript("OnEnter", ShowOnOffTooltip)
-    checkbox:SetScript("OnLeave", GameTooltip_Hide)
-    return checkbox
-end
-
-function ScubaSounds:CreateLabel(parent, checkbox, text)
-    local label = parent:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-    label:SetPoint("LEFT", checkbox, "RIGHT", 2, 1)
-    label:SetText(text)
-    return label
-end
-
--- Chance-to-play box at the right of a row, for a trigger with hasChance
-function ScubaSounds:CreateChanceBox(page, trigger, x, y)
-    local chance = CreateFrame("EditBox", nil, page, "InputBoxTemplate")
-    chance:SetSize(28, 20)
-    chance:SetPoint("TOPLEFT", x + 182, y - 4)
-    chance:SetAutoFocus(false)
-    chance:SetNumeric(true)
-    chance:SetMaxLetters(3)
-    chance:SetJustifyH("RIGHT")
-    chance:SetText(tostring(ScubaSounds:GetChance(trigger)))
-    chance:SetScript("OnTextChanged", function(self, userInput)
-        local value = tonumber(self:GetText())
-        if userInput and value then
-            if value > 100 then
-                value = 100
-                self:SetText("100")
-            end
-            ScubaSounds_Options.Chance[trigger.id] = value
-        end
-    end)
-    chance:SetScript("OnEditFocusLost", function(self)
-        self:SetText(tostring(ScubaSounds:GetChance(trigger)))
-    end)
-    chance:SetScript("OnEnterPressed", chance.ClearFocus)
-    chance:SetScript("OnEscapePressed", chance.ClearFocus)
-    chance:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-        GameTooltip:SetText("Chance to play when triggered (0-100%)", 1, 1, 1)
-        GameTooltip:Show()
-    end)
-    chance:SetScript("OnLeave", GameTooltip_Hide)
-    table.insert(page.EditBoxes, chance)
-
-    local percent = page:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-    percent:SetPoint("LEFT", chance, "RIGHT", 2, 0)
-    percent:SetText("%")
-    table.insert(page.Labels, percent)
-end
-
-function ScubaSounds:CreateSoundRow(page, category, sound, x, y)
-    if not category.unused then
-        local checkbox = ScubaSounds:CreateCheckbox(page, x, y, ScubaSounds_Options[sound], function(checked)
-            ScubaSounds_Options[sound] = checked
-        end)
-        table.insert(page.Checkboxes, checkbox)
-    end
-
-    local play = CreateFrame("Button", nil, page)
-    play:SetSize(22, 22)
-    play:SetPoint("TOPLEFT", x + 30, y - 5)
-    play:SetNormalTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Up")
-    play:SetPushedTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Down")
-    play:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight", "ADD")
-    play:SetScript("OnClick", function()
-        ScubaSounds:PreviewSound(sound)
-    end)
-    play:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-        GameTooltip:SetText("Preview", 1, 1, 1)
-        GameTooltip:Show()
-    end)
-    play:SetScript("OnLeave", GameTooltip_Hide)
-
-    local name = CreateFrame("Button", nil, page)
-    name:SetPoint("TOPLEFT", x + 58, y - 9)
-    local text = name:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    text:SetPoint("LEFT")
-    text:SetText(sound)
-    name:SetSize(text:GetStringWidth(), 14)
-    name:SetScript("OnEnter", function(self)
-        ScubaSounds:ShowSoundTooltip(self, sound, category)
-    end)
-    name:SetScript("OnLeave", GameTooltip_Hide)
-    table.insert(page.Names, text)
-end
-
-function ScubaSounds:CreateGroup(page, item, x, y)
-    local box = CreateFrame("Frame", nil, page, "BackdropTemplate")
-    box:SetFrameLevel(page:GetFrameLevel())
-    box:SetPoint("TOPLEFT", x - 4, y - 3)
-    box:SetSize(COLUMN_WIDTH - 8, ROW_HEIGHT * item.span + 2)
-    box:SetBackdrop({
-        bgFile = "Interface\\Buttons\\WHITE8x8",
-        edgeFile = "Interface\\Buttons\\WHITE8x8",
-        edgeSize = 1
-    })
-    box:SetBackdropColor(1, 0.82, 0, 0.035)
-    box:SetBackdropBorderColor(0.35, 0.33, 0.27, 1)
-
-    local header = page:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    header:SetPoint("TOPLEFT", x + 4, y - 9)
-    header:SetText("Picks 1 of " .. #item.sounds)
-    table.insert(page.Labels, header)
-
-    local trigger = item.trigger
-    if trigger.hasChance then
-        ScubaSounds:CreateChanceBox(page, trigger, x, y)
-    end
-
-    for i, sound in ipairs(item.sounds) do
-        ScubaSounds:CreateSoundRow(page, page.Category, sound, x, y - ROW_HEIGHT * i)
-    end
-end
-
--- Category off greys out everything on its page except previews
-function ScubaSounds:RefreshCategoryPage(page)
-    local enabled = ScubaSounds_Options.Categories[page.Category.id].enabled
-    for _, checkbox in ipairs(page.Checkboxes) do
-        checkbox:SetEnabled(enabled)
-    end
-    for _, editBox in ipairs(page.EditBoxes) do
-        editBox:SetEnabled(enabled)
-        editBox:SetTextColor(unpack(enabled and LABEL_COLOR or DISABLED_COLOR))
-    end
-    for _, label in ipairs(page.Labels) do
-        label:SetTextColor(unpack(enabled and LABEL_COLOR or DISABLED_COLOR))
-    end
-    for _, name in ipairs(page.Names) do
-        name:SetTextColor(unpack(enabled and NAME_COLOR or NAME_DISABLED_COLOR))
-    end
-end
-
-function ScubaSounds:CreateCategoryPage(frame, category)
-    local page = CreateFrame("Frame", nil, frame)
-    page:SetAllPoints()
-    page:Hide()
-    page.Category = category
-    page.Checkboxes, page.EditBoxes, page.Labels, page.Names = {}, {}, {}, {}
-
-    if category.unused then
-        local message = page:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-        message:SetPoint("TOPLEFT", GRID_LEFT + 2, -40)
-        message:SetText("These sounds aren't hooked up to anything yet. Preview them for ideas.")
-    else
-        local settings = ScubaSounds_Options.Categories[category.id]
-        local categoryCheckbox = ScubaSounds:CreateCheckbox(page, GRID_LEFT, -31, settings.enabled, function(checked)
-            settings.enabled = checked
-            ScubaSounds:RefreshCategoryPage(page)
-        end)
-        ScubaSounds:CreateLabel(page, categoryCheckbox, "Play " .. category.name .. " sounds")
-        local bgCheckbox = ScubaSounds:CreateCheckbox(page, GRID_LEFT + 250, -31, settings.inBattlegrounds,
-            function(checked)
-                settings.inBattlegrounds = checked
-            end)
-        table.insert(page.Checkboxes, bgCheckbox)
-        table.insert(page.Labels, ScubaSounds:CreateLabel(page, bgCheckbox, "Play in battlegrounds"))
-    end
-
-    local separator = page:CreateTexture(nil, "ARTWORK")
-    separator:SetColorTexture(0.35, 0.33, 0.27, 1)
-    separator:SetHeight(1)
-    separator:SetPoint("TOPLEFT", GRID_LEFT, -69)
-    separator:SetPoint("TOPRIGHT", -GRID_LEFT, -69)
-
-    -- The grid scrolls once a tab has more rows than fit. It shares the page's widget lists so the category
-    -- checkbox still greys everything out
-    -- Named, since some versions of the template find the scroll bar by name when hiding it
-    local scroll = CreateFrame("ScrollFrame", "ScubaSoundsGrid" .. category.id, page, "UIPanelScrollFrameTemplate")
-    scroll.scrollBarHideable = true
-    scroll:SetPoint("TOPLEFT", 0, GRID_SCROLL_TOP)
-    scroll:SetPoint("BOTTOMRIGHT", -28, 8)
-    local grid = CreateFrame("Frame", nil, scroll)
-    grid:SetWidth(OPTIONS_WIDTH - 28)
-    scroll:SetScrollChild(grid)
-    grid.Category = category
-    grid.Checkboxes, grid.EditBoxes, grid.Labels, grid.Names = page.Checkboxes, page.EditBoxes, page.Labels, page.Names
-
-    local items, numRows = ScubaSounds:LayoutCategory(category)
-    for _, item in ipairs(items) do
-        local x = GRID_LEFT + COLUMN_WIDTH * item.col
-        local y = GRID_TOP - GRID_SCROLL_TOP - ROW_HEIGHT * item.row
-        if item.trigger then
-            ScubaSounds:CreateGroup(grid, item, x, y)
-        else
-            ScubaSounds:CreateSoundRow(grid, category, item.sounds[1], x, y)
-            if item.chanceTrigger then
-                ScubaSounds:CreateChanceBox(grid, item.chanceTrigger, x, y)
-            end
-        end
-    end
-    grid:SetHeight(GRID_TOP - GRID_SCROLL_TOP + ROW_HEIGHT * numRows + 8)
-    page.Scroll = scroll
-    page.Grid = grid
-    if not category.unused then
-        ScubaSounds:RefreshCategoryPage(page)
-    end
-    return page, numRows
-end
-
--- =================================================================
--- Notable Loot tab
--- =================================================================
--- A collapsible header for a list or one of its groups. Open/closed is saved per player
-function ScubaSounds:CreateLootHeader(content, key, text, indent, isList)
-    local header = CreateFrame("Button", nil, content, "BackdropTemplate")
-    header:SetHeight(LOOT_HEADER_HEIGHT)
-    header:SetBackdrop({
-        bgFile = "Interface\\Buttons\\WHITE8x8",
-        edgeFile = "Interface\\Buttons\\WHITE8x8",
-        edgeSize = 1
-    })
-    if isList then
-        header:SetBackdropColor(0.23, 0.2, 0.15, 1)
-        header:SetBackdropBorderColor(0.56, 0.48, 0.29, 1)
-    else
-        header:SetBackdropColor(0.11, 0.1, 0.08, 1)
-        header:SetBackdropBorderColor(0.29, 0.26, 0.21, 1)
-    end
-    header.Toggle = header:CreateTexture(nil, "ARTWORK")
-    header.Toggle:SetSize(14, 14)
-    header.Toggle:SetPoint("LEFT", 6, 0)
-    local label = header:CreateFontString(nil, "ARTWORK", isList and "GameFontNormal" or "GameFontHighlight")
-    label:SetPoint("LEFT", header.Toggle, "RIGHT", 6, 0)
-    label:SetText(text)
-    header.Key = key
-    header.Indent = indent
-    header:SetScript("OnClick", function()
-        local open = ScubaSounds_Options.NotableLootOpen
-        open[key] = not open[key] or nil
-        ScubaSounds:RefreshNotableLoot()
-    end)
-    return header
-end
-
--- Icon straight away (GetItemInfoInstant needs no server data); name and quality once the item loads
-function ScubaSounds:CreateLootItem(content, itemId, width)
-    local button = CreateFrame("Button", nil, content)
-    button:SetSize(width, LOOT_ITEM_HEIGHT)
-    button:RegisterForClicks("LeftButtonUp")
-    button:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight", "ADD")
-    local icon = button:CreateTexture(nil, "ARTWORK")
-    icon:SetSize(LOOT_ICON_SIZE, LOOT_ICON_SIZE)
-    icon:SetPoint("LEFT", 2, 0)
-    local _, _, _, _, iconFile = C_Item.GetItemInfoInstant(itemId)
-    icon:SetTexture(iconFile or QUESTION_MARK_ICON)
-    button.Border = button:CreateTexture(nil, "OVERLAY")
-    button.Border:SetTexture("Interface\\Common\\WhiteIconFrame")
-    button.Border:SetAllPoints(icon)
-    button.Name = button:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
-    button.Name:SetPoint("LEFT", icon, "RIGHT", 6, 0)
-    button.Name:SetWidth(width - LOOT_ICON_SIZE - 12)
-    button.Name:SetJustifyH("LEFT")
-    button.Name:SetWordWrap(false)
-    button.Name:SetText(iconFile and "" or "Unknown item " .. itemId)
-    button.ItemId = itemId
-    button:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-        GameTooltip:SetItemByID(itemId)
-        GameTooltip:Show()
-    end)
-    button:SetScript("OnLeave", GameTooltip_Hide)
-    -- Like clicking an item in your bags: shift-click adds its link to the chat message being typed
-    button:SetScript("OnClick", function()
-        local link = select(2, GetItemInfo(itemId))
-        if link and IsModifiedClick() then
-            HandleModifiedItemClick(link)
-        end
-    end)
-    return button
-end
-
--- Loads a shown item's name and quality from the server, once
-function ScubaSounds:LoadLootItem(button)
-    if button.Requested or not C_Item.GetItemInfoInstant(button.ItemId) then
-        return
-    end
-    button.Requested = true
-    local item = Item:CreateFromItemID(button.ItemId)
-    item:ContinueOnItemLoad(function()
-        local color = item:GetItemQualityColor()
-        button.Name:SetText(item:GetItemName())
-        if color then
-            button.Name:SetTextColor(color.r, color.g, color.b)
-            button.Border:SetVertexColor(color.r, color.g, color.b)
-        end
-    end)
-end
-
-function ScubaSounds:CreateNotableLootPage(frame)
-    local page = CreateFrame("Frame", nil, frame)
-    page:SetAllPoints()
-    page:Hide()
-
-    local note = page:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-    note:SetPoint("TOPLEFT", GRID_LEFT + 2, -40)
-    note:SetText("Getting one of these plays a sound. Any legendary item also counts as a big item.")
-
-    local separator = page:CreateTexture(nil, "ARTWORK")
-    separator:SetColorTexture(0.35, 0.33, 0.27, 1)
-    separator:SetHeight(1)
-    separator:SetPoint("TOPLEFT", GRID_LEFT, -69)
-    separator:SetPoint("TOPRIGHT", -GRID_LEFT, -69)
-
-    local scroll = CreateFrame("ScrollFrame", nil, page, "UIPanelScrollFrameTemplate")
-    scroll:SetPoint("TOPLEFT", GRID_LEFT, -74)
-    scroll:SetPoint("BOTTOMRIGHT", -36, 16)
-    local width = OPTIONS_WIDTH - GRID_LEFT - 36
-    local content = CreateFrame("Frame", nil, scroll)
-    content:SetSize(width, 1)
-    scroll:SetScrollChild(content)
-
-    -- Every list, group and item is built once; RefreshNotableLoot shows and positions what's open
-    local itemWidth = math.floor((width - LOOT_INDENT * 2) / LOOT_COLUMNS) - 4
-    local lists = {}
-    for _, list in ipairs(ScubaSounds.Data.NotableLoot) do
-        local count = 0
-        local groups = {}
-        for _, group in ipairs(list.groups) do
-            count = count + #group.items
-            local key = list.id .. "/" .. group.name
-            local entry = {
-                header = ScubaSounds:CreateLootHeader(content, key, group.name .. " (" .. #group.items .. ")",
-                    LOOT_INDENT, false),
-                items = {}
-            }
-            for _, itemId in ipairs(group.items) do
-                table.insert(entry.items, ScubaSounds:CreateLootItem(content, itemId, itemWidth))
-            end
-            table.insert(groups, entry)
-        end
-        table.insert(lists, {
-            header = ScubaSounds:CreateLootHeader(content, list.id,
-                list.name .. " (" .. count .. ")  |cffa8a8a8" .. list.description .. "|r", 0, true),
-            groups = groups
-        })
-    end
-    ScubaSounds.UI.NotableLoot = {
-        content = content,
-        width = width,
-        itemWidth = itemWidth,
-        lists = lists
-    }
-    ScubaSounds:RefreshNotableLoot()
-    return page
-end
-
-function ScubaSounds:RefreshNotableLoot()
-    local ui = ScubaSounds.UI.NotableLoot
-    local open = ScubaSounds_Options.NotableLootOpen
-    local y = 0
-    local function place(header)
-        header:ClearAllPoints()
-        header:SetPoint("TOPLEFT", header.Indent, -y)
-        header:SetWidth(ui.width - header.Indent)
-        header:Show()
-        local isOpen = open[header.Key]
-        header.Toggle:SetTexture(isOpen and "Interface\\Buttons\\UI-MinusButton-Up" or
-                                     "Interface\\Buttons\\UI-PlusButton-Up")
-        y = y + LOOT_HEADER_HEIGHT + 3
-        return isOpen
-    end
-    for _, list in ipairs(ui.lists) do
-        local listOpen = place(list.header)
-        for _, group in ipairs(list.groups) do
-            local groupOpen = listOpen and place(group.header)
-            if not listOpen then
-                group.header:Hide()
-            end
-            for i, button in ipairs(group.items) do
-                if groupOpen then
-                    local column, row = (i - 1) % LOOT_COLUMNS, math.floor((i - 1) / LOOT_COLUMNS)
-                    button:ClearAllPoints()
-                    button:SetPoint("TOPLEFT", LOOT_INDENT * 2 + column * (ui.itemWidth + 4), -(y + row * LOOT_ITEM_HEIGHT))
-                    button:Show()
-                    ScubaSounds:LoadLootItem(button)
-                else
-                    button:Hide()
-                end
-            end
-            if groupOpen then
-                y = y + math.ceil(#group.items / LOOT_COLUMNS) * LOOT_ITEM_HEIGHT + 6
-            end
-        end
-        y = y + 4
-    end
-    ui.content:SetHeight(math.max(y, 1))
-end
-
--- =================================================================
--- Stats tab
--- =================================================================
-local function CreateStatsColumn(parent, column, font, justify)
-    local text = parent:CreateFontString(nil, "ARTWORK", font)
-    text:SetPoint("LEFT", STATS_COLUMNS[column][1] + 4, 0)
-    text:SetWidth(STATS_COLUMNS[column][2])
-    text:SetJustifyH(justify or "LEFT")
-    text:SetWordWrap(false)
-    return text
-end
-
-function ScubaSounds:CreateStatsPage(frame)
-    local page = CreateFrame("Frame", nil, frame)
-    page:SetAllPoints()
-    page:Hide()
-    local ui = {}
-
-    -- Guild / Myself toggle
-    local views = {{"guild", "Guild"}, {"myself", "Myself"}}
-    ui.ViewButtons = {}
-    for i, view in ipairs(views) do
-        local button = CreateFrame("Button", nil, page, "UIPanelButtonTemplate")
-        button:SetSize(80, 22)
-        button:SetPoint("TOPLEFT", GRID_LEFT + (i - 1) * 84, -34)
-        button:SetText(view[2])
-        button.View = view[1]
-        button:SetScript("OnClick", function()
-            ScubaSounds_Options.StatsView = view[1]
-            ScubaSounds:RefreshStatsPage()
-        end)
-        table.insert(ui.ViewButtons, button)
-    end
-    ui.Note = page:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-    ui.Note:SetPoint("TOPLEFT", GRID_LEFT + 178, -39)
-    ui.Status = page:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
-    ui.Status:SetPoint("TOPLEFT", GRID_LEFT + 2, -61)
-
-    ui.AskButton = CreateFrame("Button", nil, page, "UIPanelButtonTemplate")
-    ui.AskButton:SetSize(90, 22)
-    ui.AskButton:SetPoint("TOPRIGHT", -GRID_LEFT - 4, -34)
-    ui.AskButton:SetText("Refresh")
-    -- Once per opening of the window, so it can't be spammed
-    ui.AskButton:SetScript("OnClick", function(self)
-        self:Disable()
-        ScubaSounds:RequestStats()
-    end)
-    frame:HookScript("OnHide", function()
-        ui.AskButton:Enable()
-    end)
-
-    local width = OPTIONS_WIDTH - GRID_LEFT - 36
-    local header = CreateFrame("Frame", nil, page)
-    header:SetPoint("TOPLEFT", GRID_LEFT, -76)
-    header:SetSize(width, 16)
-    CreateStatsColumn(header, "sound", "GameFontNormalSmall"):SetText("Sound")
-    CreateStatsColumn(header, "tab", "GameFontNormalSmall"):SetText("Tab")
-    ui.FirstHeader = CreateStatsColumn(header, "first", "GameFontNormalSmall")
-    ui.PlaysHeader = CreateStatsColumn(header, "plays", "GameFontNormalSmall", "RIGHT")
-    local separator = page:CreateTexture(nil, "ARTWORK")
-    separator:SetColorTexture(0.35, 0.33, 0.27, 1)
-    separator:SetHeight(1)
-    separator:SetPoint("TOPLEFT", GRID_LEFT, -93)
-    separator:SetPoint("TOPRIGHT", -GRID_LEFT, -93)
-
-    local scroll = CreateFrame("ScrollFrame", nil, page, "UIPanelScrollFrameTemplate")
-    scroll:SetPoint("TOPLEFT", GRID_LEFT, -96)
-    scroll:SetPoint("BOTTOMRIGHT", -36, 16)
-    local content = CreateFrame("Frame", nil, scroll)
-    content:SetSize(width, 1)
-    scroll:SetScrollChild(content)
-
-    -- Each sound's tabs, in tab order
-    local soundTabs = {}
-    for _, category in ipairs(ScubaSounds.Data.Categories) do
-        for _, trigger in ipairs(ScubaSounds.Data.Triggers) do
-            if trigger.category == category.id then
-                for _, sound in ipairs(trigger.sounds) do
-                    soundTabs[sound] = soundTabs[sound] or {}
-                    if soundTabs[sound][#soundTabs[sound]] ~= category.name then
-                        table.insert(soundTabs[sound], category.name)
-                    end
-                end
-            end
-        end
-    end
-    local sounds = {}
-    for sound in pairs(ScubaSounds.Data.UsedSounds) do
-        table.insert(sounds, sound)
-    end
-    table.sort(sounds, function(a, b)
-        return strlower(a) < strlower(b)
-    end)
-
-    ui.Rows = {}
-    for i, sound in ipairs(sounds) do
-        local row = CreateFrame("Button", nil, content)
-        row:SetSize(width, ROW_HEIGHT)
-        row:SetPoint("TOPLEFT", 0, -(i - 1) * ROW_HEIGHT)
-        row:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight", "ADD")
-        row.SoundName = sound
-        row.Sound = CreateStatsColumn(row, "sound", "GameFontHighlightSmall")
-        row.Sound:SetText(sound)
-        CreateStatsColumn(row, "tab", "GameFontHighlightSmall"):SetText(table.concat(soundTabs[sound] or {}, ", "))
-        row.First = CreateStatsColumn(row, "first", "GameFontHighlightSmall")
-        row.Plays = CreateStatsColumn(row, "plays", "GameFontHighlightSmall", "RIGHT")
-        row:SetScript("OnEnter", function(self)
-            ScubaSounds:ShowStatsTooltip(self)
-        end)
-        row:SetScript("OnLeave", GameTooltip_Hide)
-        table.insert(ui.Rows, row)
-    end
-    content:SetHeight(math.max(#sounds * ROW_HEIGHT, 1))
-    ScubaSounds.UI.Stats = ui
-    page:SetScript("OnShow", function()
-        ScubaSounds:RefreshStatsPage()
-    end)
-    return page
-end
-
--- Guild: everyone who has heard a sound, this account's characters included. {name, first}, earliest first
-function ScubaSounds:SoundListeners(sound)
-    local listeners = {}
-    for character, first in pairs(ScubaSounds_Options.GuildHeard[sound] or {}) do
-        table.insert(listeners, {
-            name = character,
-            first = first
-        })
-    end
-    for character, entries in pairs(ScubaSounds_Options.SoundsHeard) do
-        if entries[sound] then
-            table.insert(listeners, {
-                name = character,
-                first = entries[sound].first,
-                count = entries[sound].count
-            })
-        end
-    end
-    table.sort(listeners, function(a, b)
-        return a.first < b.first
-    end)
-    return listeners
-end
-
--- Myself: this account's characters only
-function ScubaSounds:OwnSoundListeners(sound)
-    local listeners = {}
-    for _, listener in ipairs(ScubaSounds:SoundListeners(sound)) do
-        if listener.count then
-            table.insert(listeners, listener)
-        end
-    end
-    return listeners
-end
-
-local function FormatStatsTime(serverTime)
-    return date("%b %d %Y, %H:%M", serverTime)
-end
-
-function ScubaSounds:RefreshStatsPage()
-    local ui = ScubaSounds.UI.Stats
-    if not ui then
-        return
-    end
-    local isGuild = ScubaSounds_Options.StatsView ~= "myself"
-    for _, button in ipairs(ui.ViewButtons) do
-        if (button.View == "guild") == isGuild then
-            button:LockHighlight()
-        else
-            button:UnlockHighlight()
-        end
-    end
-    ui.AskButton:SetShown(isGuild)
-    ui.Note:SetText(isGuild and "Sounds heard across the guild; hover a row for the players." or
-                        "Sounds played on this account; hover a row for each character.")
-    ui.FirstHeader:SetText(isGuild and "First Heard By" or "First Heard")
-    ui.PlaysHeader:SetText(isGuild and "Unique Plays" or "Plays")
-
-    local found, totalPlays = 0, 0
-    for _, row in ipairs(ui.Rows) do
-        local listeners = isGuild and ScubaSounds:SoundListeners(row.SoundName) or
-                              ScubaSounds:OwnSoundListeners(row.SoundName)
-        local plays = #listeners
-        if not isGuild then
-            plays = 0
-            for _, listener in ipairs(listeners) do
-                plays = plays + listener.count
-            end
-            totalPlays = totalPlays + plays
-        end
-        local heard = #listeners > 0
-        local color = heard and LABEL_COLOR or DISABLED_COLOR
-        row.Sound:SetTextColor(unpack(heard and NAME_COLOR or NAME_DISABLED_COLOR))
-        row.First:SetTextColor(unpack(color))
-        row.Plays:SetTextColor(unpack(color))
-        if heard then
-            found = found + 1
-            local first = FormatStatsTime(listeners[1].first)
-            row.First:SetText(isGuild and listeners[1].name .. ", " .. first or first)
-            row.Plays:SetText(plays)
-        else
-            row.First:SetText("Not heard yet")
-            row.Plays:SetText("")
-        end
-    end
-    if isGuild then
-        local characters = {}
-        for character in pairs(ScubaSounds_Options.GuildReporters) do
-            characters[character] = true
-        end
-        for character in pairs(ScubaSounds_Options.SoundsHeard) do
-            characters[character] = true
-        end
-        local reporters = 0
-        for _ in pairs(characters) do
-            reporters = reporters + 1
-        end
-        ui.Status:SetText(found .. " of " .. #ui.Rows .. " sounds heard in the guild, reports from " .. reporters ..
-                              " characters")
-    else
-        ui.Status:SetText(found .. " of " .. #ui.Rows .. " sounds heard on this account, " .. totalPlays ..
-                              " plays in total")
-    end
-end
-
-function ScubaSounds:ShowStatsTooltip(row)
-    local isGuild = ScubaSounds_Options.StatsView ~= "myself"
-    local listeners = isGuild and ScubaSounds:SoundListeners(row.SoundName) or
-                          ScubaSounds:OwnSoundListeners(row.SoundName)
-    GameTooltip:SetOwner(row, "ANCHOR_RIGHT")
-    GameTooltip:AddLine(row.SoundName)
-    if #listeners == 0 then
-        GameTooltip:AddLine("Nobody has heard this yet", 0.5, 0.5, 0.5)
-    end
-    for _, listener in ipairs(listeners) do
-        if isGuild then
-            GameTooltip:AddDoubleLine(listener.name, FormatStatsTime(listener.first), 1, 1, 1, 0.6, 0.6, 0.6)
-        else
-            GameTooltip:AddDoubleLine(listener.name, listener.count == 1 and "1 play" or listener.count .. " plays",
-                1, 1, 1, 1, 0.82, 0)
-            GameTooltip:AddLine("   first " .. FormatStatsTime(listener.first), 0.6, 0.6, 0.6)
-        end
-    end
-    GameTooltip:Show()
-end
-
-function ScubaSounds:CreateGlobalOptionsPage(frame)
-    local page = CreateFrame("Frame", nil, frame)
-    page:SetAllPoints()
-    page:Hide()
-
-    local outsideRaid = ScubaSounds:CreateCheckbox(page, GRID_LEFT, -31,
-        ScubaSounds_Options[ScubaSounds_PlayOutsideRaid], function(checked)
-            ScubaSounds_Options[ScubaSounds_PlayOutsideRaid] = checked
-        end)
-    ScubaSounds:CreateLabel(page, outsideRaid, ScubaSounds_PlayOutsideRaid)
-
-    local disableSounds = ScubaSounds:CreateCheckbox(page, GRID_LEFT, -31 - ROW_HEIGHT - 4,
-        ScubaSounds_Options[ScubaSounds_DisableSounds], function(checked)
-            ScubaSounds:SetSoundsDisabled(checked)
-        end)
-    ScubaSounds:CreateLabel(page, disableSounds, ScubaSounds_DisableSounds .. "  (/ss on, /ss off)")
-    ScubaSounds.UI.DisableSoundsCheckbox = disableSounds
-
-    local sendGuildMessages = ScubaSounds:CreateCheckbox(page, GRID_LEFT, -31 - 2 * (ROW_HEIGHT + 4),
-        ScubaSounds_Options[ScubaSounds_SendGuildMessages], function(checked)
-            ScubaSounds_Options[ScubaSounds_SendGuildMessages] = checked
-        end)
-    ScubaSounds:CreateLabel(page, sendGuildMessages, ScubaSounds_SendGuildMessages)
-    return page
-end
-
--- Sizes the window to the tallest tab, capped at VisibleRows; taller tabs scroll. Safe to call any time
-function ScubaSounds:ApplyVisibleRows()
-    local rows = math.min(ScubaSounds.UI.MaxRows, ScubaSounds_Options.VisibleRows)
-    ScubaSoundsOptionsFrame:SetSize(OPTIONS_WIDTH, -GRID_TOP + ROW_HEIGHT * rows + 20)
-    for _, page in ipairs(ScubaSounds.UI.Pages) do
-        if page.Scroll then
-            local scrollBar = page.Scroll.ScrollBar or _G[page.Scroll:GetName() .. "ScrollBar"]
-            -- The scroll frame follows the window's new size on the next frame
-            C_Timer.After(0, function()
-                local fits = page.Grid:GetHeight() <= page.Scroll:GetHeight() + 1
-                if scrollBar then
-                    scrollBar:SetShown(not fits)
-                end
-                page.Scroll:SetVerticalScroll(fits and 0 or math.min(page.Scroll:GetVerticalScroll(),
-                    page.Scroll:GetVerticalScrollRange()))
-            end)
-        end
-    end
-end
-
-function ScubaSounds:BuildOptionsFrame()
-    local frame = ScubaSoundsOptionsFrame
-    ScubaSounds.UI.Pages = {}
-    ScubaSounds.UI.Tabs = {}
-    local maxRows = 0
-
-    local tabNames = {}
-    for _, category in ipairs(ScubaSounds.Data.Categories) do
-        local page, numRows
-        if category.notableLoot then
-            page, numRows = ScubaSounds:CreateNotableLootPage(frame), 0
-        else
-            page, numRows = ScubaSounds:CreateCategoryPage(frame, category)
-        end
-        table.insert(ScubaSounds.UI.Pages, page)
-        table.insert(tabNames, category.name)
-        maxRows = math.max(maxRows, numRows)
-    end
-    table.insert(ScubaSounds.UI.Pages, ScubaSounds:CreateStatsPage(frame))
-    table.insert(tabNames, "Stats")
-    table.insert(ScubaSounds.UI.Pages, ScubaSounds:CreateGlobalOptionsPage(frame))
-    table.insert(tabNames, "Options")
-
-    ScubaSounds.UI.MaxRows = maxRows
-    ScubaSounds:ApplyVisibleRows()
-
-    -- Tabs fill a row under the window, then wrap onto another row below it
-    local rowWidth, rowStart = 0, nil
-    for i, tabName in ipairs(tabNames) do
-        local tab = CreateFrame("Button", "ScubaSoundsOptionsFrameTab" .. i, frame, "PanelTabButtonTemplate")
-        tab:SetID(i)
-        tab:SetText(tabName)
-        tab:SetScript("OnClick", function(self)
-            GameTooltip_Hide()
-            ScubaSounds:SelectOptionsTab(self:GetID())
-        end)
-        PanelTemplates_TabResize(tab, 0)
-        if not rowStart then
-            tab:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 11, 2)
-            rowStart, rowWidth = tab, tab:GetWidth()
-        elseif rowWidth + 3 + tab:GetWidth() > OPTIONS_WIDTH - 22 then
-            tab:SetPoint("TOPLEFT", rowStart, "BOTTOMLEFT", 0, TAB_ROW_SPACING)
-            rowStart, rowWidth = tab, tab:GetWidth()
-        else
-            tab:SetPoint("LEFT", ScubaSounds.UI.Tabs[i - 1], "RIGHT", 3, 0)
-            rowWidth = rowWidth + 3 + tab:GetWidth()
-        end
-        table.insert(ScubaSounds.UI.Tabs, tab)
-    end
-    frame.Tabs = ScubaSounds.UI.Tabs
-    PanelTemplates_SetNumTabs(frame, #tabNames)
-    ScubaSounds:SelectOptionsTab(1)
+    return not ScubaSounds:IsTriggerFound(trigger)
 end
 
 -- =================================================================
 -- Audio Engine
 -- =================================================================
+-- The sound's checkbox in that tab
+function ScubaSounds:IsSoundOn(categoryId, sound)
+    return not ScubaSounds_Options.SoundsOff[categoryId .. "/" .. sound]
+end
+
 function ScubaSounds:ShouldPlay(sound)
     -- On timeout
     if ScubaSounds.Audio.Timeouts[sound] then
@@ -4210,11 +3005,6 @@ function ScubaSounds:ShouldPlay(sound)
     end
 
     if ScubaSounds_Options[ScubaSounds_DisableSounds] then
-        return false
-    end
-
-    -- Sound is disabled in /ss options
-    if ScubaSounds_Options[sound] == false then
         return false
     end
 
@@ -4242,6 +3032,211 @@ function ScubaSounds:SoundPath(sound)
 end
 
 -- Options preview: ignores every setting, timeout and overlap rule
+-- Dismounts we cause: /dismount, cancelling the mount buff, and starting a cast (casting while mounted dismounts)
+-- Vendor purchases only: looted, crafted, traded, mailed and bought-back items never go through BuyMerchantItem
+function ScubaSounds:HookMerchantBuys()
+    if not BuyMerchantItem then
+        return
+    end
+    hooksecurefunc("BuyMerchantItem", function(index)
+        local character = ScubaSounds:FullName("player")
+        local link = GetMerchantItemLink(index)
+        if not character or ScubaSounds_Options.FirstPotionBought[character] or issecretvalue(link) or not link then
+            return
+        end
+        local _, _, _, _, _, classId, subclassId = C_Item.GetItemInfoInstant(link)
+        if classId == ScubaSounds.Data.ConsumableItemClass and subclassId == ScubaSounds.Data.PotionItemSubclass then
+            ScubaSounds_Options.FirstPotionBought[character] = true
+            ScubaSounds:Fire("FirstPotionBought")
+        end
+    end)
+end
+
+function ScubaSounds:HookDismounts()
+    local function ownAction()
+        ScubaSounds.State.LastOwnDismountAction = GetTime()
+    end
+    if Dismount then
+        hooksecurefunc("Dismount", ownAction)
+    end
+    if CancelUnitBuff then
+        hooksecurefunc("CancelUnitBuff", ownAction)
+    end
+end
+
+function ScubaSounds.Events:UNIT_SPELLCAST_START(unitTarget)
+    if unitTarget == "player" then
+        ScubaSounds.State.LastOwnDismountAction = GetTime()
+    end
+end
+
+function ScubaSounds:CheckDismount()
+    local mounted = IsMounted()
+    if issecretvalue(mounted) then
+        return
+    end
+    local state = ScubaSounds.State
+    local wasMounted = state.WasMounted
+    state.WasMounted = mounted and true or false
+    if not wasMounted or mounted then
+        return
+    end
+    local dismountedAt = GetTime()
+    local inCombat = UnitAffectingCombat("player")
+    C_Timer.After(ScubaSounds.Data.DazedCheckDelay, function()
+        local dazed = ScubaSounds:IsDazed()
+        if dazed == nil then -- the debuff can't be read: an in-combat dismount we didn't cause
+            local isDead, onTaxi = UnitIsDeadOrGhost("player"), UnitOnTaxi("player")
+            dazed = not issecretvalue(inCombat) and inCombat and not issecretvalue(isDead) and not isDead and
+                        not issecretvalue(onTaxi) and not onTaxi and
+                        dismountedAt - state.LastOwnDismountAction > ScubaSounds.Data.OwnDismountWindow
+        end
+        if dazed then
+            ScubaSounds:Fire("DazedOffMount")
+        end
+    end)
+end
+
+-- true / false, or nil when the game won't say (secret)
+function ScubaSounds:IsDazed()
+    local data = ScubaSounds.Data
+    local aura = C_UnitAuras.GetPlayerAuraBySpellID(data.DazedSpellId)
+    if issecretvalue(aura) then
+        return nil
+    end
+    if aura then
+        return true
+    end
+    if C_UnitAuras.GetAuraDataBySpellName then
+        aura = C_UnitAuras.GetAuraDataBySpellName("player", data.DazedSpellName, "HARMFUL")
+        if issecretvalue(aura) then
+            return nil
+        end
+        return aura ~= nil
+    end
+    return false
+end
+
+-- (play icon)[Sound (Tab tab)]: click previews the sound, shift-click opens that tab. The icon is part of the link
+function ScubaSounds:DiscoveryLink(sound, tabName)
+    local data = ScubaSounds.Data
+    return "|c" .. data.DiscoveryLinkColor .. "|H" .. data.DiscoveryLinkType .. ":" .. sound .. ":" .. tabName .. "|h" ..
+               data.DiscoveryLinkIcon .. "[" .. sound .. " (" .. tabName .. " tab)]|h|r"
+end
+
+function ScubaSounds:CategoryName(categoryId)
+    for _, category in ipairs(ScubaSounds.Data.Categories) do
+        if category.id == categoryId then
+            return category.name
+        end
+    end
+    return categoryId
+end
+
+-- What counts as discovered right before the login sync
+function ScubaSounds:SnapshotDiscoveries()
+    local found = {}
+    for _, trigger in ipairs(ScubaSounds.Data.Triggers) do
+        found[trigger.id] = ScubaSounds:IsTriggerFound(trigger)
+    end
+    ScubaSounds.State.DiscoverySnapshot = found
+end
+
+-- Everything discovered since the snapshot, as links in our own chat window. Nothing printed if there's nothing new
+function ScubaSounds:ReportNewDiscoveries()
+    local snapshot = ScubaSounds.State.DiscoverySnapshot
+    if not snapshot then
+        return
+    end
+    ScubaSounds.State.DiscoverySnapshot = nil
+    local links, seen = {}, {}
+    for _, trigger in ipairs(ScubaSounds.Data.Triggers) do
+        if not snapshot[trigger.id] and ScubaSounds:IsTriggerFound(trigger) then
+            local tabName = ScubaSounds:CategoryName(trigger.category)
+            for _, sound in ipairs(trigger.sounds) do
+                local key = sound .. ":" .. tabName
+                if ScubaSounds:IsSoundHeard(sound) and not seen[key] then
+                    seen[key] = true
+                    table.insert(links, ScubaSounds:DiscoveryLink(sound, tabName))
+                end
+            end
+        end
+    end
+    if #links == 0 then
+        return
+    end
+    ScubaSounds:PrintAwayDiscoveries(links)
+end
+
+-- The login summary's lines, from a list of DiscoveryLinks
+function ScubaSounds:PrintAwayDiscoveries(links)
+    ScubaSounds:SendMessage(#links == 1 and "1 sound discovered while you were away:" or #links ..
+                                " sounds discovered while you were away:")
+    local perLine = ScubaSounds.Data.NewDiscoveriesPerLine
+    for i = 1, #links, perLine do
+        DEFAULT_CHAT_FRAME:AddMessage("   " .. table.concat(links, ", ", i, math.min(i + perLine - 1, #links)))
+    end
+end
+
+function ScubaSounds:SetUpDiscoveryLinks()
+    local data = ScubaSounds.Data
+    local function linkFilter(pattern)
+        return function(_, _, message, ...)
+            if issecretvalue(message) or type(message) ~= "string" then
+                return false
+            end
+            local before, sound, tabName = message:match(pattern)
+            if not sound or not ScubaSounds.Audio.SoundInfo[sound] then
+                return false
+            end
+            return false, before .. ScubaSounds:DiscoveryLink(sound, tabName), ...
+        end
+    end
+    ChatFrame_AddMessageEventFilter("CHAT_MSG_GUILD", linkFilter(data.DiscoveryLinkPattern))
+    -- Whispers received, and our own sent ones
+    ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", linkFilter(data.WhisperLinkPattern))
+    ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", linkFilter(data.WhisperLinkPattern))
+    -- Our links never reach the game's own handling, which doesn't know them
+    local setItemRef = SetItemRef
+    SetItemRef = function(link, ...)
+        local linkType, sound, tabName = strsplit(":", link or "", 3)
+        if linkType ~= data.DiscoveryLinkType then
+            return setItemRef(link, ...)
+        end
+        if IsShiftKeyDown() then
+            ScubaSounds:ShowOptionsTab(tabName)
+        elseif ScubaSounds.Audio.SoundInfo[sound] then
+            ScubaSounds:PreviewSound(sound)
+        end
+    end
+    -- Hovering one says what clicking does, since chat links get no other hover feedback
+    local function onEnter(self, link)
+        local linkType, sound, tabName = strsplit(":", link or "", 3)
+        if linkType ~= data.DiscoveryLinkType then
+            return
+        end
+        GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
+        GameTooltip:AddLine(sound, 1, 1, 1)
+        GameTooltip:AddLine("Click to play", 0.5, 0.85, 1)
+        GameTooltip:AddLine("Shift-click to open the " .. tabName .. " tab", 0.5, 0.85, 1)
+        GameTooltip:Show()
+        self.ScubaSoundsLinkTooltip = true
+    end
+    local function onLeave(self)
+        if self.ScubaSoundsLinkTooltip then
+            self.ScubaSoundsLinkTooltip = nil
+            GameTooltip:Hide()
+        end
+    end
+    for i = 1, NUM_CHAT_WINDOWS do
+        local chatFrame = _G["ChatFrame" .. i]
+        if chatFrame then
+            chatFrame:HookScript("OnHyperlinkEnter", onEnter)
+            chatFrame:HookScript("OnHyperlinkLeave", onLeave)
+        end
+    end
+end
+
 function ScubaSounds:PreviewSound(sound)
     PlaySoundFile(ScubaSounds:SoundPath(sound), "Master")
 end
@@ -4253,16 +3248,21 @@ function ScubaSounds:Fire(event, ctx)
     local isLocal = ctx.relayedBy == nil
     for _, trigger in ipairs(ScubaSounds.Data.Listeners[event] or {}) do
         if not trigger.when or trigger.when(ctx) then
+            local relay = trigger.relay
+            local relays = isLocal and (trigger.together or relay == true or (type(relay) == "function" and relay(ctx)))
+            -- A relayed trigger with several sounds is picked here, so the whole group plays the same one
+            if relays and #trigger.sounds > 1 then
+                ctx.sound = ScubaSounds:SelectRandom(trigger.sounds)
+            end
             if isLocal and trigger.together then
                 ScubaSounds:RelayToGroupTogether(event, ctx, function()
-                    ScubaSounds:PlayTrigger(trigger.id)
+                    ScubaSounds:PlayTrigger(trigger.id, ctx.sound, ctx)
                 end)
             else
-                local relay = trigger.relay
-                if isLocal and (relay == true or (type(relay) == "function" and relay(ctx))) then
+                if relays then
                     ScubaSounds:RelayToGroup(event, ctx)
                 end
-                ScubaSounds:PlayTrigger(trigger.id)
+                ScubaSounds:PlayTrigger(trigger.id, ctx.sound, ctx)
             end
             if ScubaSounds.Data.ExclusiveEvents[event] then
                 return
@@ -4272,12 +3272,25 @@ function ScubaSounds:Fire(event, ctx)
 end
 
 -- Percent chance a hasChance trigger plays: the player's setting, else the trigger's default
+-- A secret plays at its default chance until it's discovered, whatever was saved before (the box is locked till then)
 function ScubaSounds:GetChance(trigger)
-    return ScubaSounds_Options.Chance[trigger.id] or trigger.defaultChance or 100
+    local default = trigger.defaultChance or 100
+    if ScubaSounds:IsHiddenSecret(trigger) then
+        return default
+    end
+    return ScubaSounds_Options.Chance[trigger.id] or default
 end
 
 -- Checks the trigger's category (and its battleground setting) and chance, then plays one of its playable sounds
-function ScubaSounds:PlayTrigger(triggerId)
+function ScubaSounds:RecentTriggerSounds(trigger)
+    local recent = ScubaSounds_Options.RecentTriggerSounds
+    recent[trigger.id] = recent[trigger.id] or {}
+    return recent[trigger.id]
+end
+
+-- pickedSound: play this one if it's the trigger's and playable here (a relay's pick); otherwise pick at random
+-- ctx: the event context, used to tell whether we set it off (for first-discovery announcements)
+function ScubaSounds:PlayTrigger(triggerId, pickedSound, ctx)
     local trigger = ScubaSounds.Data.TriggersById[triggerId]
     if not trigger then
         return false
@@ -4296,20 +3309,55 @@ function ScubaSounds:PlayTrigger(triggerId)
     if trigger.hasChance and math.random(1, 100) > ScubaSounds:GetChance(trigger) then
         return false
     end
+    -- One of a trigger's sounds at a time: another can't start on top while one is still playing
+    for _, sound in ipairs(trigger.sounds) do
+        if ScubaSounds.Audio.CurrentlyPlaying[sound] then
+            return false
+        end
+    end
     local playable = {}
     for _, sound in ipairs(trigger.sounds) do
-        if ScubaSounds:ShouldPlay(sound) then
+        if ScubaSounds:IsSoundOn(trigger.category, sound) and ScubaSounds:ShouldPlay(sound) then
             table.insert(playable, sound)
         end
     end
-    local sound = ScubaSounds:SelectRandom(playable)
+    local recent = trigger.noRepeat and ScubaSounds:RecentTriggerSounds(trigger)
+    if recent then
+        local fresh = {}
+        for _, playableSound in ipairs(playable) do
+            if not ScubaSounds:HasValue(recent, playableSound) then
+                table.insert(fresh, playableSound)
+            end
+        end
+        if #fresh > 0 then -- if every playable sound played recently, any of them will do
+            playable = fresh
+        end
+    end
+    local sound = ScubaSounds:HasValue(playable, pickedSound) and pickedSound or ScubaSounds:SelectRandom(playable)
     if sound == nil or not ScubaSounds:PlaySound(sound) then
         return false
+    end
+    if recent then
+        table.insert(recent, sound)
+        while #recent > trigger.noRepeat do
+            table.remove(recent, 1)
+        end
     end
     if trigger.cooldown then
         ScubaSounds.State.TriggerCooldowns[trigger.id] = GetTime() + trigger.cooldown
     end
-    ScubaSounds:RecordSoundHeard(sound)
+    local isFirstDiscovery = ScubaSounds:IsHiddenSecret(trigger)
+    ScubaSounds:RecordSoundHeard(sound, trigger.id)
+    local recentPlays = ScubaSounds_Options.RecentPlays
+    table.insert(recentPlays, 1, {
+        sound = sound,
+        category = trigger.category,
+        time = GetServerTime()
+    })
+    recentPlays[ScubaSounds.Data.RecentPlaysKept + 1] = nil
+    if isFirstDiscovery then
+        ScubaSounds:AnnounceDiscovery(trigger, sound, ctx)
+    end
     return true
 end
 
@@ -4334,13 +3382,19 @@ function ScubaSounds:PlaySound(sound)
     return false
 end
 
-
 -- =================================================================
 -- Slash Command
 -- =================================================================
 SLASH_SCUBASOUNDS1 = "/ss"
 SLASH_SCUBASOUNDS2 = "/scubasounds"
 function SlashCmdList.SCUBASOUNDS(args)
+    -- Player names keep their case and any accents, so whisper reads the raw text
+    local command, rest = args:match("^%s*(%S*)%s*(.-)%s*$")
+    if strlower(command) == "whisper" then
+        ScubaSounds:WhisperSoundCommand(rest)
+        return
+    end
+
     local words = {}
     for word in args:gmatch("%w+") do
         table.insert(words, word)
@@ -4350,20 +3404,215 @@ function SlashCmdList.SCUBASOUNDS(args)
         words[i] = strlower(words[i])
     end
 
-    if ScubaSounds:HasValue(words, "options") or ScubaSounds:HasValue(words, "option") then
+    if words[1] == "debug" then
+        ScubaSounds:DebugCommand(words)
+    elseif words[1] == "recent" then
+        ScubaSounds:PrintRecentPlays()
+    elseif ScubaSounds:HasValue(words, "options") or ScubaSounds:HasValue(words, "option") then
         ScubaSounds:ShowOptions()
     elseif ScubaSounds:HasValue(words, "on") then
         ScubaSounds:SetSoundsDisabled(false)
     elseif ScubaSounds:HasValue(words, "off") then
         ScubaSounds:SetSoundsDisabled(true)
-    elseif words[1] == "rows" then
-        -- /ss rows <n> sets how many rows the window shows before tabs scroll; /ss rows resets it
-        local rows = tonumber(words[2])
-        ScubaSounds_Options.VisibleRows = rows and math.max(1, math.floor(rows)) or DEFAULT_VISIBLE_ROWS
-        ScubaSounds:ApplyVisibleRows()
-        ScubaSounds:SendMessage("Showing up to " .. ScubaSounds_Options.VisibleRows .. " rows")
     else
-        ScubaSounds:SendMessage("Commands: options, on, off, rows <n>")
+        ScubaSounds:PrintCommands("Commands:", {
+            {"/ss options", "open the options window"},
+            {"/ss on", "turn sounds on"},
+            {"/ss off", "turn sounds off"},
+            {"/ss recent", "the last 10 sounds played"},
+            {"/ss whisper <player> <sound>", "whisper someone a sound's link"},
+            {"/ss debug", "testing commands"}
+        })
+    end
+end
+
+-- A heading, then one command per line with what it does
+function ScubaSounds:PrintCommands(heading, commands)
+    ScubaSounds:SendMessage(heading)
+    for _, command in ipairs(commands) do
+        DEFAULT_CHAT_FRAME:AddMessage("   " .. command[1] .. " |cffa8a8a8- " .. command[2] .. "|r")
+    end
+end
+
+-- /ss recent: the last sounds played on this account as timestamped links (click to hear again). Newest last, so it
+-- ends up at the bottom of the chat window
+function ScubaSounds:PrintRecentPlays()
+    local plays = ScubaSounds_Options.RecentPlays
+    if #plays == 0 then
+        ScubaSounds:SendMessage("No sounds played yet")
+        return
+    end
+    ScubaSounds:SendMessage("Last " .. #plays .. " sounds played, newest at the bottom:")
+    for i = #plays, 1, -1 do
+        local play = plays[i]
+        DEFAULT_CHAT_FRAME:AddMessage("   |cffa8a8a8[" .. date("%b %d %H:%M:%S", play.time) .. "]|r " ..
+                                          ScubaSounds:DiscoveryLink(play.sound, ScubaSounds:CategoryName(play.category)))
+    end
+end
+
+-- A used sound's exact name from any capitalization, or nil (after telling the player there's no such sound)
+function ScubaSounds:FindSoundByName(name)
+    for sound in pairs(ScubaSounds.Data.UsedSounds) do
+        if strlower(sound) == strlower(name) then
+            return sound
+        end
+    end
+    ScubaSounds:SendMessage("No sound named " .. name)
+end
+
+-- The names of the tabs a sound is in, in tab order. Empty (with a message) if it has no triggers
+function ScubaSounds:SoundTabNames(sound)
+    local tabs = {}
+    for _, category in ipairs(ScubaSounds.Data.Categories) do
+        for _, trigger in ipairs(ScubaSounds.Data.Triggers) do
+            if trigger.category == category.id and tabs[#tabs] ~= category.name and
+                ScubaSounds:HasValue(trigger.sounds, sound) then
+                table.insert(tabs, category.name)
+            end
+        end
+    end
+    if #tabs == 0 then
+        ScubaSounds:SendMessage(sound .. " has no triggers, so it has no tab to link to")
+    end
+    return tabs
+end
+
+-- /ss whisper <player> <sound>: whispers the sound's link (its first tab), clickable for players with the addon
+function ScubaSounds:WhisperSoundCommand(rest)
+    -- Forever names have a space ("Kay Mon"), so the player is everything before the last word
+    local target, name = rest:match("^(.-)%s+(%S+)$")
+    if not target then
+        ScubaSounds:SendMessage("Usage: /ss whisper <player> <sound>")
+        return
+    end
+    local sound = ScubaSounds:FindSoundByName(name)
+    local tabName = sound and ScubaSounds:SoundTabNames(sound)[1]
+    if not tabName then
+        return
+    end
+    if C_ChatInfo.InChatMessagingLockdown and C_ChatInfo.InChatMessagingLockdown() then
+        ScubaSounds:SendMessage("Chat is locked during this encounter; try again after it")
+        return
+    end
+    SendChatMessage(ScubaSounds.Data.WhisperSoundMessage:format(sound, tabName), "WHISPER", nil, target)
+end
+
+-- /ss whisper <name>: as a name is typed, the rest of the first matching player (friends, guild, group, recent
+-- whispers, like /w) is filled in, highlighted, so typing on replaces it. Tab accepts it
+function ScubaSounds:SetUpWhisperNameCompletion()
+    local list = AUTOCOMPLETE_LIST and (AUTOCOMPLETE_LIST.WHISPER or AUTOCOMPLETE_LIST.ALL)
+    if not list then
+        return
+    end
+    local function firstMatch(partial)
+        local ok, results
+        if C_AutoComplete and C_AutoComplete.GetAutoCompleteResults then
+            ok, results = pcall(C_AutoComplete.GetAutoCompleteResults, partial, 1, #partial, false, list.include,
+                list.exclude)
+        elseif GetAutoCompleteResults then
+            ok, results = pcall(GetAutoCompleteResults, partial, list.include, list.exclude, 1, #partial)
+        end
+        local result = ok and type(results) == "table" and results[1]
+        return type(result) == "table" and result.name or result
+    end
+    local function onTextChanged(self, userInput)
+        local text = self:GetText()
+        local typedMore = #text > (self.ScubaSoundsLastLength or 0)
+        self.ScubaSoundsLastLength = #text
+        -- Only while typing forward at the end of the name, so backspace can still remove the filled-in part
+        if not userInput or not typedMore or self:GetCursorPosition() ~= #text then
+            return
+        end
+        -- Everything after "whisper", since Forever names have a space
+        local slash, command, partial = text:match("^(/%S+)%s+(%S+)%s+(%S.*)$")
+        slash = slash and strlower(slash)
+        if (slash ~= "/ss" and slash ~= "/scubasounds") or strlower(command) ~= "whisper" then
+            return
+        end
+        local name = firstMatch(partial)
+        if type(name) ~= "string" or #name <= #partial or strlower(name:sub(1, #partial)) ~= strlower(partial) then
+            return
+        end
+        local completed = text .. name:sub(#partial + 1)
+        self.ScubaSoundsCompletion = completed
+        self:SetText(completed)
+        -- As typed, so the next letter (replacing the highlight) still counts as typing on
+        self.ScubaSoundsLastLength = #text
+        self:HighlightText(#text, #completed)
+    end
+    local function onTabPressed(self)
+        if self.ScubaSoundsCompletion and self:GetText() == self.ScubaSoundsCompletion then
+            self.ScubaSoundsCompletion = nil
+            self:SetText(self:GetText() .. " ")
+            self:SetCursorPosition(#self:GetText())
+        end
+    end
+    for i = 1, NUM_CHAT_WINDOWS do
+        local editBox = _G["ChatFrame" .. i .. "EditBox"]
+        if editBox then
+            editBox:HookScript("OnTextChanged", onTextChanged)
+            editBox:HookScript("OnTabPressed", onTabPressed)
+        end
+    end
+end
+
+-- /ss debug <command> ...: tools for testing. Everything prints only in our own chat window
+function ScubaSounds:DebugCommand(words)
+    if words[2] == "chatlink" and words[3] then
+        -- /ss debug chatlink <sound>: the sound's discovery link for each of its tabs, as guild chat would show it
+        local sound = ScubaSounds:FindSoundByName(words[3])
+        for _, tabName in ipairs(sound and ScubaSounds:SoundTabNames(sound) or {}) do
+            ScubaSounds:SendMessage(ScubaSounds:DiscoveryLink(sound, tabName))
+        end
+    elseif words[2] == "discovery" and words[3] then
+        -- /ss debug discovery <sound>: the guild message each of its triggers posts when first set off, with the link
+        -- guildmates with the addon see
+        local sound = ScubaSounds:FindSoundByName(words[3])
+        if not sound then
+            return
+        end
+        local data, seen = ScubaSounds.Data, {}
+        for _, category in ipairs(data.Categories) do
+            for _, trigger in ipairs(data.Triggers) do
+                local text = trigger.groupDiscovery and
+                                 data.GroupDiscoveryMessage:format(IsInRaid() and "raid" or "group", sound, category.name) or
+                                 data.DiscoveryMessage:format(ScubaSounds:FullName("player") or UnitName("player"), sound,
+                        category.name)
+                if trigger.category == category.id and not seen[text] and ScubaSounds:HasValue(trigger.sounds, sound) then
+                    seen[text] = true
+                    local before = text:match(data.DiscoveryLinkPattern)
+                    ScubaSounds:SendMessage(before .. ScubaSounds:DiscoveryLink(sound, category.name))
+                end
+            end
+        end
+        if not next(seen) then
+            ScubaSounds:SendMessage(sound .. " has no triggers, so it has no discovery message")
+        end
+    elseif words[2] == "awaydiscoveries" then
+        -- /ss debug awaydiscoveries: the login summary of sounds discovered while away, for 12 random sounds
+        -- (found or not). Only printed; nothing is recorded or sent
+        local entries, seen = {}, {}
+        for _, trigger in ipairs(ScubaSounds.Data.Triggers) do
+            local tabName = ScubaSounds:CategoryName(trigger.category)
+            for _, sound in ipairs(trigger.sounds) do
+                if not seen[sound .. ":" .. tabName] then
+                    seen[sound .. ":" .. tabName] = true
+                    table.insert(entries, {sound, tabName})
+                end
+            end
+        end
+        local links = {}
+        for _ = 1, math.min(12, #entries) do
+            local entry = table.remove(entries, math.random(#entries))
+            table.insert(links, ScubaSounds:DiscoveryLink(entry[1], entry[2]))
+        end
+        ScubaSounds:PrintAwayDiscoveries(links)
+    else
+        ScubaSounds:PrintCommands("Debug commands (only print here, nothing is sent or unlocked):", {
+            {"/ss debug chatlink <sound>", "the sound's link for each of its tabs"},
+            {"/ss debug discovery <sound>", "the guild message posted when it's first unlocked"},
+            {"/ss debug awaydiscoveries", "the login summary, for 12 random sounds"}
+        })
     end
 end
 
@@ -4404,7 +3653,12 @@ end
 
 function ScubaSounds:FindAura(unit, spellId, filter)
     if unit == "player" then
-        return C_UnitAuras.GetPlayerAuraBySpellID(spellId)
+        -- In encounters this may come back secret, which can't even be tested; treat it as not found
+        local aura = C_UnitAuras.GetPlayerAuraBySpellID(spellId)
+        if issecretvalue(aura) then
+            return nil
+        end
+        return aura
     end
     for i = 1, 40 do
         local aura = C_UnitAuras.GetAuraDataByIndex(unit, i, filter)
@@ -4448,8 +3702,8 @@ function ScubaSounds:ItemIdFromItemLink(itemLink)
 end
 
 function ScubaSounds:IsInClassicRaid()
-    local mapID = C_Map.GetBestMapForUnit("player")
-    if ScubaSounds.Data.RaidIds[mapID] ~= nil then
+    local instanceId = select(8, GetInstanceInfo())
+    if not issecretvalue(instanceId) and ScubaSounds.Data.RaidIds[instanceId] ~= nil then
         return true
     end
     local zoneName = GetRealZoneText()
@@ -4466,43 +3720,6 @@ function ScubaSounds:EqualsIgnoreCase(a, b)
     return a ~= nil and b ~= nil and strlower(a) == strlower(b)
 end
 
--- Player names are full Forever names ("First Surname"), compared ignoring case. UnitName returns them split (the
--- surname where the realm usually is), so names are always read through FullName / FullNameFromGuid
-function ScubaSounds:FullName(unit)
-    local name = GetUnitName(unit, false)
-    if issecretvalue(name) then
-        return nil
-    end
-    return name
-end
-
--- GetPlayerInfoByGUID splits the name like UnitName, its last return being the surname
-function ScubaSounds:FullNameFromGuid(guid)
-    local _, _, _, _, _, name, surname = GetPlayerInfoByGUID(guid)
-    if issecretvalue(name) or not name then
-        return nil
-    end
-    if not issecretvalue(surname) and surname and surname ~= "" then
-        return name .. " " .. surname
-    end
-    return name
-end
-
-function ScubaSounds:IsGzNigelSender()
-    local name = ScubaSounds:FullName("player")
-    return name ~= nil and (ScubaSounds:IsNameInSet(name, ScubaSounds_GzNigelSenders) or
-               ScubaSounds:IsNameInSet(ScubaSounds:GetTruePlayerName(name), ScubaSounds_GzNigelSenders))
-end
-
-function ScubaSounds:IsNameInSet(name, set)
-    for listName in pairs(set) do
-        if ScubaSounds:EqualsIgnoreCase(name, listName) then
-            return true
-        end
-    end
-    return false
-end
-
 -- Party/raid unit tokens, including the player
 function ScubaSounds:GroupUnits()
     local units = {}
@@ -4516,16 +3733,7 @@ function ScubaSounds:GroupUnits()
     return units
 end
 
--- The group unit token ("raid5") for a full name or GUID, for APIs that need a unit
-function ScubaSounds:GroupUnitForName(playerName)
-    for _, unit in ipairs(ScubaSounds:GroupUnits()) do
-        if ScubaSounds:EqualsIgnoreCase(ScubaSounds:FullName(unit), playerName) then
-            return unit
-        end
-    end
-    return nil
-end
-
+-- The group unit token ("raid5") for a GUID, for APIs that need a unit
 function ScubaSounds:GroupUnitForGuid(guid)
     for _, unit in ipairs(ScubaSounds:GroupUnits()) do
         if UnitGUID(unit) == guid then
@@ -4533,15 +3741,6 @@ function ScubaSounds:GroupUnitForGuid(guid)
         end
     end
     return nil
-end
-
-function ScubaSounds:IsPlayerInGroup(playerName)
-    return ScubaSounds:GroupUnitForName(playerName) ~= nil
-end
-
--- A character's full name (any alt, any case) -> its true name
-function ScubaSounds:GetTruePlayerName(playerName)
-    return ScubaSounds.Data.PlayerNameToTrueName[strlower(playerName)] or playerName
 end
 
 function ScubaSounds:SelectRandom(list)

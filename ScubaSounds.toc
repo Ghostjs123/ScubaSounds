@@ -5,5 +5,10 @@
 ## Author: Kaymon
 ## SavedVariables: ScubaSounds_Options
 
+Libs\ChatThrottleLib.lua
+SoundInfo.lua
+PlayerNames.lua
+NotableLoot.lua
 ScubaSounds.lua
+Options.lua
 ScubaSounds.xml

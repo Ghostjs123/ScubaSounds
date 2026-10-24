@@ -33,7 +33,7 @@
             <Layer level="ARTWORK">
                 <Texture name="ScubaSoundsOptionsFrameTitle" file="Interface\DialogFrame\UI-DialogBox-Header">
                     <Size>
-                        <AbsDimension x="268" y="64" />
+                        <AbsDimension x="310" y="64" />
                     </Size>
                     <Anchors>
                         <Anchor point="TOP">
@@ -58,14 +58,14 @@
 
         <Frames>
 
-            <Button name="ScubaSoundsOptionsFrameClose" inherits="UIPanelButtonTemplate" text="X">
+            <Button name="ScubaSoundsOptionsFrameClose" inherits="UIPanelCloseButton">
                 <Size>
-                    <AbsDimension x="30" y="30"/>
+                    <AbsDimension x="32" y="32"/>
                 </Size>
                 <Anchors>
                     <Anchor point="TOPRIGHT" relativeTo="ScubaSoundsOptionsFrame">
                         <Offset>
-                            <AbsDimension x="-10" y="-10" />
+                            <AbsDimension x="6" y="6" />
                         </Offset>
                     </Anchor>
                 </Anchors>
