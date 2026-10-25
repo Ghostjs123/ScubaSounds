@@ -24,7 +24,9 @@ ScubaSounds.Audio.SoundInfo = {
         extension = "mp3",
         duration = 4,
         canOverlapSelf = false,
-        timeout = 5
+        timeout = 5,
+        -- Unused tab tooltip: what it played for before Forever
+        formerUse = "Used to play when you crit for 6300-6399 damage (needs the combat log)"
     },
     ["ANewRecord"] = {
         extension = "wav",
@@ -42,7 +44,7 @@ ScubaSounds.Audio.SoundInfo = {
         extension = "ogg",
         duration = 3,
         canOverlapSelf = false,
-        timeout = 1,
+        timeout = 120,
         credit = "Shib"
     },
     ["BallsATug"] = {
@@ -70,6 +72,20 @@ ScubaSounds.Audio.SoundInfo = {
         duration = 3,
         canOverlapSelf = false,
         timeout = 1
+    },
+    ["BlueMyself"] = {
+        extension = "ogg",
+        duration = 3,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Jujewmagic"
+    },
+    ["BomboClatt"] = {
+        extension = "ogg",
+        duration = 5,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Kaymon"
     },
     ["BonVoyagePussy"] = {
         extension = "wav",
@@ -113,7 +129,8 @@ ScubaSounds.Audio.SoundInfo = {
         extension = "ogg",
         duration = 11,
         canOverlapSelf = false,
-        timeout = 30
+        timeout = 30,
+        formerUse = "Used to play when entering Ahn'Qiraj (picks 1 of 4 with DisableHisHand, ImDoingMyPart and Cavern)"
     },
     ["CopCuties"] = {
         extension = "wav",
@@ -137,7 +154,8 @@ ScubaSounds.Audio.SoundInfo = {
         extension = "ogg",
         duration = 8,
         canOverlapSelf = true,
-        timeout = 30
+        timeout = 30,
+        formerUse = "Used to play when entering Ahn'Qiraj (picks 1 of 4 with ComeOnYouApes, ImDoingMyPart and Cavern)"
     },
     ["Discord"] = {
         extension = "wav",
@@ -311,7 +329,8 @@ ScubaSounds.Audio.SoundInfo = {
         extension = "ogg",
         duration = 21,
         canOverlapSelf = false,
-        timeout = 30
+        timeout = 30,
+        formerUse = "Used to play when entering Ahn'Qiraj (picks 1 of 4 with ComeOnYouApes, DisableHisHand and Cavern)"
     },
     ["ImRetarded"] = {
         extension = "wav",
@@ -388,6 +407,13 @@ ScubaSounds.Audio.SoundInfo = {
         duration = 1,
         canOverlapSelf = false,
         timeout = 1
+    },
+    ["MommysBoy"] = {
+        extension = "ogg",
+        duration = 3,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Kaymon"
     },
     ["Money"] = {
         extension = "wav",
@@ -518,6 +544,13 @@ ScubaSounds.Audio.SoundInfo = {
         canOverlapSelf = false,
         timeout = 1
     },
+    ["PapaMeat"] = {
+        extension = "ogg",
+        duration = 5,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Kaymon"
+    },
     ["Pathetic"] = {
         extension = "wav",
         duration = 1,
@@ -529,6 +562,13 @@ ScubaSounds.Audio.SoundInfo = {
         duration = 2,
         canOverlapSelf = false,
         timeout = 1,
+        credit = "Shib"
+    },
+    ["RaidWipe"] = {
+        extension = "ogg",
+        duration = 7,
+        canOverlapSelf = false,
+        timeout = 120,
         credit = "Shib"
     },
     ["Rampage"] = {
@@ -612,7 +652,8 @@ ScubaSounds.Audio.SoundInfo = {
         extension = "ogg",
         duration = 11,
         canOverlapSelf = false,
-        timeout = 300
+        timeout = 300,
+        formerUse = "Used to play for the whole raid when it pulled C'Thun"
     },
     ["StoleThatShit"] = {
         extension = "ogg",
@@ -620,13 +661,6 @@ ScubaSounds.Audio.SoundInfo = {
         canOverlapSelf = false,
         timeout = 1,
         credit = "Shib"
-    },
-    ["SuperSaiyan"] = {
-        extension = "wav",
-        duration = 19,
-        canOverlapSelf = false,
-        timeout = 60,
-        folder = "LevelUp" -- a level-up sound, but not one of the LevelUpSounds jingles (its own length, no credit)
     },
     ["ThanksDahfart"] = {
         extension = "mp3",
@@ -646,6 +680,13 @@ ScubaSounds.Audio.SoundInfo = {
         canOverlapSelf = false,
         timeout = 1,
         credit = "Kaymon"
+    },
+    ["UsbUnplug"] = {
+        extension = "ogg",
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Flame"
     },
     ["Vampire"] = {
         extension = "ogg",
@@ -693,6 +734,13 @@ ScubaSounds.Audio.SoundInfo = {
         timeout = 1,
         credit = "Shib"
     },
+    ["XPShutdown"] = {
+        extension = "ogg",
+        duration = 3,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Mangan"
+    },
     ["YouHaveNoMana"] = {
         extension = "wav",
         duration = 1,
@@ -707,25 +755,40 @@ ScubaSounds.Audio.SoundInfo = {
     }
 }
 
--- Level-up jingles, kept in Sounds/LevelUp. Sound -> duration in seconds
+-- Every sound on the Level Ups tab, kept in Sounds/LevelUp. Sound -> its SoundInfo; anything left out takes
+-- LevelUpDefaults
 ScubaSounds.Data.LevelUpSounds = {
-    Diablo2LevelUp = 2,
-    FF7Victory = 4,
-    GoldenSunVictory = 5,
-    Mario1Up = 1,
-    MarioPowerUp = 1,
-    PokemonLevelUp = 3,
-    RuneScapeLevelUp = 3,
-    Warcraft3LevelUp = 3,
-    ZeldaItemGet = 2
+    Diablo2LevelUp = {duration = 2},
+    FF7Victory = {duration = 4},
+    GoldenSunVictory = {duration = 5},
+    Mario1Up = {duration = 1},
+    MarioPowerUp = {duration = 1},
+    PokemonLevelUp = {duration = 3},
+    RuneScapeLevelUp = {duration = 3},
+    SuperSaiyan = {
+        extension = "wav",
+        duration = 19,
+        timeout = 60,
+        credit = "Kaymon"
+    },
+    Warcraft3LevelUp = {duration = 3},
+    YouDoButYouDont = {duration = 2},
+    ZeldaItemGet = {duration = 2}
 }
-for sound, duration in pairs(ScubaSounds.Data.LevelUpSounds) do
-    ScubaSounds.Audio.SoundInfo[sound] = {
-        extension = "ogg",
-        duration = duration,
-        canOverlapSelf = false,
-        timeout = 1,
-        credit = "Jujewmagic",
-        folder = "LevelUp"
-    }
+ScubaSounds.Data.LevelUpDefaults = {
+    extension = "ogg",
+    canOverlapSelf = false,
+    timeout = 1,
+    credit = "Jujewmagic",
+    folder = "LevelUp"
+}
+for sound, overrides in pairs(ScubaSounds.Data.LevelUpSounds) do
+    local info = {}
+    for key, value in pairs(ScubaSounds.Data.LevelUpDefaults) do
+        info[key] = value
+    end
+    for key, value in pairs(overrides) do
+        info[key] = value
+    end
+    ScubaSounds.Audio.SoundInfo[sound] = info
 end

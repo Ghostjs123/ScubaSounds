@@ -6,7 +6,7 @@
 ## SavedVariables: ScubaSounds_Options
 
 Libs\ChatThrottleLib.lua
-SoundInfo.lua
+Sounds\SoundInfo.lua
 PlayerNames.lua
 NotableLoot.lua
 ScubaSounds.lua

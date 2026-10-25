@@ -29,6 +29,7 @@ local PLAY_BUTTON_X = CHECKBOX_SIZE + 2
 local PLAY_BUTTON_Y = CHECKBOX_Y - (CHECKBOX_SIZE - PLAY_BUTTON_SIZE) / 2
 local NAME_X = PLAY_BUTTON_X + PLAY_BUTTON_SIZE + 6
 local NAME_Y = CHECKBOX_Y - (CHECKBOX_SIZE - 14) / 2
+local NAME_MAX_WIDTH = CHANCE_BOX_X - NAME_X - 4
 local GRID_TOP = -53
 local GRID_SCROLL_TOP = -52 -- sound grids scroll from just under the separator
 local CATEGORY_TOGGLES_Y = -25 -- the "Play ... sounds" / "Play in battlegrounds" checkboxes
@@ -174,29 +175,22 @@ function ScubaSounds:LayoutCategory(category)
                         trigger = trigger
                     })
                 else
-                    local sound = trigger.sounds[1]
-                    singles[sound] = singles[sound] or {}
-                    if trigger.hasChance then
-                        singles[sound].chanceTrigger = trigger
-                    end
+                    singles[trigger.sounds[1]] = true
                 end
             end
         end
-        for sound, single in pairs(singles) do
+        for sound in pairs(singles) do
             table.insert(items, {
-                sounds = {sound},
-                chanceTrigger = single.chanceTrigger
+                sounds = {sound}
             })
         end
         -- A tab that's one group (the whole tab picks one at random, like Level Ups) shows plain rows, no group box
         if #items == 1 and items[1].trigger then
-            local trigger = items[1].trigger
             local sounds = items[1].sounds
             items = {}
-            for i, sound in ipairs(sounds) do
+            for _, sound in ipairs(sounds) do
                 table.insert(items, {
-                    sounds = {sound},
-                    chanceTrigger = i == 1 and trigger.hasChance and trigger or nil
+                    sounds = {sound}
                 })
             end
         end
@@ -205,29 +199,36 @@ function ScubaSounds:LayoutCategory(category)
         return strlower(a.sounds[1]) < strlower(b.sounds[1])
     end)
 
-    -- Each item goes into whichever column is shortest so far (the leftmost on a tie), so rows read left to right
-    local heights = {}
-    for col = 1, COLUMNS do
-        heights[col] = 0
-    end
-    local contentHeight = 0
+    -- Items read down column 1, then column 2, then column 3. Columns are filled in order up to the shortest height
+    -- that fits everything in COLUMNS columns, so they come out as even as the items allow
+    local total = 0
     for _, item in ipairs(items) do
-        local height = ROW_HEIGHT
+        item.height = ROW_HEIGHT
         if item.trigger then
-            height = GROUP_MARGIN_TOP + GROUP_HEADER_HEIGHT + ROW_HEIGHT * #item.sounds + GROUP_PADDING +
-                         GROUP_MARGIN_BOTTOM
+            item.height = GROUP_MARGIN_TOP + GROUP_HEADER_HEIGHT + ROW_HEIGHT * #item.sounds + GROUP_PADDING +
+                              GROUP_MARGIN_BOTTOM
         end
-        local col = 1
-        for c = 2, COLUMNS do
-            if heights[c] < heights[col] then
-                col = c
-            end
-        end
-        item.col, item.y = col - 1, heights[col]
-        heights[col] = heights[col] + height
-        contentHeight = math.max(contentHeight, heights[col])
+        total = total + item.height
     end
-    return items, contentHeight
+    local function fill(limit)
+        local col, y, contentHeight = 0, 0, 0
+        for _, item in ipairs(items) do
+            if y > 0 and y + item.height > limit then
+                col, y = col + 1, 0
+            end
+            item.col, item.y = col, y
+            y = y + item.height
+            contentHeight = math.max(contentHeight, y)
+        end
+        return col < COLUMNS, contentHeight
+    end
+    for limit = math.ceil(total / COLUMNS), total do
+        local fits, contentHeight = fill(limit)
+        if fits then
+            return items, contentHeight
+        end
+    end
+    return items, select(2, fill(total))
 end
 
 function ScubaSounds:GetTriggerTooltipText(trigger, sound)
@@ -243,6 +244,13 @@ end
 
 function ScubaSounds:ShowSoundTooltip(owner, sound, category)
     GameTooltip:SetOwner(owner, "ANCHOR_RIGHT")
+    ScubaSounds:AddSoundTooltipLines(sound, category)
+    GameTooltip:Show()
+end
+
+-- A sound's name, what sets it off in that tab (or that it's still a secret), its credit and the other tabs it's in.
+-- Shared by the options window and chat links
+function ScubaSounds:AddSoundTooltipLines(sound, category)
     GameTooltip:AddLine(sound, 1, 1, 1)
     local showsCredit = false
     local shownLines = {} -- several secret triggers all read "New in Forever"; say it once
@@ -265,6 +273,10 @@ function ScubaSounds:ShowSoundTooltip(owner, sound, category)
     end
     if category.unused then
         GameTooltip:AddLine("Not hooked up to anything yet", NAME_COLOR[1], NAME_COLOR[2], NAME_COLOR[3], true)
+        local formerUse = ScubaSounds.Audio.SoundInfo[sound].formerUse
+        if formerUse then
+            GameTooltip:AddLine(formerUse, 0.66, 0.66, 0.66, true)
+        end
     end
     local credit = ScubaSounds.Audio.SoundInfo[sound].credit
     if credit and not showsCredit then
@@ -276,7 +288,6 @@ function ScubaSounds:ShowSoundTooltip(owner, sound, category)
                         ScubaSounds:GetTriggerTooltipText(trigger, sound), 0.66, 0.66, 0.66)
         end
     end
-    GameTooltip:Show()
 end
 
 local function ShowOnOffTooltip(checkbox)
@@ -309,8 +320,43 @@ function ScubaSounds:CreateLabel(parent, checkbox, text)
     return label
 end
 
--- Chance-to-play box at the right of a row, for a trigger with hasChance
-function ScubaSounds:CreateChanceBox(page, trigger, x, y)
+-- The triggers in a tab that can play a sound
+function ScubaSounds:SoundTriggers(categoryId, sound)
+    local triggers = {}
+    for _, trigger in ipairs(ScubaSounds.Data.Triggers) do
+        if trigger.category == categoryId and ScubaSounds:HasValue(trigger.sounds, sound) then
+            table.insert(triggers, trigger)
+        end
+    end
+    return triggers
+end
+
+-- Locked while every trigger of the sound in this tab is still a secret
+function ScubaSounds:IsChanceLocked(triggers)
+    for _, trigger in ipairs(triggers) do
+        if not ScubaSounds:IsHiddenSecret(trigger) then
+            return false
+        end
+    end
+    return true
+end
+
+-- What the box shows: the chance on a discovered trigger, else the secret's default
+local function ShownChance(triggers, sound)
+    for _, trigger in ipairs(triggers) do
+        if not ScubaSounds:IsHiddenSecret(trigger) then
+            return ScubaSounds:GetChance(trigger, sound)
+        end
+    end
+    return ScubaSounds:GetChance(triggers[1], sound)
+end
+
+-- Chance-to-play box at the right of a sound's row, for that sound in this tab
+function ScubaSounds:CreateChanceBox(page, category, sound, x, y)
+    local triggers = ScubaSounds:SoundTriggers(category.id, sound)
+    if #triggers == 0 then
+        return
+    end
     local chance = CreateFrame("EditBox", nil, page, "InputBoxTemplate")
     -- Wide enough for "100" in the template's font, with the text kept off the box's right edge
     -- No taller than a row, so it can't reach into a group box above or below
@@ -322,7 +368,7 @@ function ScubaSounds:CreateChanceBox(page, trigger, x, y)
     chance:SetFontObject("GameFontHighlightSmall")
     chance:SetJustifyH("RIGHT")
     chance:SetTextInsets(0, 6, 0, 0)
-    chance:SetText(tostring(ScubaSounds:GetChance(trigger)))
+    chance:SetText(tostring(ShownChance(triggers, sound)))
     chance:SetScript("OnTextChanged", function(self, userInput)
         local value = tonumber(self:GetText())
         if userInput and value then
@@ -330,20 +376,20 @@ function ScubaSounds:CreateChanceBox(page, trigger, x, y)
                 value = 100
                 self:SetText("100")
             end
-            ScubaSounds_Options.Chance[trigger.id] = value
+            ScubaSounds_Options.Chance[category.id .. "/" .. sound] = value
         end
     end)
     chance:SetScript("OnEditFocusLost", function(self)
-        self:SetText(tostring(ScubaSounds:GetChance(trigger)))
+        self:SetText(tostring(ShownChance(triggers, sound)))
     end)
     chance:SetScript("OnEnterPressed", chance.ClearFocus)
     chance:SetScript("OnEscapePressed", chance.ClearFocus)
     chance.IsScubaSoundsInput = true -- see ClearInputFocus
-    chance.Trigger = trigger -- locked while the trigger is still a secret (see RefreshCategoryPage)
+    chance.Triggers = triggers -- locked while they're all still secrets (see RefreshCategoryPage)
     chance:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
         GameTooltip:SetText("Chance to play when triggered (0-100%)", 1, 1, 1)
-        if ScubaSounds:IsHiddenSecret(trigger) then
+        if ScubaSounds:IsChanceLocked(triggers) then
             GameTooltip:AddLine("Locked until someone in the guild discovers this sound", 0.5, 0.5, 0.5, true)
         end
         GameTooltip:Show()
@@ -391,13 +437,30 @@ function ScubaSounds:CreateSoundRow(page, category, sound, x, y)
     local text = name:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     text:SetPoint("LEFT")
     text:SetText(sound)
-    name:SetSize(text:GetStringWidth(), 14)
+    text:SetWordWrap(false)
+    -- A name too long for the room before the chance box is cut short with "..." (the tooltip has it in full)
+    local width = text:GetStringWidth()
+    if not category.unused and width > NAME_MAX_WIDTH then
+        width = NAME_MAX_WIDTH
+        text:SetWidth(width)
+        text:SetJustifyH("LEFT")
+    end
+    name:SetSize(width, 14)
     name:SetScript("OnEnter", function(self)
         ScubaSounds:ShowSoundTooltip(self, sound, category)
     end)
     name:SetScript("OnLeave", GameTooltip_Hide)
+    name:SetScript("OnClick", function()
+        if IsModifiedClick("CHATLINK") then
+            ScubaSounds:LinkSoundInChat(sound, category.name)
+        end
+    end)
     text.Sound = sound
     table.insert(page.Names, text)
+
+    if not category.unused then
+        ScubaSounds:CreateChanceBox(page, category, sound, x, y)
+    end
 end
 
 function ScubaSounds:CreateGroup(page, item, x, y)
@@ -419,12 +482,6 @@ function ScubaSounds:CreateGroup(page, item, x, y)
     header:SetText("Picks 1 of " .. #item.sounds)
     table.insert(page.Labels, header)
 
-    local trigger = item.trigger
-    if trigger.hasChance then
-        -- On the header line
-        ScubaSounds:CreateChanceBox(page, trigger, x, top - GROUP_HEADER_TOP + 3)
-    end
-
     for i, sound in ipairs(item.sounds) do
         ScubaSounds:CreateSoundRow(page, page.Category, sound, x, top - GROUP_HEADER_HEIGHT - ROW_HEIGHT * (i - 1))
     end
@@ -438,7 +495,7 @@ function ScubaSounds:RefreshCategoryPage(page)
     end
     for _, editBox in ipairs(page.EditBoxes) do
         -- A secret's chance can't be changed until it's discovered, so nobody dials every secret to 100% up front
-        local editable = enabled and not (editBox.Trigger and ScubaSounds:IsHiddenSecret(editBox.Trigger))
+        local editable = enabled and not (editBox.Triggers and ScubaSounds:IsChanceLocked(editBox.Triggers))
         if not editable and editBox:HasFocus() then
             editBox:ClearFocus()
         end
@@ -523,9 +580,6 @@ function ScubaSounds:CreateCategoryPage(frame, category)
             ScubaSounds:CreateGroup(grid, item, x, y)
         else
             ScubaSounds:CreateSoundRow(grid, category, item.sounds[1], x, y)
-            if item.chanceTrigger then
-                ScubaSounds:CreateChanceBox(grid, item.chanceTrigger, x, y)
-            end
         end
     end
     grid:SetHeight((GRID_SCROLL_TOP - GRID_TOP) + math.max(contentHeight, ROW_HEIGHT))
@@ -865,6 +919,12 @@ function ScubaSounds:CreateStatsPage(frame)
             ScubaSounds:ShowStatsTooltip(self)
         end)
         row:SetScript("OnLeave", GameTooltip_Hide)
+        row:SetScript("OnClick", function()
+            local tabName = IsModifiedClick("CHATLINK") and ScubaSounds:SoundTabNames(sound)[1]
+            if tabName then
+                ScubaSounds:LinkSoundInChat(sound, tabName)
+            end
+        end)
         table.insert(ui.Rows, row)
     end
     content:SetHeight(math.max(#sounds * ROW_HEIGHT, 1))
@@ -1041,10 +1101,24 @@ function ScubaSounds:CreateGlobalOptionsPage(frame)
         end)
     ScubaSounds:CreateLabel(page, sendGuildMessages, ScubaSounds_SendGuildMessages)
 
-    -- How the secrets work, for players new to the addon
+    -- Only the prank target, and only once the addon has said it for him at least once
+    local prank = ScubaSounds_Options.StartAttackPrank
+    local tartattack = ScubaSounds:CreateCheckbox(page, GRID_LEFT, -31 - 3 * (ROW_HEIGHT + 4), prank.enabled,
+        function(checked)
+            prank.enabled = checked
+        end)
+    ScubaSounds:CreateLabel(page, tartattack, "Say \"" .. ScubaSounds.Data.StartAttackPrankMessage .. "\" in guild chat")
+
+    -- How the secrets work, for players new to the addon. Below the prank's checkbox when it shows
     local heading = page:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-    heading:SetPoint("TOPLEFT", GRID_LEFT + 4, -31 - 3 * (ROW_HEIGHT + 4) - 16)
     heading:SetText("Secret sounds")
+    page:SetScript("OnShow", function()
+        local showPrank = prank.fired and ScubaSounds:IsStartAttackPrankTarget() or false
+        tartattack:SetShown(showPrank)
+        tartattack:SetChecked(prank.enabled)
+        heading:ClearAllPoints()
+        heading:SetPoint("TOPLEFT", GRID_LEFT + 4, -31 - (showPrank and 4 or 3) * (ROW_HEIGHT + 4) - 16)
+    end)
     local text = page:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
     text:SetPoint("TOPLEFT", heading, "BOTTOMLEFT", 0, -6)
     text:SetWidth(OPTIONS_WIDTH - 2 * GRID_LEFT - 16)

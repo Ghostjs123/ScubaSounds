@@ -128,7 +128,7 @@ ScubaSounds.Data.DeathSoundMap = {
     [Uncletouches] = {"BallsATug"},
     [Vimy] = {"Frenchie"},
     [Vitoli] = {"VitoliSuxDix"},
-    [Zarix] = {"MyGlasses"}
+    [Zarix] = {"MyGlasses", "Pathetic"}
 }
 ScubaSounds.Data.DeviceDeathSoundRotation = {Kaemo, Stavis}
 
