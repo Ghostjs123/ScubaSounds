@@ -940,7 +940,7 @@ AddTrigger("CatTamed", "Misc", "WW91IHRhbWUgYSBjYXQ=", {"NiceKitty"}, {
     newInForever = true
 })
 
-AddTrigger("PetTamed", "Misc", "WW91IHRhbWUgYSBiZWFzdA==", {"GoodBoy1", "BomboClatt", "MommysBoy", "PapaMeat"}, {
+AddTrigger("PetTamed", "Misc", "WW91IHRhbWUgYSBiZWFzdA==", {"GoodBoy", "BomboClatt", "MommysBoy", "PapaMeat"}, {
     on = "PetTamed",
     noRepeat = 1,
     newInForever = true
@@ -3066,8 +3066,58 @@ end
 -- Saved Options and Secrets (the options window is in Options.lua)
 -- =================================================================
 
+-- Old sound name -> new name. Saved plays, discoveries and settings move over to the new name
+ScubaSounds.Data.RenamedSounds = {
+    GoodBoy1 = "GoodBoy"
+}
+
+local function RenameSavedSound(options, old, new)
+    local function move(t)
+        if t and t[old] ~= nil then
+            t[new] = t[new] or t[old]
+            t[old] = nil
+        end
+    end
+    for _, entries in pairs(options.SoundsHeard or {}) do
+        move(entries)
+    end
+    move(options.GuildHeard)
+    move(options.GuildEarliest and options.GuildEarliest.sounds)
+    -- "<category ID>/<sound>" keys
+    for _, t in ipairs({options.SoundsOff or {}, options.Chance or {}}) do
+        local renamed = {}
+        for key in pairs(t) do
+            local category, sound = key:match("^(.-)/(.+)$")
+            if sound == old then
+                renamed[key] = category .. "/" .. new
+            end
+        end
+        for key, newKey in pairs(renamed) do
+            if t[newKey] == nil then
+                t[newKey] = t[key]
+            end
+            t[key] = nil
+        end
+    end
+    for _, sounds in pairs(options.RecentTriggerSounds or {}) do
+        for i, sound in ipairs(sounds) do
+            if sound == old then
+                sounds[i] = new
+            end
+        end
+    end
+    for _, play in ipairs(options.RecentPlays or {}) do
+        if play.sound == old then
+            play.sound = new
+        end
+    end
+end
+
 function ScubaSounds:InitOptions()
     local options = ScubaSounds_Options
+    for old, new in pairs(ScubaSounds.Data.RenamedSounds) do
+        RenameSavedSound(options, old, new)
+    end
     -- Sounds turned off, per tab: "<category ID>/<sound>" -> true. A sound in two tabs has a checkbox in each
     options.SoundsOff = options.SoundsOff or {}
     -- Older versions saved one on/off per sound; it carries over to every tab the sound is in

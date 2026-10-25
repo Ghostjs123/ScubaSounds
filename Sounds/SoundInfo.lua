@@ -213,7 +213,7 @@ ScubaSounds.Audio.SoundInfo = {
         timeout = 1,
         credit = "Shib"
     },
-    ["GoodBoy1"] = {
+    ["GoodBoy"] = {
         extension = "ogg",
         duration = 7,
         canOverlapSelf = false,
