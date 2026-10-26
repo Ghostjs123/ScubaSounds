@@ -26,6 +26,9 @@ ScubaSounds_EventFrame:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player")
 
 ScubaSounds_EventFrame:RegisterUnitEvent("UNIT_SPELLCAST_START", "player")
 
+-- Hunter pet XP, a second sign of a pet level up. Registered in a pcall since it may not exist in every client
+pcall(ScubaSounds_EventFrame.RegisterUnitEvent, ScubaSounds_EventFrame, "UNIT_PET_EXPERIENCE", "pet")
+
 function ScubaSounds_OnEvent(self, event, ...)
     local handler = ScubaSounds.Events[event]
     if handler then
@@ -103,6 +106,7 @@ function ScubaSounds.Events:ADDON_LOADED(addonName)
         ScubaSounds:SetUpInputFocusRelease()
         ScubaSounds:HookMerchantBuys()
         ScubaSounds:BuildOptionsFrame()
+        ScubaSounds:CreateMinimapButton()
         if ScubaSounds.State.ShowOptionsOnLoad then
             ScubaSounds:ShowOptions()
         end
@@ -322,7 +326,7 @@ end
 function ScubaSounds.Events:PLAYER_REGEN_ENABLED()
     ScubaSounds:HandleCombatEnded()
     if ScubaSounds.State.PetLevelChangedAt then
-        ScubaSounds:CheckPetLevelUp()
+        ScubaSounds:CheckPetLevelUp("combat ended")
     end
 end
 
@@ -344,7 +348,7 @@ end
 function ScubaSounds.Events:UNIT_PET(unit)
     if unit == "player" then
         local previousGuid = ScubaSounds.State.PetGuid
-        ScubaSounds:CheckPetLevelUp()
+        ScubaSounds:CheckPetLevelUp("UNIT_PET")
         ScubaSounds:CheckPetTamed(previousGuid)
         -- The active pet going away with the stable window open means it went into the stable
         local guid = UnitGUID("pet")
@@ -377,27 +381,60 @@ function ScubaSounds:CheckPetTamed(previousGuid)
     })
 end
 
+-- The pet's level may not read as the new one the moment the event fires, so it's checked again shortly after
 function ScubaSounds.Events:UNIT_LEVEL(unit)
+    if unit ~= "pet" then
+        -- /ss debug pet: the pet under another unit name would be missed, so say so
+        local guid, petGuid = UnitGUID(unit), UnitGUID("pet")
+        if ScubaSounds.State.TracePet and guid and petGuid and not issecretvalue(guid) and not issecretvalue(petGuid) and
+            guid == petGuid then
+            ScubaSounds:TracePet("UNIT_LEVEL", "fired for your pet as \"" .. tostring(unit) .. "\", not \"pet\"")
+        end
+        return
+    end
+    ScubaSounds:CheckPetLevelUp("UNIT_LEVEL")
+    for _, delay in ipairs(ScubaSounds.Data.PetLevelRecheckDelays) do
+        C_Timer.After(delay, function()
+            ScubaSounds:CheckPetLevelUp("UNIT_LEVEL +" .. delay .. "s")
+        end)
+    end
+end
+
+function ScubaSounds.Events:UNIT_PET_EXPERIENCE(unit)
     if unit == "pet" then
-        ScubaSounds:CheckPetLevelUp()
+        ScubaSounds:CheckPetLevelUp("UNIT_PET_EXPERIENCE")
     end
 end
 
 -- The same pet at a higher level than remembered plays. Read as secret (in combat), the remembered pet is kept and
--- checked again when combat ends, timed from when the change happened
-function ScubaSounds:CheckPetLevelUp()
+-- checked again when combat ends, timed from when the change happened. source: what asked, for /ss debug pet
+function ScubaSounds:CheckPetLevelUp(source)
     local state = ScubaSounds.State
     local previousGuid, previousLevel = state.PetGuid, state.PetLevel
     if not ScubaSounds:RememberPet() then
         state.PetLevelChangedAt = state.PetLevelChangedAt or GetTime()
+        ScubaSounds:TracePet(source, "pet unreadable (secret), checking again when combat ends")
         return
     end
     local changedAt = state.PetLevelChangedAt or GetTime()
     state.PetLevelChangedAt = nil
-    if state.PetGuid and state.PetGuid == previousGuid and previousLevel and state.PetLevel > previousLevel and
-        changedAt - state.LastPlayerLevelUp > ScubaSounds.Data.PetLevelUpWithPlayerWindow and
-        ScubaSounds_Options.Categories.LevelUps.petLevelUps then
+    local samePet = state.PetGuid ~= nil and state.PetGuid == previousGuid
+    local leveled = samePet and previousLevel ~= nil and state.PetLevel > previousLevel
+    local withPlayer = changedAt - state.LastPlayerLevelUp <= ScubaSounds.Data.PetLevelUpWithPlayerWindow
+    local optionOn = ScubaSounds_Options.Categories.LevelUps.petLevelUps
+    local plays = leveled and not withPlayer and optionOn
+    ScubaSounds:TracePet(source, string.format("level %s -> %s, same pet %s, with your level up %s, option %s: %s",
+        tostring(previousLevel), tostring(state.PetLevel), tostring(samePet), tostring(withPlayer), tostring(optionOn),
+        plays and "plays" or "no sound"))
+    if plays then
         ScubaSounds:Fire("LeveledUp")
+    end
+end
+
+-- /ss debug pet: every pet level check printed in chat until turned off
+function ScubaSounds:TracePet(source, text)
+    if ScubaSounds.State.TracePet then
+        ScubaSounds:SendMessage("Pet check (" .. tostring(source) .. "): " .. text)
     end
 end
 

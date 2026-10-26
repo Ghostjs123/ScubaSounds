@@ -284,13 +284,24 @@ function ScubaSounds:DebugCommand(words)
         end
         ScubaSounds:SendMessage(state.ShowHiddenOptions and "Hidden options shown until the window closes" or
                                     "Hidden options back to normal")
+    elseif words[2] == "pet" then
+        -- /ss debug pet: prints every pet level check (what fired, the levels, and why it did or didn't play) until
+        -- turned off or /reload, with what's remembered about the pet right now
+        local state = ScubaSounds.State
+        state.TracePet = not state.TracePet
+        local guid, level = UnitGUID("pet"), UnitLevel("pet")
+        ScubaSounds:SendMessage(string.format("Pet level tracing %s. Remembered: level %s%s. Now: %s",
+            state.TracePet and "on" or "off", tostring(state.PetLevel), state.PetGuid and "" or " (no pet remembered)",
+            (issecretvalue(guid) or issecretvalue(level)) and "secret" or
+                (guid and ("level " .. tostring(level)) or "no pet out")))
     else
         ScubaSounds:PrintCommands("Debug commands (only print here, nothing is sent or unlocked):", {
             {"/ss debug chatlink <sound>", "the sound's link for each of its tabs"},
             {"/ss debug discovery <sound>", "the guild message posted when it's first unlocked"},
             {"/ss debug awaydiscoveries (or ao) [count]", "the login summary, for count random sounds (default 12)"},
             {"/ss debug levelup (or lo)", "play the next level-up jingle of a pretend round"},
-            {"/ss debug hidden", "show or hide options other characters get, while the options window is open"}
+            {"/ss debug hidden", "show or hide options other characters get, while the options window is open"},
+            {"/ss debug pet", "print every pet level check, to see why a pet level up did or didn't play"}
         })
     end
 end

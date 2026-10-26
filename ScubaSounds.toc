@@ -18,5 +18,6 @@ Guild.lua
 Detectors.lua
 Events.lua
 SlashCommands.lua
+MinimapButton.lua
 Options.lua
 ScubaSounds.xml

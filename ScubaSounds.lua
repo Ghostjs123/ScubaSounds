@@ -268,6 +268,7 @@ ScubaSounds.Data.CopperPerGold = 10000
 -- Leveling
 ScubaSounds.Data.MaxLevel = 60
 ScubaSounds.Data.PetLevelUpWithPlayerWindow = 2 -- seconds; a pet leveling with you (warlock demons) counts once
+ScubaSounds.Data.PetLevelRecheckDelays = {0.5, 2} -- seconds after a pet UNIT_LEVEL, in case its level reads late
 
 -- Red error messages for lacking an item, by GetGameMessageInfo name (any the client lacks just never match)
 ScubaSounds.Data.MissingItemErrors = {

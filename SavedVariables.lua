@@ -89,7 +89,7 @@ function ScubaSounds:InitOptions()
         options[ScubaSounds_GuildDeaths] = true
     end
     if options[ScubaSounds_PlayDiscoveries] == nil then
-        options[ScubaSounds_PlayDiscoveries] = true
+        options[ScubaSounds_PlayDiscoveries] = false
     end
     options.Categories = options.Categories or {}
     for _, category in ipairs(ScubaSounds.Data.Categories) do
@@ -138,6 +138,11 @@ function ScubaSounds:InitOptions()
     options.GuildEarliest.triggers = options.GuildEarliest.triggers or {}
     ScubaSounds:SeedEarliest()
     options.StatsView = options.StatsView or "guild" -- Stats tab: "guild" or "myself"
+    -- The minimap button: angle around the minimap in degrees (225 = bottom left), hidden from the Options tab
+    options.Minimap = options.Minimap or {
+        angle = 225,
+        hidden = false
+    }
     -- Stats tab order: column "sound", "tab", "first" or "plays"
     options.StatsSort = options.StatsSort or {
         column = "sound",

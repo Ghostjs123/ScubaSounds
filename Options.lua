@@ -90,7 +90,7 @@ local STATS_COLUMNS = { -- x offset and width of each Stats tab column
     plays = {560, 75}
 }
 local STATS_SORT_ARROW_SIZE = {9, 8}
-local PRANK_CHECKBOX_X = 340 -- Options tab: Bobmoney's checkbox, right of "Send messages in guild"
+local RIGHT_COLUMN_X = 340 -- Options tab: the second column of checkboxes (minimap button, Bobmoney's prank)
 local TEXT_PLAY_BUTTON_SIZE = 16 -- a play button inside a line of text (Stats rows, Notable Loot list headers)
 local QUESTION_MARK_ICON = 134400 -- INV_Misc_QuestionMark, for an ID the client doesn't know
 
@@ -1193,6 +1193,12 @@ function ScubaSounds:CreateGlobalOptionsPage(frame)
         end)
     ScubaSounds:CreateLabel(page, outsideRaid, ScubaSounds_PlayOutsideRaid)
 
+    local minimapButton = ScubaSounds:CreateCheckbox(page, GRID_LEFT + RIGHT_COLUMN_X, -31,
+        not ScubaSounds_Options.Minimap.hidden, function(checked)
+            ScubaSounds:SetMinimapButtonShown(checked)
+        end)
+    ScubaSounds:CreateLabel(page, minimapButton, "Show minimap button")
+
     local disableSounds = ScubaSounds:CreateCheckbox(page, GRID_LEFT, -31 - ROW_HEIGHT - 4,
         ScubaSounds_Options[ScubaSounds_DisableSounds], function(checked)
             ScubaSounds:SetSoundsDisabled(checked)
@@ -1221,7 +1227,7 @@ function ScubaSounds:CreateGlobalOptionsPage(frame)
     -- Only the prank target, and only once the addon has said it for him at least once. Beside "Send messages in
     -- guild" (it's guild chat too), so showing it doesn't move anything
     local prank = ScubaSounds_Options.StartAttackPrank
-    local tartattack = ScubaSounds:CreateCheckbox(page, GRID_LEFT + PRANK_CHECKBOX_X, -31 - 2 * (ROW_HEIGHT + 4),
+    local tartattack = ScubaSounds:CreateCheckbox(page, GRID_LEFT + RIGHT_COLUMN_X, -31 - 2 * (ROW_HEIGHT + 4),
         prank.enabled,
         function(checked)
             prank.enabled = checked

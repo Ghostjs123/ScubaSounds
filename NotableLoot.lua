@@ -174,6 +174,24 @@ ScubaSounds.Data.NotableLoot = {{
             13505, -- Runeblade of Baron Rivendare
             13353, -- Book of the Dead
             18401, -- Nostro's Compendium of Dragon Slaying
+            10847, -- Dragon's Call (Shade of Eranikus, Sunken Temple)
+            12462, -- Embrace of the Wind Serpent (Avatar of Hakkar, Sunken Temple)
+            273811, -- Repurposed Rack (Forever, Hamhock in the Stockade)
+        }
+    }, {
+        name = "Rare Dungeon Drops",
+        -- Dungeon trash drops under 0.1% in Wowhead's Classic Era data, by dungeon, rarest first
+        items = {
+            1482, -- Shadowfang (Shadowfang)
+            1935, -- Assassin's Blade (Shadowfang)
+            9491, -- Hotshot Pilot's Gloves (Gnomeregan)
+            9429, -- Miner's Hat of the Deep (Uldaman)
+            9424, -- Ginn-su Sword (Uldaman)
+            9465, -- Digmaster 5000 (Uldaman)
+            9425, -- Pendulum of Doom (Uldaman)
+            9431, -- Papal Fez (Uldaman)
+            17061, -- Juno's Shadow (Stratholme)
+            18736, -- Plaguehound Leggings (Stratholme)
         }
     }, {
         name = "Level 40 Mounts",
