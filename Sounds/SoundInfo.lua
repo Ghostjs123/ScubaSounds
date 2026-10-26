@@ -60,6 +60,13 @@ ScubaSounds.Audio.SoundInfo = {
         timeout = 1,
         credit = "Shib"
     },
+    ["BeastObeyMe"] = {
+        extension = "ogg",
+        duration = 5,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Keyteor"
+    },
     ["BeforeWar"] = {
         extension = "ogg",
         duration = 4,
@@ -759,20 +766,34 @@ ScubaSounds.Audio.SoundInfo = {
 -- LevelUpDefaults
 ScubaSounds.Data.LevelUpSounds = {
     Diablo2LevelUp = {duration = 2},
+    DragonQuestLevelUp = {duration = 3},
+    EldenRingVictory = {duration = 7},
+    Fallout3LevelUp = {duration = 11},
     FF7Victory = {duration = 4},
+    FFXIVLevelUp = {duration = 7},
+    FireEmblemLevelUp = {duration = 2},
+    FlawlessVictory = {duration = 2},
     GoldenSunVictory = {duration = 5},
     Mario1Up = {duration = 1},
+    Mario64StarGet = {duration = 3},
     MarioPowerUp = {duration = 1},
+    MinecraftLevelUp = {duration = 2},
     PokemonLevelUp = {duration = 3},
+    ProtossUpgrade = {duration = 2},
     RuneScapeLevelUp = {duration = 3},
+    SkyrimLevelUp = {duration = 8},
+    Sonic3OneUp = {duration = 3},
+    SunshineShineGet = {duration = 6},
     SuperSaiyan = {
         extension = "wav",
         duration = 19,
         timeout = 60,
-        credit = "Kaymon"
+        credit = "Kaymon",
+        delay = 0
     },
     Warcraft3LevelUp = {duration = 3},
     YouDoButYouDont = {duration = 2},
+    ZeldaHeartContainer = {duration = 4},
     ZeldaItemGet = {duration = 2}
 }
 ScubaSounds.Data.LevelUpDefaults = {
@@ -780,7 +801,9 @@ ScubaSounds.Data.LevelUpDefaults = {
     canOverlapSelf = false,
     timeout = 1,
     credit = "Jujewmagic",
-    folder = "LevelUp"
+    folder = "LevelUp",
+    -- Seconds after the trigger, so the jingle doesn't land on top of the game's own level-up sound
+    delay = 1
 }
 for sound, overrides in pairs(ScubaSounds.Data.LevelUpSounds) do
     local info = {}

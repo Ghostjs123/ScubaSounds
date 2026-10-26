@@ -1,4 +1,4 @@
--- ScubaSounds: the options window (/ss options). Loaded after ScubaSounds.lua (see ScubaSounds.toc); everything here
+-- ScubaSounds: the options window (/ss options). Loaded after the other addon files (see ScubaSounds.toc); everything here
 -- runs once the addon has loaded
 local _G = _G
 local CreateFrame = _G.CreateFrame
@@ -89,6 +89,8 @@ local STATS_COLUMNS = { -- x offset and width of each Stats tab column
     first = {340, 215},
     plays = {560, 75}
 }
+local STATS_SORT_ARROW_SIZE = {9, 8}
+local PRANK_CHECKBOX_X = 340 -- Options tab: Bobmoney's checkbox, right of "Send messages in guild"
 local TEXT_PLAY_BUTTON_SIZE = 16 -- a play button inside a line of text (Stats rows, Notable Loot list headers)
 local QUESTION_MARK_ICON = 134400 -- INV_Misc_QuestionMark, for an ID the client doesn't know
 
@@ -281,6 +283,11 @@ function ScubaSounds:AddSoundTooltipLines(sound, category)
     local credit = ScubaSounds.Audio.SoundInfo[sound].credit
     if credit and not showsCredit then
         GameTooltip:AddLine("Credit " .. credit, 1, 1, 1, true)
+    end
+    -- The same name the Stats tab's guild view shows
+    local first = ScubaSounds:SoundListeners(sound)[1]
+    if first then
+        GameTooltip:AddLine("First discovered by " .. first.name, 0.66, 0.66, 0.66, true)
     end
     for _, trigger in ipairs(ScubaSounds.Data.Triggers) do
         if trigger.category ~= category.id and ScubaSounds:HasValue(trigger.sounds, sound) then
@@ -859,10 +866,32 @@ function ScubaSounds:CreateStatsPage(frame)
     local header = CreateFrame("Frame", nil, page)
     header:SetPoint("TOPLEFT", GRID_LEFT, -76)
     header:SetSize(width, 16)
-    CreateStatsColumn(header, "sound", "GameFontNormalSmall"):SetText("Sound")
-    CreateStatsColumn(header, "tab", "GameFontNormalSmall"):SetText("Tab")
-    ui.FirstHeader = CreateStatsColumn(header, "first", "GameFontNormalSmall")
-    ui.PlaysHeader = CreateStatsColumn(header, "plays", "GameFontNormalSmall", "RIGHT")
+    -- Clicking a header sorts by it (again flips the order); an arrow right of the sorted one shows which way
+    ui.Headers = {}
+    local function addHeader(column, justify)
+        local text = CreateStatsColumn(header, column, "GameFontNormalSmall", justify)
+        local button = CreateFrame("Button", nil, header)
+        button:SetAllPoints(text)
+        button:SetScript("OnClick", function()
+            ScubaSounds:SortStatsBy(column)
+        end)
+        button:SetScript("OnEnter", function(self)
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip:SetText("Click to sort", 1, 1, 1)
+            GameTooltip:Show()
+        end)
+        button:SetScript("OnLeave", GameTooltip_Hide)
+        text.Arrow = header:CreateTexture(nil, "ARTWORK")
+        text.Arrow:SetTexture("Interface\\Buttons\\UI-SortArrow")
+        text.Arrow:SetSize(STATS_SORT_ARROW_SIZE[1], STATS_SORT_ARROW_SIZE[2])
+        text.Justify = justify
+        ui.Headers[column] = text
+        return text
+    end
+    addHeader("sound"):SetText("Sound")
+    addHeader("tab"):SetText("Tab")
+    ui.FirstHeader = addHeader("first")
+    ui.PlaysHeader = addHeader("plays", "RIGHT")
     local separator = page:CreateTexture(nil, "ARTWORK")
     separator:SetColorTexture(0.35, 0.33, 0.27, 1)
     separator:SetHeight(1)
@@ -912,7 +941,8 @@ function ScubaSounds:CreateStatsPage(frame)
         row.Sound:SetPoint("LEFT", play, "RIGHT", 4, 0)
         row.Sound:SetWidth(STATS_COLUMNS.sound[2] - TEXT_PLAY_BUTTON_SIZE - 4)
         row.Sound:SetText(sound)
-        CreateStatsColumn(row, "tab", "GameFontHighlightSmall"):SetText(table.concat(soundTabs[sound] or {}, ", "))
+        row.TabText = table.concat(soundTabs[sound] or {}, ", ")
+        CreateStatsColumn(row, "tab", "GameFontHighlightSmall"):SetText(row.TabText)
         row.First = CreateStatsColumn(row, "first", "GameFontHighlightSmall")
         row.Plays = CreateStatsColumn(row, "plays", "GameFontHighlightSmall", "RIGHT")
         row:SetScript("OnEnter", function(self)
@@ -990,6 +1020,74 @@ local function FormatStatsTime(serverTime)
     return date("%b %d %Y, %H:%M", serverTime)
 end
 
+-- Same column flips the order; a new one starts ascending, except Plays, which starts with the most played
+function ScubaSounds:SortStatsBy(column)
+    local sort = ScubaSounds_Options.StatsSort
+    if sort.column == column then
+        sort.ascending = not sort.ascending
+    else
+        sort.column, sort.ascending = column, column ~= "plays"
+    end
+    ScubaSounds:RefreshStatsPage()
+end
+
+-- What a row sorts by in each column; nil for a sound nobody has heard (those stay at the bottom either way)
+local STATS_SORT_VALUES = {
+    sound = function(row)
+        return strlower(row.SoundName)
+    end,
+    tab = function(row)
+        return strlower(row.TabText)
+    end,
+    first = function(row)
+        return row.FirstHeardAt
+    end,
+    plays = function(row)
+        return row.PlayCount
+    end
+}
+
+local function SortStatsRows(ui)
+    local sort = ScubaSounds_Options.StatsSort
+    local value = STATS_SORT_VALUES[sort.column] or STATS_SORT_VALUES.sound
+    local ordered = {}
+    for i, row in ipairs(ui.Rows) do
+        ordered[i] = row
+    end
+    table.sort(ordered, function(a, b)
+        local va, vb = value(a), value(b)
+        if (va == nil) ~= (vb == nil) then
+            return va ~= nil
+        elseif va ~= nil and va ~= vb then
+            if sort.ascending then
+                return va < vb
+            end
+            return va > vb
+        end
+        return strlower(a.SoundName) < strlower(b.SoundName)
+    end)
+    for i, row in ipairs(ordered) do
+        row:ClearAllPoints()
+        row:SetPoint("TOPLEFT", 0, -(i - 1) * ROW_HEIGHT)
+    end
+    -- UI-SortArrow points down; flipped for ascending
+    for column, text in pairs(ui.Headers) do
+        local arrow = text.Arrow
+        arrow:SetShown(column == sort.column)
+        arrow:ClearAllPoints()
+        if text.Justify == "RIGHT" then
+            arrow:SetPoint("LEFT", text, "RIGHT", 2, 0)
+        else
+            arrow:SetPoint("LEFT", text, "LEFT", text:GetStringWidth() + 3, 0)
+        end
+        if sort.ascending then
+            arrow:SetTexCoord(0, 0.5625, 1, 0)
+        else
+            arrow:SetTexCoord(0, 0.5625, 0, 1)
+        end
+    end
+end
+
 function ScubaSounds:RefreshStatsPage()
     local ui = ScubaSounds.UI.Stats
     if not ui then
@@ -1022,6 +1120,8 @@ function ScubaSounds:RefreshStatsPage()
             totalPlays = totalPlays + plays
         end
         local heard = #listeners > 0
+        row.FirstHeardAt = heard and listeners[1].first or nil
+        row.PlayCount = heard and plays or nil
         local color = heard and LABEL_COLOR or DISABLED_COLOR
         row.Sound:SetTextColor(unpack(heard and NAME_COLOR or NAME_DISABLED_COLOR))
         row.First:SetTextColor(unpack(color))
@@ -1036,6 +1136,7 @@ function ScubaSounds:RefreshStatsPage()
             row.Plays:SetText("")
         end
     end
+    SortStatsRows(ui)
     if isGuild then
         local characters = {}
         for character in pairs(ScubaSounds_Options.GuildReporters) do
@@ -1062,6 +1163,10 @@ function ScubaSounds:ShowStatsTooltip(row)
                           ScubaSounds:OwnSoundListeners(row.SoundName)
     GameTooltip:SetOwner(row, "ANCHOR_RIGHT")
     GameTooltip:AddLine(row.SoundName)
+    local first = ScubaSounds:SoundListeners(row.SoundName)[1]
+    if first then
+        GameTooltip:AddLine("First discovered by " .. first.name, 0.66, 0.66, 0.66)
+    end
     if #listeners == 0 then
         GameTooltip:AddLine("Nobody has heard this yet", 0.5, 0.5, 0.5)
     end
@@ -1101,36 +1206,61 @@ function ScubaSounds:CreateGlobalOptionsPage(frame)
         end)
     ScubaSounds:CreateLabel(page, sendGuildMessages, ScubaSounds_SendGuildMessages)
 
-    -- Only the prank target, and only once the addon has said it for him at least once
+    local guildDeaths = ScubaSounds:CreateCheckbox(page, GRID_LEFT, -31 - 3 * (ROW_HEIGHT + 4),
+        ScubaSounds_Options[ScubaSounds_GuildDeaths], function(checked)
+            ScubaSounds_Options[ScubaSounds_GuildDeaths] = checked
+        end)
+    ScubaSounds:CreateLabel(page, guildDeaths, ScubaSounds_GuildDeaths)
+
+    local playDiscoveries = ScubaSounds:CreateCheckbox(page, GRID_LEFT, -31 - 4 * (ROW_HEIGHT + 4),
+        ScubaSounds_Options[ScubaSounds_PlayDiscoveries], function(checked)
+            ScubaSounds_Options[ScubaSounds_PlayDiscoveries] = checked
+        end)
+    ScubaSounds:CreateLabel(page, playDiscoveries, ScubaSounds_PlayDiscoveries)
+
+    -- Only the prank target, and only once the addon has said it for him at least once. Beside "Send messages in
+    -- guild" (it's guild chat too), so showing it doesn't move anything
     local prank = ScubaSounds_Options.StartAttackPrank
-    local tartattack = ScubaSounds:CreateCheckbox(page, GRID_LEFT, -31 - 3 * (ROW_HEIGHT + 4), prank.enabled,
+    local tartattack = ScubaSounds:CreateCheckbox(page, GRID_LEFT + PRANK_CHECKBOX_X, -31 - 2 * (ROW_HEIGHT + 4),
+        prank.enabled,
         function(checked)
             prank.enabled = checked
         end)
-    ScubaSounds:CreateLabel(page, tartattack, "Say \"" .. ScubaSounds.Data.StartAttackPrankMessage .. "\" in guild chat")
+    -- The label belongs to the checkbox, so hiding the checkbox hides its text too
+    ScubaSounds:CreateLabel(tartattack, tartattack, "Say \"" .. ScubaSounds.Data.StartAttackPrankMessage .. "\" in guild chat")
 
-    -- How the secrets work, for players new to the addon. Below the prank's checkbox when it shows
+    -- How the secrets work, for players new to the addon, below the checkboxes
     local heading = page:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     heading:SetText("Secret sounds")
-    page:SetScript("OnShow", function()
-        local showPrank = prank.fired and ScubaSounds:IsStartAttackPrankTarget() or false
+    heading:SetPoint("TOPLEFT", GRID_LEFT + 4, -31 - 5 * (ROW_HEIGHT + 4) - 16)
+    -- /ss debug hidden shows it anyway until the window closes
+    local function updatePrank()
+        local showPrank = prank.fired and ScubaSounds:IsStartAttackPrankTarget() or ScubaSounds.State.ShowHiddenOptions or
+                              false
         tartattack:SetShown(showPrank)
         tartattack:SetChecked(prank.enabled)
-        heading:ClearAllPoints()
-        heading:SetPoint("TOPLEFT", GRID_LEFT + 4, -31 - (showPrank and 4 or 3) * (ROW_HEIGHT + 4) - 16)
+    end
+    page:SetScript("OnShow", updatePrank)
+    updatePrank() -- the page may already be showing (the last tab used), so OnShow won't run first
+    ScubaSounds.UI.UpdateHiddenOptions = updatePrank
+    frame:HookScript("OnHide", function()
+        if ScubaSounds.State.ShowHiddenOptions then
+            ScubaSounds.State.ShowHiddenOptions = false
+            updatePrank()
+        end
     end)
     local text = page:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
     text:SetPoint("TOPLEFT", heading, "BOTTOMLEFT", 0, -6)
     text:SetWidth(OPTIONS_WIDTH - 2 * GRID_LEFT - 16)
     text:SetJustifyH("LEFT")
-    text:SetSpacing(3)
+    text:SetSpacing(2)
     text:SetText(table.concat({
         "Every sound starts out secret. Its hovercard only says \"Still a secret\" (or \"New in Forever\" for sounds " ..
             "added for Forever) until someone in the guild sets it off for real.",
         "|cff4de566Green|r names haven't been heard by anyone in the guild yet. Once someone hears one, it turns " ..
             "|cffffd100gold|r and its hovercard shows what sets it off. A sound with several triggers reveals each one " ..
             "separately, when that trigger happens.",
-        "The first discovery of each trigger is announced in guild chat. Click the sound in that message to hear it, " ..
+        "The first discovery of each sound and each trigger is announced in guild chat. Click the sound in that message to hear it, " ..
             "or shift-click it to open its tab here. When you log in, your chat lists everything the guild found while " ..
             "you were away.",
         "Previewing a sound with its play button never counts as hearing it, so try them all. The Stats tab shows who " ..

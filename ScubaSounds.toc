@@ -10,5 +10,13 @@ Sounds\SoundInfo.lua
 PlayerNames.lua
 NotableLoot.lua
 ScubaSounds.lua
+Triggers.lua
+Util.lua
+Audio.lua
+SavedVariables.lua
+Guild.lua
+Detectors.lua
+Events.lua
+SlashCommands.lua
 Options.lua
 ScubaSounds.xml

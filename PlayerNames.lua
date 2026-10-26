@@ -132,7 +132,7 @@ ScubaSounds.Data.DeathSoundMap = {
 }
 ScubaSounds.Data.DeviceDeathSoundRotation = {Kaemo, Stavis}
 
--- For ScubaSounds.lua, which can't see the locals above
+-- For the other files, which can't see the locals above
 ScubaSounds.Data.TrueNames = {
     Arenthis = Arenthis,
     Beaten = Beaten,
