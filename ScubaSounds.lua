@@ -42,6 +42,18 @@ ScubaSounds.Data.CraftedByPattern = FormatToPattern(ITEM_CREATED_BY) -- "<Made b
 -- Riding skill chat lines: "Your skill in %s has increased to %d." and "You have gained the %s skill."
 ScubaSounds.Data.SkillRankUpPattern = FormatToPattern(SKILL_RANK_UP, true)
 ScubaSounds.Data.SkillGainedPattern = FormatToPattern(ERR_SKILL_GAINED_S, true)
+-- Exploring a new area: "Discovered: %s" (center of the screen) or "Discovered %s: %d experience gained"
+ScubaSounds.Data.ExploredPatterns = {}
+for _, format in ipairs({ERR_ZONE_EXPLORED, ERR_ZONE_EXPLORED_XP}) do
+    if type(format) == "string" then
+        table.insert(ScubaSounds.Data.ExploredPatterns, FormatToPattern(format, true))
+    end
+end
+-- "<place> is now your home." when the hearthstone is set (a backup for HEARTHSTONE_BOUND)
+ScubaSounds.Data.HearthBoundPattern = type(ERR_DEATHBIND_SUCCESS_S) == "string" and
+                                          FormatToPattern(ERR_DEATHBIND_SUCCESS_S, true) or "^(.+) is now your home%.$"
+-- The event and the chat line both arrive for one bind; within this many seconds it counts once
+ScubaSounds.Data.HearthBoundRepeatWindow = 2
 -- "You are now %s with %s." when a reputation standing changes
 ScubaSounds.Data.FactionStandingPattern = FormatToPattern(FACTION_STANDING_CHANGED, true)
 
@@ -96,6 +108,26 @@ ScubaSounds.Data.OutOfManaCooldown = 5 * 60 -- seconds
 -- On the frog trigger rather than the sound, so the one-time murloc kill can't be swallowed by it
 ScubaSounds.Data.FrogKilledCooldown = 2 * 60 -- seconds
 ScubaSounds.Data.LevelUpAnnounceDelay = 2 -- seconds
+-- Our own chat messages with one of these as a whole word (any case) can play Profanity
+ScubaSounds.Data.ProfanityWords = {"fuck", "fucking"}
+-- Using one of these items (bags, action bars, /use) can play AnotherDude. Item ID -> true
+ScubaSounds.Data.DelightItemIds = {
+    [6657] = true, -- Savory Deviate Delight
+    [251525] = true -- Savory Whimsyfin Delight (Forever)
+}
+-- One press can reach more than one of the item-use hooks; within this many seconds it counts once
+ScubaSounds.Data.ItemUseRepeatWindow = 1
+-- The one-time sounds "Replay one-time sounds every time" plays again, for its tooltip
+ScubaSounds.Data.ReplayOneTimeSounds = {
+    "Gold milestones (100g, 1000g, 5000g): when your gold climbs past one again",
+    "First ring, first bag, first green or better weapon: any one this character hasn't worn before (swapping gear " ..
+        "you've already worn, like an Outfitter set, stays quiet)",
+    "First Bestial Wrath, first Arcane Missiles: every cast",
+    "First murloc kill: every murloc killing blow",
+    "First lava damage (MansNotHot): each new step into lava, at most every 3 minutes",
+    "Discovering Raven Hill (Cemetery): each visit to Raven Hill or its cemetery, at most every 3 minutes",
+    "First death at level 12+ (StupidMistakes, OhNo): every death at 12+, and it replaces your own death sound"
+}
 -- Trigger cooldowns longer than this many seconds are saved, so a /reload doesn't reset them
 ScubaSounds.Data.SavedCooldownMin = 60
 
@@ -145,11 +177,36 @@ ScubaSounds.Data.BasicCampfireSpellName = "Basic Campfire"
 -- Taming: a Tame Beast cast, then a pet we haven't seen within the window. Matched by ID or name like the spells above
 ScubaSounds.Data.TameBeastSpellId = 1515
 ScubaSounds.Data.TameBeastSpellName = "Tame Beast"
--- A character's first Bestial Wrath cast plays once, ever (per character)
-ScubaSounds.Data.BestialWrathSpellId = 19574
-ScubaSounds.Data.BestialWrathSpellName = "Bestial Wrath"
+-- A character's first cast of each of these plays once, ever (per character). Matched by spell ID (every rank) or
+-- by name, in case Forever's IDs differ. kind -> {spellIds, name, event}
+ScubaSounds.Data.FirstCasts = {
+    bestialWrath = {
+        spellIds = {
+            [19574] = true
+        },
+        name = "Bestial Wrath",
+        event = "FirstBestialWrath"
+    },
+    arcaneMissiles = {
+        spellIds = {
+            [5143] = true,
+            [5144] = true,
+            [5145] = true,
+            [8416] = true,
+            [8417] = true,
+            [10211] = true,
+            [10212] = true,
+            [25345] = true
+        },
+        name = "Arcane Missiles",
+        event = "FirstArcaneMissiles"
+    }
+}
+-- A channelled spell can report both its channel starting and succeeding; within this many seconds it counts once
+ScubaSounds.Data.FirstCastRepeatWindow = 1
 ScubaSounds.Data.TameWindow = 25 -- seconds; the channel takes about 20
 ScubaSounds.Data.CatFamilyName = "Cat" -- UnitCreatureFamily for lions, tigers, panthers, lynxes and nightsabers
+ScubaSounds.Data.WolfFamilyName = "Wolf" -- UnitCreatureFamily for wolves and worgs
 -- Camping: resting emotes near a campfire earn its buffs. Matched by ID or name like the spells above
 ScubaSounds.Data.CampfireNearbySpellId = 1283391
 ScubaSounds.Data.CampfireNearbyName = "Campfire Nearby"
@@ -169,6 +226,21 @@ ScubaSounds.Data.RidingRankTiers = {
 
 -- Damage schools
 ScubaSounds.Data.FireSchoolMask = 4
+-- Lava: an out-of-combat fire tick at least this big (campfires and braziers tick far lower)
+ScubaSounds.Data.LavaMinDamage = 50
+-- "Replay one-time sounds every time": a new lava entry is a tick after this long out of lava, replayed at most
+-- once per LavaReplayCooldown
+ScubaSounds.Data.LavaReentryGap = 5 -- seconds
+ScubaSounds.Data.LavaReplayCooldown = 3 * 60 -- seconds
+-- Discovering either of these Duskwood areas plays Cemetery, once per character (lowercased area names). With
+-- "Replay one-time sounds every time", entering one again replays it, at most once per CemeteryReplayCooldown
+ScubaSounds.Data.CemeteryAreas = {
+    ["raven hill"] = true,
+    ["raven hill cemetery"] = true
+}
+ScubaSounds.Data.CemeteryReplayCooldown = 3 * 60 -- seconds
+-- Entering one without its discovery message this long after means it was explored before: counted, silently
+ScubaSounds.Data.CemeteryDiscoveryWait = 2 -- seconds
 
 -- Group wipe
 ScubaSounds.Data.MinWipeGroupSize = 5
@@ -376,6 +448,8 @@ ScubaSounds.Data.BlockedChatRetry = 5 -- seconds between tries while guild chat 
 ScubaSounds.Data.BlockedChatGiveUp = 3600 -- seconds
 -- Guild broadcasts: COMMAND:<player>:key=value;key=value. Info for building on later, clients ignore unknown commands
 ScubaSounds_DiedCommand = "DIED"
+-- PLAYED:<player>:s=<sound>;c=<category ID>: every sound a client plays, for "Play every sound"
+ScubaSounds_PlayedCommand = "PLAYED"
 ScubaSounds_MaxLevelCommand = "LEVEL60" -- every guild member plays the max level sound
 ScubaSounds_GoldMilestoneCommand = "GOLD" -- GOLD:<player>:g=<gold>, every guild member plays that milestone's sound
 ScubaSounds.GuildEvents = {} -- receive hooks: ScubaSounds.GuildEvents[command] = function(self, playerName, fields)
@@ -390,6 +464,14 @@ ScubaSounds.Data.StatsRequestDelay = 10 -- seconds after logging in, once the gu
 ScubaSounds.Data.GuildDeathMaxAge = 15 -- seconds
 ScubaSounds.Data.GuildDeathWait = 1.5 -- seconds
 ScubaSounds.Data.GuildDeathDuplicateWindow = 20 -- seconds
+-- A character's first death at FirstDeathMinLevel or higher plays a FirstDeath sound for the whole guild instead of
+-- their death sound, and posts FirstDeathMessage (with the character's name) in guild chat. Death sounds for deaths
+-- seen here wait FirstDeathWait seconds for the dying player's DIED message, which says whether it's their first
+ScubaSounds.Data.FirstDeathMinLevel = 12
+ScubaSounds.Data.FirstDeathWait = 1 -- seconds
+ScubaSounds.Data.FirstDeathMessage = "Alert: Retard (%s) has died"
+-- "Play every sound": a guildmate's play arriving later than this (held up by lockdown) is dropped
+ScubaSounds.Data.PlayedMaxAge = 15 -- seconds
 ScubaSounds.Data.StatsReplyDelay = 30 -- seconds; replies are spread out so the guild doesn't answer at once
 -- The login discoveries summary waits for the whole sync: the request, every reply's random wait, and a few seconds for
 -- the last replies to arrive (they may queue behind other traffic)
@@ -435,6 +517,8 @@ ScubaSounds_NumBagSlots = 4
 ScubaSounds_PlayOutsideRaid = "Play outside of raid"
 ScubaSounds_DisableSounds = "Disable Sounds"
 ScubaSounds_GuildDeaths = "Play guildmates' death sounds when they're not with you"
+ScubaSounds_ReplayOneTime = "Replay one-time sounds every time" -- for us only, never in guild chat
+ScubaSounds_PlayEverySound = "Play every sound" -- every guildmate's plays, with who in our chat (debugging)
 ScubaSounds_PlayDiscoveries = "Play first discovery sounds when found" -- a guildmate's new find plays for us too
 ScubaSounds_SendGuildMessages = "Send messages in guild" -- chat players can read ("ding", "gz nigel"); addon messages always go out
 
@@ -489,6 +573,7 @@ ScubaSounds.Data.WowEvents = {"ADDON_LOADED", "PLAYER_DEAD", "ENCOUNTER_START", 
                               "UNIT_LEVEL", "UNIT_PET", "CHAT_MSG_SYSTEM", "PLAYER_MONEY", "BAG_UPDATE",
                               "PET_STABLE_SHOW", "PET_STABLE_CLOSED", "UNIT_DISPLAYPOWER",
                               "GROUP_ROSTER_UPDATE", "PLAYER_UNGHOST", "UNIT_HEALTH", "PLAYER_GUILD_UPDATE",
+                              "UI_INFO_MESSAGE", "CHAT_MSG_COMBAT_XP_GAIN",
                               "CHAT_MSG_COMBAT_FACTION_CHANGE", "UPDATE_FACTION"}
 -- Unit tokens for you and your group, so the frequent unit events can skip everything else with one lookup
 ScubaSounds.Data.GroupUnitTokens = {
@@ -522,6 +607,9 @@ ScubaSounds.State.ActiveAuras = {}
 ScubaSounds.State.RecentHelloTheresCount = 0
 ScubaSounds.State.RecentDeathSoundsCount = 0
 ScubaSounds.State.FactionStandings = {} -- faction name -> standing ID last seen this session
+ScubaSounds.State.EverySoundPlaying = {} -- "Play every sound": sound -> GetTime() its last play here ends
+ScubaSounds.State.LastFirstCastAt = {} -- first-cast kind -> GetTime() it last counted (see FirstCastRepeatWindow)
+ScubaSounds.State.FirstDeaths = {} -- lowercased full name -> {sound, name, at, replay}: a first death waiting to play
 ScubaSounds.State.SyncedDiscoveries = {} -- guildmate who logged in -> discoveries new to us from their push
 ScubaSounds.State.LocalDeaths = {} -- lowercased full name -> GetTime() of the last death seen here (UNIT_DIED)
 ScubaSounds.State.ResurrectRequested = false

@@ -237,6 +237,7 @@ function ScubaSounds:PlayTrigger(triggerId, pickedSound, ctx)
     if sound == nil or not ScubaSounds:PlaySound(sound) then
         return false
     end
+    ScubaSounds:BroadcastPlayed(sound, trigger.category)
     if recent then
         table.insert(recent, sound)
         while #recent > trigger.noRepeat do
@@ -260,7 +261,8 @@ function ScubaSounds:PlayTrigger(triggerId, pickedSound, ctx)
         time = GetServerTime()
     })
     recentPlays[ScubaSounds.Data.RecentPlaysKept + 1] = nil
-    if isFirstDiscovery then
+    -- A replayed one-time sound ("Replay one-time sounds every time") never posts a discovery in guild chat
+    if isFirstDiscovery and not (ctx and ctx.replay) then
         if trigger.announceDelay then
             C_Timer.After(trigger.announceDelay, function()
                 ScubaSounds:AnnounceDiscovery(trigger, sound, ctx)

@@ -91,6 +91,12 @@ function ScubaSounds:InitOptions()
     if options[ScubaSounds_PlayDiscoveries] == nil then
         options[ScubaSounds_PlayDiscoveries] = false
     end
+    if options[ScubaSounds_ReplayOneTime] == nil then
+        options[ScubaSounds_ReplayOneTime] = false
+    end
+    if options[ScubaSounds_PlayEverySound] == nil then
+        options[ScubaSounds_PlayEverySound] = false
+    end
     options.Categories = options.Categories or {}
     for _, category in ipairs(ScubaSounds.Data.Categories) do
         options.Categories[category.id] = options.Categories[category.id] or {
@@ -174,7 +180,20 @@ function ScubaSounds:InitOptions()
         end
     end
     options.GoldMilestonesDone = options.GoldMilestonesDone or {} -- gold amount -> true, account-wide
-    options.FirstBestialWrathDone = options.FirstBestialWrathDone or {} -- character -> true after their first cast
+    options.FirstDeathDone = options.FirstDeathDone or {} -- character -> true after their first death at 12+
+    options.FirstLavaDone = options.FirstLavaDone or {} -- character -> true after their first lava damage
+    options.CemeteryDone = options.CemeteryDone or {} -- character -> true once Raven Hill (or its cemetery) is found
+    -- First-cast kind ("bestialWrath") -> character -> true after their first cast
+    options.FirstCastDone = options.FirstCastDone or {}
+    for kind in pairs(ScubaSounds.Data.FirstCasts) do
+        options.FirstCastDone[kind] = options.FirstCastDone[kind] or {}
+    end
+    if options.FirstBestialWrathDone then -- saved by the version that only had Bestial Wrath
+        for character in pairs(options.FirstBestialWrathDone) do
+            options.FirstCastDone.bestialWrath[character] = true
+        end
+        options.FirstBestialWrathDone = nil
+    end
     -- Milestone kind -> character -> lowercased profession or faction -> true once announced
     options.MilestonesDone = options.MilestonesDone or {}
     for kind in pairs(ScubaSounds.Data.Milestones) do
@@ -182,6 +201,8 @@ function ScubaSounds:InitOptions()
     end
     -- kind ("ring", "bag") -> character -> true once their first one has counted
     options.FirstEquipDone = options.FirstEquipDone or {}
+    -- kind -> character -> item ID -> true for every qualifying item worn, so replays only play for new gear
+    options.EquippedSeen = options.EquippedSeen or {}
     for kind in pairs(ScubaSounds.Data.FirstEquips) do
         options.FirstEquipDone[kind] = options.FirstEquipDone[kind] or {}
     end

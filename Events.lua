@@ -22,9 +22,18 @@ ScubaSounds_EventFrame:RegisterUnitEvent("UNIT_COMBAT", "player")
 
 ScubaSounds_EventFrame:RegisterUnitEvent("UNIT_AURA", "player")
 
+-- Being charmed (mind controlled) changes the player's unit flags
+ScubaSounds_EventFrame:RegisterUnitEvent("UNIT_FLAGS", "player")
+
 ScubaSounds_EventFrame:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player")
 
 ScubaSounds_EventFrame:RegisterUnitEvent("UNIT_SPELLCAST_START", "player")
+
+-- Channelled spells (Arcane Missiles) may only report their channel starting
+ScubaSounds_EventFrame:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START", "player")
+
+-- Setting the hearthstone. Registered in a pcall since it may not exist in every client (the chat line is the backup)
+pcall(ScubaSounds_EventFrame.RegisterEvent, ScubaSounds_EventFrame, "HEARTHSTONE_BOUND")
 
 -- Hunter pet XP, a second sign of a pet level up. Registered in a pcall since it may not exist in every client
 pcall(ScubaSounds_EventFrame.RegisterUnitEvent, ScubaSounds_EventFrame, "UNIT_PET_EXPERIENCE", "pet")
@@ -99,6 +108,8 @@ function ScubaSounds.Events:ADDON_LOADED(addonName)
         ScubaSounds_EventFrame:UnregisterEvent("ADDON_LOADED")
         ScubaSounds:InitOptions()
         ScubaSounds:HookEmotes()
+        ScubaSounds:HookOutgoingChat()
+        ScubaSounds:HookItemUse()
         ScubaSounds:HookMacroUse()
         ScubaSounds:SetUpDiscoveryLinks()
         ScubaSounds:SetUpWhisperNameCompletion()
@@ -263,14 +274,7 @@ function ScubaSounds.Events:UNIT_SPELLCAST_SUCCEEDED(unitTarget, castGUID, spell
         (not issecretvalue(spellName) and ScubaSounds:EqualsIgnoreCase(spellName, ScubaSounds.Data.TameBeastSpellName)) then
         ScubaSounds.State.TameBeastCastAt = GetTime()
     end
-    if spellId == ScubaSounds.Data.BestialWrathSpellId or
-        (not issecretvalue(spellName) and ScubaSounds:EqualsIgnoreCase(spellName, ScubaSounds.Data.BestialWrathSpellName)) then
-        local done = ScubaSounds_Options.FirstBestialWrathDone
-        if not done[sourceName] then
-            done[sourceName] = true -- used up even if the sound is off or can't play right now
-            ScubaSounds:Fire("FirstBestialWrath")
-        end
-    end
+    ScubaSounds:CheckFirstCast(spellId, spellName, sourceName)
     ScubaSounds:Fire("SpellCast", {
         spellId = spellId,
         spellName = not issecretvalue(spellName) and spellName or nil,
@@ -278,6 +282,41 @@ function ScubaSounds.Events:UNIT_SPELLCAST_SUCCEEDED(unitTarget, castGUID, spell
         sourceUnit = unitTarget,
         isPlayer = unitTarget == "player"
     })
+end
+
+function ScubaSounds.Events:UNIT_SPELLCAST_CHANNEL_START(unitTarget, castGUID, spellId)
+    if issecretvalue(spellId) or unitTarget ~= "player" then
+        return
+    end
+    local sourceName = ScubaSounds:FullName("player")
+    if sourceName then
+        ScubaSounds:CheckFirstCast(spellId, C_Spell.GetSpellName(spellId), sourceName)
+    end
+end
+
+-- A character's first cast of one of Data.FirstCasts fires its event once, ever. With "Replay one-time sounds every
+-- time" on, later casts fire it again as a replay (heard only by us)
+function ScubaSounds:CheckFirstCast(spellId, spellName, character)
+    for kind, firstCast in pairs(ScubaSounds.Data.FirstCasts) do
+        if firstCast.spellIds[spellId] or
+            (not issecretvalue(spellName) and ScubaSounds:EqualsIgnoreCase(spellName, firstCast.name)) then
+            local last = ScubaSounds.State.LastFirstCastAt[kind]
+            if last and GetTime() - last < ScubaSounds.Data.FirstCastRepeatWindow then
+                return -- the same channelled cast, reported twice
+            end
+            ScubaSounds.State.LastFirstCastAt[kind] = GetTime()
+            local done = ScubaSounds_Options.FirstCastDone[kind]
+            if not done[character] then
+                done[character] = true -- used up even if the sound is off or can't play right now
+                ScubaSounds:Fire(firstCast.event)
+            elseif ScubaSounds_Options[ScubaSounds_ReplayOneTime] then
+                ScubaSounds:Fire(firstCast.event, {
+                    replay = true
+                })
+            end
+            return
+        end
+    end
 end
 
 function ScubaSounds.Events:RESURRECT_REQUEST()
@@ -376,8 +415,10 @@ function ScubaSounds:CheckPetTamed(previousGuid)
     end
     state.TameBeastCastAt = nil
     local family = UnitCreatureFamily("pet")
+    family = not issecretvalue(family) and family or nil
     ScubaSounds:Fire("PetTamed", {
-        isCat = not issecretvalue(family) and ScubaSounds:EqualsIgnoreCase(family, ScubaSounds.Data.CatFamilyName)
+        isCat = ScubaSounds:EqualsIgnoreCase(family, ScubaSounds.Data.CatFamilyName),
+        isWolf = ScubaSounds:EqualsIgnoreCase(family, ScubaSounds.Data.WolfFamilyName)
     })
 end
 
@@ -463,6 +504,7 @@ function ScubaSounds.Events:UNIT_COMBAT(unitTarget, action, flagText, amount, sc
         isCrit = not issecretvalue(flagText) and flagText == "CRITICAL",
         inCombat = UnitAffectingCombat("player")
     }
+    ScubaSounds:HandleLavaDamage(ScubaSounds.State.LastPlayerDamage)
 end
 
 function ScubaSounds.Events:PLAYER_ALIVE()
@@ -474,11 +516,39 @@ end
 function ScubaSounds.Events:UNIT_AURA(unitTarget)
     if unitTarget == "player" then
         ScubaSounds:HandlePlayerAura()
+        ScubaSounds:CheckMindControlled()
+    end
+end
+
+function ScubaSounds.Events:UNIT_FLAGS(unitTarget)
+    if unitTarget == "player" then
+        ScubaSounds:CheckMindControlled()
     end
 end
 
 function ScubaSounds.Events:ZONE_CHANGED_NEW_AREA()
     ScubaSounds:HandleZoneChange()
+    ScubaSounds:CheckCemeteryArea()
+end
+
+-- Moving between areas within a zone (Raven Hill and its cemetery are areas of Duskwood)
+function ScubaSounds.Events:ZONE_CHANGED()
+    ScubaSounds:CheckCemeteryArea()
+end
+
+function ScubaSounds.Events:ZONE_CHANGED_INDOORS()
+    ScubaSounds:CheckCemeteryArea()
+end
+
+-- "Discovered: Raven Hill" in the middle of the screen. The message is the first argument in older clients and the
+-- second (after a message type) in newer ones
+function ScubaSounds.Events:UI_INFO_MESSAGE(first, second)
+    ScubaSounds:HandleExploredMessage(type(first) == "string" and first or second)
+end
+
+-- "Discovered Raven Hill: 270 experience gained."
+function ScubaSounds.Events:CHAT_MSG_COMBAT_XP_GAIN(message)
+    ScubaSounds:HandleExploredMessage(message)
 end
 
 function ScubaSounds.Events:CHAT_MSG_LOOT(lootMessage)
@@ -486,8 +556,16 @@ function ScubaSounds.Events:CHAT_MSG_LOOT(lootMessage)
     ScubaSounds:HandleRollMessage(lootMessage)
 end
 
+function ScubaSounds.Events:HEARTHSTONE_BOUND()
+    ScubaSounds:HandleHearthBound()
+end
+
 function ScubaSounds.Events:CHAT_MSG_SYSTEM(message)
     ScubaSounds:HandleRollMessage(message)
+    if not issecretvalue(message) and type(message) == "string" and message:match(ScubaSounds.Data.HearthBoundPattern) then
+        ScubaSounds:HandleHearthBound()
+    end
+    ScubaSounds:HandleExploredMessage(message)
     ScubaSounds:HandleFactionStandingMessage(message)
 end
 
@@ -617,25 +695,42 @@ function ScubaSounds:CountLoginBaseline()
     ScubaSounds:CheckGoldMilestones(false)
 end
 
+-- Every qualifying item worn is remembered, so with "Replay one-time sounds every time" only gear this character
+-- hasn't worn before plays again (swapping between known sets stays quiet)
 function ScubaSounds:CheckFirstEquip(kind, canPlay)
     if canPlay and not ScubaSounds.State.LoginBaselineDone then
         return -- still logging in; the baseline will count this silently
     end
     local character = ScubaSounds:FullName("player")
-    local done = ScubaSounds_Options.FirstEquipDone[kind]
-    if not character or done[character] then
+    if not character then
         return
     end
+    local options = ScubaSounds_Options
+    local done = options.FirstEquipDone[kind]
+    options.EquippedSeen[kind] = options.EquippedSeen[kind] or {}
+    options.EquippedSeen[kind][character] = options.EquippedSeen[kind][character] or {}
+    local seen = options.EquippedSeen[kind][character]
     local firstEquip = ScubaSounds.Data.FirstEquips[kind]
+    local qualifying, newItem = false, false
     for slot in pairs(ScubaSounds:FirstEquipSlots(kind)) do
         local itemId = GetInventoryItemID("player", slot)
         if itemId and not issecretvalue(itemId) and (not firstEquip.qualifies or firstEquip.qualifies(slot, itemId)) then
-            done[character] = true
-            if canPlay then
-                ScubaSounds:Fire(firstEquip.event)
+            qualifying = true
+            if not seen[itemId] then
+                seen[itemId] = true
+                newItem = true
             end
-            return
         end
+    end
+    if qualifying and not done[character] then
+        done[character] = true
+        if canPlay then
+            ScubaSounds:Fire(firstEquip.event)
+        end
+    elseif newItem and canPlay and options[ScubaSounds_ReplayOneTime] then
+        ScubaSounds:Fire(firstEquip.event, {
+            replay = true
+        })
     end
 end
 

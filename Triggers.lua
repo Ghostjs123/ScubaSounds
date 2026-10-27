@@ -113,7 +113,8 @@ for _, trueName in ipairs(deathNames) do
         textArgs = {trueName},
         when = function(death)
             return death.trueName == trueName and not death.isFeigning
-        end
+        end,
+        newInForever = Data.NewInForeverDeaths[trueName]
     })
 end
 
@@ -160,6 +161,11 @@ AddTrigger("FrogKilled", "OtherDeaths", "WW91IGtpbGwgYSBmcm9nIG9yIHRvYWQ=", {"Ga
 
 AddTrigger("MurlocKilled", "OtherDeaths", "WW91IGtpbGwgYSBtdXJsb2MgZm9yIHRoZSBmaXJzdCB0aW1lIChvbmNlIHBlciBhY2NvdW50KQ==", {"GayFrogs"}, {
     on = "MurlocKilled",
+    newInForever = true
+})
+
+AddTrigger("FirstDeath", "OtherDeaths", "QSBndWlsZCBtZW1iZXIgZGllcyBmb3IgdGhlIGZpcnN0IHRpbWUgYXQgbGV2ZWwgMTIgb3IgaGlnaGVyIChvbmNlIHBlciBjaGFyYWN0ZXIp", {"StupidMistakes", "OhNo"}, {
+    on = "FirstDeath",
     newInForever = true
 })
 
@@ -433,11 +439,19 @@ AddTrigger("HugOrKiss", "Misc", "WW91IC9odWcgb3IgL2tpc3Mgc29tZW9uZQ==", {"Gay1",
     newInForever = true
 })
 
--- PetTamed is exclusive, so a cat's sound plays instead of the general one
+-- PetTamed is exclusive, so a cat's or wolf's sound plays instead of the general one
 AddTrigger("CatTamed", "Misc", "WW91IHRhbWUgYSBjYXQ=", {"NiceKitty"}, {
     on = "PetTamed",
     when = function(tame)
         return tame.isCat
+    end,
+    newInForever = true
+})
+
+AddTrigger("WolfTamed", "Misc", "WW91IHRhbWUgYSB3b2xm", {"PetThatDawg"}, {
+    on = "PetTamed",
+    when = function(tame)
+        return tame.isWolf
     end,
     newInForever = true
 })
@@ -451,6 +465,30 @@ AddTrigger("PetTamed", "Misc", "WW91IHRhbWUgYSBiZWFzdA==", {"GoodBoy", "BomboCla
 -- Milestones with no sound yet: ProfessionMaxed and ReputationExalted fire with ctx.name (the profession or faction),
 -- after their guild message has gone out. A sound for one is just an AddTrigger with on = "ProfessionMaxed" (or
 -- "ReputationExalted"), plus a when(ctx) to limit it to some professions or factions
+
+AddTrigger("MindControlled", "Misc", "WW91IGdldCBtaW5kIGNvbnRyb2xsZWQ=", {"MindOfItsOwn"}, {
+    on = "MindControlled",
+    defaultChance = 10,
+    newInForever = true
+})
+
+AddTrigger("HearthBound", "Misc", "WW91IHNldCB5b3VyIGhlYXJ0aHN0b25lIGF0IGFuIGlubmtlZXBlcg==", {"KingCastle"}, {
+    on = "HearthBound",
+    defaultChance = 10,
+    newInForever = true
+})
+
+AddTrigger("AteDelight", "Misc", "WW91IGVhdCBhIFNhdm9yeSBEZXZpYXRlIERlbGlnaHQgb3IgU2F2b3J5IFdoaW1zeWZpbiBEZWxpZ2h0", {"AnotherDude"}, {
+    on = "AteDelight",
+    defaultChance = 5,
+    newInForever = true
+})
+
+AddTrigger("Profanity", "Misc", "WW91IHNheSAiZnVjayIgb3IgImZ1Y2tpbmciIGluIGNoYXQ=", {"Profanity"}, {
+    on = "SaidProfanity",
+    defaultChance = 1,
+    newInForever = true
+})
 
 AddTrigger("Lick", "Misc", "WW91IC9saWNr", {"Lick"}, {
     on = "EmotePerformed",
@@ -466,12 +504,36 @@ AddTrigger("PetStabled", "Misc", "WW91IHN0YWJsZSB5b3VyIHBldA==", {"ShowDog"}, {
     newInForever = true
 })
 
+AddTrigger("Bow", "Misc", "WW91IC9ib3c=", {"Sensei"}, {
+    on = "EmotePerformed",
+    when = function(emote)
+        return emote.token == "BOW"
+    end,
+    defaultChance = 5,
+    newInForever = true
+})
+
 AddTrigger("Dance", "Misc", "WW91IC9kYW5jZQ==", {"FuckMeHard"}, {
     on = "EmotePerformed",
     when = function(emote)
         return emote.token == "DANCE"
     end,
     defaultChance = 5,
+    newInForever = true
+})
+
+AddTrigger("CemeteryDiscovered", "Misc", "WW91IGRpc2NvdmVyIFJhdmVuIEhpbGwgb3IgUmF2ZW4gSGlsbCBDZW1ldGVyeSBpbiBEdXNrd29vZCAob25jZSBwZXIgY2hhcmFjdGVyKQ==", {"Cemetery"}, {
+    on = "CemeteryDiscovered",
+    newInForever = true
+})
+
+AddTrigger("FirstLava", "Misc", "WW91IHRha2UgbGF2YSBkYW1hZ2UgZm9yIHRoZSBmaXJzdCB0aW1lIChvbmNlIHBlciBjaGFyYWN0ZXIp", {"MansNotHot"}, {
+    on = "FirstLava",
+    newInForever = true
+})
+
+AddTrigger("FirstArcaneMissiles", "Misc", "WW91IGNhc3QgQXJjYW5lIE1pc3NpbGVzIGZvciB0aGUgZmlyc3QgdGltZSAob25jZSBwZXIgY2hhcmFjdGVyKQ==", {"MagicMissle"}, {
+    on = "FirstArcaneMissiles",
     newInForever = true
 })
 

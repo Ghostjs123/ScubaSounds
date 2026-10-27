@@ -35,6 +35,7 @@ local Rizka = "Rizka"
 local Scharf = "Scharf"
 local Sevvy = "Sevvy"
 local Shaq = "Shaq"
+local Shib = "Shib"
 local Sleeby = "Sleeby"
 local Starrs = "Starrs"
 local Stavis = "Stavis"
@@ -82,6 +83,7 @@ ScubaSounds.Data.PlayerNames = {
     [Uncletouches] = {"Cuckletonn"},
     [Vimy] = {"Vimy"},
     [Vitoli] = {"Vitoli", "Uglyvit"},
+    [Shib] = {"Shib"},
     [Zarix] = {"Yellowfilth"}
 }
 
@@ -98,13 +100,14 @@ end
 ScubaSounds.Data.DeathSoundMap = {
     [Arenthis] = {"ImRetarded"},
     [Beaten] = {"Divine"},
+    [Bobmoney] = {"DownTheWell"},
     [Brutezy] = {"RetardAlert"},
     [Chaka] = {"LegoYoda"},
     [Cousy] = {"BestWarlock"},
     [Dahhart] = {"Dahhart", "ThanksDahfart"},
     [Device] = {"Keyboard"},
     [Doppel] = {"Discord"},
-    [Fahb] = {"Fahb"},
+    [Fahb] = {"Fahb", "AttackOnTitan", "Fallen"},
     [Fishy] = {"UnderTheWater"},
     [Germanicus] = {"Nein"},
     [Hellexus] = {"Money"},
@@ -113,14 +116,15 @@ ScubaSounds.Data.DeathSoundMap = {
     [Junny] = {"WhoAreYou"},
     [Kaymon] = {"BreakingNews"},
     [Keyteor] = {"Owow"},
-    [Laak] = {"Minecraft"},
+    [Laak] = {"Minecraft", "FirstBeer"},
     [Leaflix] = {"ANewRecord", "Failure", "Rat"},
     [Nacho] = {"Goofy"},
-    [Nigel] = {"GreatSuccess"},
+    [Nigel] = {"GreatSuccess", "Weeaboo"},
     [Nips] = {"CopCuties"},
     [Rizka] = {"Oof"},
     [Scharf] = {"How"},
     [Sevvy] = {"SevvyLove"},
+    [Shib] = {"PettingZoo"},
     [Sleeby] = {"NorthScream"},
     [Starrs] = {"KyakPenis"},
     [Stud] = {"Ryan"},
@@ -131,6 +135,11 @@ ScubaSounds.Data.DeathSoundMap = {
     [Zarix] = {"MyGlasses", "Pathetic"}
 }
 ScubaSounds.Data.DeviceDeathSoundRotation = {Kaemo, Stavis}
+-- Players whose death sound is new in Forever: their trigger says "New in Forever" (with the credit) until it's found
+ScubaSounds.Data.NewInForeverDeaths = {
+    [Bobmoney] = true,
+    [Shib] = true
+}
 
 -- For the other files, which can't see the locals above
 ScubaSounds.Data.TrueNames = {
@@ -170,6 +179,7 @@ ScubaSounds.Data.TrueNames = {
     Uncletouches = Uncletouches,
     Vimy = Vimy,
     Vitoli = Vitoli,
+    Shib = Shib,
     Zarix = Zarix
 }
 

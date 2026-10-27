@@ -34,11 +34,25 @@ ScubaSounds.Audio.SoundInfo = {
         canOverlapSelf = false,
         timeout = 1
     },
+    ["AnotherDude"] = {
+        extension = "ogg",
+        duration = 4,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Shib"
+    },
     ["AriseSoldiers"] = {
         extension = "ogg",
         duration = 3,
         canOverlapSelf = false,
         timeout = 1
+    },
+    ["AttackOnTitan"] = {
+        extension = "ogg",
+        duration = 9,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Shib"
     },
     ["BadMan"] = {
         extension = "ogg",
@@ -125,6 +139,13 @@ ScubaSounds.Audio.SoundInfo = {
         canOverlapSelf = false,
         timeout = 30
     },
+    ["Cemetery"] = {
+        extension = "ogg",
+        duration = 4,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Shib"
+    },
     ["ChrisHansen"] = {
         extension = "ogg",
         duration = 5,
@@ -183,6 +204,13 @@ ScubaSounds.Audio.SoundInfo = {
         timeout = 1,
         credit = "Kaymon"
     },
+    ["DownTheWell"] = {
+        extension = "ogg",
+        duration = 3,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Shib"
+    },
     ["Downer"] = {
         extension = "wav",
         duration = 3,
@@ -201,11 +229,25 @@ ScubaSounds.Audio.SoundInfo = {
         canOverlapSelf = false,
         timeout = 1
     },
+    ["Fallen"] = {
+        extension = "ogg",
+        duration = 3,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Shib"
+    },
     ["Failure"] = {
         extension = "mp3",
         duration = 1,
         canOverlapSelf = false,
         timeout = 1
+    },
+    ["FirstBeer"] = {
+        extension = "ogg",
+        duration = 4,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Shib"
     },
     ["Frenchie"] = {
         extension = "ogg",
@@ -364,6 +406,13 @@ ScubaSounds.Audio.SoundInfo = {
         timeout = 1,
         credit = "Kaymon"
     },
+    ["KingCastle"] = {
+        extension = "ogg",
+        duration = 3,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Shib"
+    },
     ["KyakPenis"] = {
         extension = "wav",
         duration = 1,
@@ -403,11 +452,32 @@ ScubaSounds.Audio.SoundInfo = {
         canOverlapSelf = false,
         timeout = 120
     },
+    ["MagicMissle"] = {
+        extension = "ogg",
+        duration = 3,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Shib"
+    },
     ["MagesCancer"] = {
         extension = "mp3",
         duration = 6,
         canOverlapSelf = false,
         timeout = 1
+    },
+    ["MansNotHot"] = {
+        extension = "ogg",
+        duration = 7,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Shib"
+    },
+    ["MindOfItsOwn"] = {
+        extension = "ogg",
+        duration = 3,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Shib"
     },
     ["Minecraft"] = {
         extension = "wav",
@@ -506,6 +576,13 @@ ScubaSounds.Audio.SoundInfo = {
         canOverlapSelf = false,
         timeout = 1
     },
+    ["OhNo"] = {
+        extension = "ogg",
+        duration = 5,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Shib"
+    },
     ["OhTheBear"] = {
         extension = "wav",
         duration = 1,
@@ -558,6 +635,20 @@ ScubaSounds.Audio.SoundInfo = {
         timeout = 1,
         credit = "Kaymon"
     },
+    ["PetThatDawg"] = {
+        extension = "ogg",
+        duration = 5,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Shib"
+    },
+    ["PettingZoo"] = {
+        extension = "ogg",
+        duration = 3,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Shib"
+    },
     ["Pathetic"] = {
         extension = "wav",
         duration = 1,
@@ -594,6 +685,13 @@ ScubaSounds.Audio.SoundInfo = {
     ["PotionSeller"] = {
         extension = "ogg",
         duration = 7,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Shib"
+    },
+    ["Profanity"] = {
+        extension = "ogg",
+        duration = 2,
         canOverlapSelf = false,
         timeout = 1,
         credit = "Shib"
@@ -642,6 +740,13 @@ ScubaSounds.Audio.SoundInfo = {
         canOverlapSelf = false,
         timeout = 15
     },
+    ["Sensei"] = {
+        extension = "ogg",
+        duration = 3,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Shib"
+    },
     ["SevvyLove"] = {
         extension = "wav",
         duration = 1,
@@ -665,6 +770,13 @@ ScubaSounds.Audio.SoundInfo = {
     ["StoleThatShit"] = {
         extension = "ogg",
         duration = 7,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Shib"
+    },
+    ["StupidMistakes"] = {
+        extension = "ogg",
+        duration = 2,
         canOverlapSelf = false,
         timeout = 1,
         credit = "Shib"
@@ -717,6 +829,13 @@ ScubaSounds.Audio.SoundInfo = {
     ["Weapons"] = {
         extension = "ogg",
         duration = 9,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Shib"
+    },
+    ["Weeaboo"] = {
+        extension = "ogg",
+        duration = 7,
         canOverlapSelf = false,
         timeout = 1,
         credit = "Shib"

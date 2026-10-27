@@ -1206,6 +1206,25 @@ function ScubaSounds:CreateGlobalOptionsPage(frame)
     ScubaSounds:CreateLabel(page, disableSounds, ScubaSounds_DisableSounds .. "  (/ss on, /ss off)")
     ScubaSounds.UI.DisableSoundsCheckbox = disableSounds
 
+    local replayOneTime = ScubaSounds:CreateCheckbox(page, GRID_LEFT + RIGHT_COLUMN_X, -31 - ROW_HEIGHT - 4,
+        ScubaSounds_Options[ScubaSounds_ReplayOneTime], function(checked)
+            ScubaSounds_Options[ScubaSounds_ReplayOneTime] = checked
+        end)
+    ScubaSounds:CreateLabel(page, replayOneTime, ScubaSounds_ReplayOneTime)
+    -- What it replays and the spam warning, instead of the plain On/Off tooltip (kept after clicking too)
+    local function showReplayTooltip(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetText(ScubaSounds_ReplayOneTime .. ": " .. (self:GetChecked() and "On" or "Off"), 1, 1, 1)
+        GameTooltip:AddLine("Can be spammy. Only you hear the replays; nothing goes to guild chat or your group.", 1,
+            0.5, 0.25, true)
+        for _, sound in ipairs(ScubaSounds.Data.ReplayOneTimeSounds) do
+            GameTooltip:AddLine("- " .. sound, 1, 0.82, 0, true)
+        end
+        GameTooltip:Show()
+    end
+    replayOneTime:SetScript("OnEnter", showReplayTooltip)
+    replayOneTime:HookScript("OnClick", showReplayTooltip)
+
     local sendGuildMessages = ScubaSounds:CreateCheckbox(page, GRID_LEFT, -31 - 2 * (ROW_HEIGHT + 4),
         ScubaSounds_Options[ScubaSounds_SendGuildMessages], function(checked)
             ScubaSounds_Options[ScubaSounds_SendGuildMessages] = checked
@@ -1223,6 +1242,40 @@ function ScubaSounds:CreateGlobalOptionsPage(frame)
             ScubaSounds_Options[ScubaSounds_PlayDiscoveries] = checked
         end)
     ScubaSounds:CreateLabel(page, playDiscoveries, ScubaSounds_PlayDiscoveries)
+
+    local playEvery = ScubaSounds:CreateCheckbox(page, GRID_LEFT + RIGHT_COLUMN_X, -31 - 4 * (ROW_HEIGHT + 4),
+        ScubaSounds_Options[ScubaSounds_PlayEverySound], function(checked)
+            ScubaSounds_Options[ScubaSounds_PlayEverySound] = checked
+        end)
+    local playEveryLabel = ScubaSounds:CreateLabel(page, playEvery, ScubaSounds_PlayEverySound)
+    -- "every" underlined. Font strings can't underline, so a line is drawn under the word, placed from the measured
+    -- width of "Play " (on showing the page, since text may not measure yet while logging in)
+    local measure = page:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+    measure:Hide()
+    local underline = page:CreateTexture(nil, "ARTWORK")
+    underline:SetColorTexture(1, 1, 1, 0.9)
+    underline:SetHeight(1)
+    local function placeUnderline()
+        measure:SetText("Play ")
+        local before = measure:GetStringWidth()
+        measure:SetText("every")
+        local width = measure:GetStringWidth()
+        underline:ClearAllPoints()
+        underline:SetPoint("TOPLEFT", playEveryLabel, "BOTTOMLEFT", before, -1)
+        underline:SetWidth(width)
+        underline:SetShown(width > 0)
+    end
+    local function showPlayEveryTooltip(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetText(ScubaSounds_PlayEverySound .. ": " .. (self:GetChecked() and "On" or "Off"), 1, 1, 1)
+        GameTooltip:AddLine("Very spammy, mostly for debugging.", 1, 0.5, 0.25, true)
+        GameTooltip:AddLine("Plays every sound any guildmate's client plays, and says who played it with the sound's " ..
+                                "link in your chat (only you see it). Cooldowns are skipped, but sounds and tabs you've " ..
+                                "turned off stay off.", 1, 0.82, 0, true)
+        GameTooltip:Show()
+    end
+    playEvery:SetScript("OnEnter", showPlayEveryTooltip)
+    playEvery:HookScript("OnClick", showPlayEveryTooltip)
 
     -- Only the prank target, and only once the addon has said it for him at least once. Beside "Send messages in
     -- guild" (it's guild chat too), so showing it doesn't move anything
@@ -1246,8 +1299,12 @@ function ScubaSounds:CreateGlobalOptionsPage(frame)
         tartattack:SetShown(showPrank)
         tartattack:SetChecked(prank.enabled)
     end
-    page:SetScript("OnShow", updatePrank)
+    page:SetScript("OnShow", function()
+        updatePrank()
+        placeUnderline()
+    end)
     updatePrank() -- the page may already be showing (the last tab used), so OnShow won't run first
+    placeUnderline()
     ScubaSounds.UI.UpdateHiddenOptions = updatePrank
     frame:HookScript("OnHide", function()
         if ScubaSounds.State.ShowHiddenOptions then

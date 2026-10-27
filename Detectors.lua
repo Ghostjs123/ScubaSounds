@@ -23,14 +23,191 @@ function ScubaSounds:FireDeath(death)
     C_Timer.After(1, function()
         ScubaSounds.State.RecentDeathSoundsCount = ScubaSounds.State.RecentDeathSoundsCount - 1
     end)
-    ScubaSounds:Fire("PlayerDied", death)
+    if death.fromGuild then
+        ScubaSounds:Fire("PlayerDied", death)
+        return
+    end
+    -- A death seen here waits for the dying player's DIED message: their first death plays its sound instead
+    C_Timer.After(ScubaSounds.Data.FirstDeathWait, function()
+        if not ScubaSounds:PlayFirstDeath(death.name) then
+            ScubaSounds:Fire("PlayerDied", death)
+        end
+    end)
+end
+
+-- Plays a first death waiting for this name (from their DIED message, or our own death) and uses it up. False if none
+function ScubaSounds:PlayFirstDeath(name)
+    local key = name and strlower(name)
+    local entry = key and ScubaSounds.State.FirstDeaths[key]
+    if not entry then
+        return false
+    end
+    ScubaSounds.State.FirstDeaths[key] = nil
+    if GetTime() - entry.at > ScubaSounds.Data.GuildDeathDuplicateWindow then
+        return false
+    end
+    ScubaSounds:Fire("FirstDeath", {
+        sound = entry.sound,
+        sourceName = entry.name,
+        replay = entry.replay
+    })
+    return true
+end
+
+-- Lava: out of combat (environmental damage doesn't start combat), fire, and too big to be a campfire. The first tick
+-- on a character plays MansNotHot once. With "Replay one-time sounds every time", stepping back in after
+-- LavaReentryGap out of it replays it, at most once per LavaReplayCooldown
+function ScubaSounds:HandleLavaDamage(damage)
+    local data = ScubaSounds.Data
+    if damage.inCombat or damage.schoolMask ~= data.FireSchoolMask or not damage.amount or
+        damage.amount < data.LavaMinDamage then
+        return
+    end
+    local state = ScubaSounds.State
+    local character = ScubaSounds:FullName("player")
+    local lastTick = state.LastLavaTickAt
+    state.LastLavaTickAt = damage.time
+    if not character then
+        return
+    end
+    local done = ScubaSounds_Options.FirstLavaDone
+    if not done[character] then
+        done[character] = true
+        state.LastLavaReplayAt = damage.time
+        ScubaSounds:Fire("FirstLava")
+    elseif ScubaSounds_Options[ScubaSounds_ReplayOneTime] and
+        (not lastTick or damage.time - lastTick >= data.LavaReentryGap) and
+        (not state.LastLavaReplayAt or damage.time - state.LastLavaReplayAt >= data.LavaReplayCooldown) then
+        state.LastLavaReplayAt = damage.time
+        ScubaSounds:Fire("FirstLava", {
+            replay = true
+        })
+    end
+end
+
+-- Discovering Raven Hill or its cemetery, once per character. The discovery can show up on more than one event; the
+-- saved flag makes it count once
+function ScubaSounds:HandleExploredMessage(message)
+    if issecretvalue(message) or type(message) ~= "string" then
+        return
+    end
+    local area
+    for _, pattern in ipairs(ScubaSounds.Data.ExploredPatterns) do
+        area = message:match(pattern)
+        if area then
+            break
+        end
+    end
+    local character = ScubaSounds:FullName("player")
+    local done = ScubaSounds_Options.CemeteryDone
+    if not area or not character or not ScubaSounds.Data.CemeteryAreas[strlower(area)] or done[character] then
+        return
+    end
+    done[character] = true
+    ScubaSounds.State.LastCemeteryReplayAt = GetTime()
+    ScubaSounds:Fire("CemeteryDiscovered")
+end
+
+-- Entering Raven Hill or its cemetery. A character that explored it before never sees the discovery again, so after a
+-- moment without one it counts as found (silently). With "Replay one-time sounds every time", a later visit replays
+function ScubaSounds:CheckCemeteryArea()
+    local data, state = ScubaSounds.Data, ScubaSounds.State
+    local area = GetSubZoneText()
+    local inArea = not issecretvalue(area) and area and data.CemeteryAreas[strlower(area)] or false
+    local entered = inArea and not state.InCemeteryArea
+    state.InCemeteryArea = inArea
+    local character = ScubaSounds:FullName("player")
+    if not entered or not character then
+        return
+    end
+    local done = ScubaSounds_Options.CemeteryDone
+    if not done[character] then
+        C_Timer.After(data.CemeteryDiscoveryWait, function()
+            done[character] = true
+        end)
+        return
+    end
+    if ScubaSounds_Options[ScubaSounds_ReplayOneTime] and
+        (not state.LastCemeteryReplayAt or GetTime() - state.LastCemeteryReplayAt >= data.CemeteryReplayCooldown) then
+        state.LastCemeteryReplayAt = GetTime()
+        ScubaSounds:Fire("CemeteryDiscovered", {
+            replay = true
+        })
+    end
+end
+
+-- Becoming mind controlled (charmed by anything: a priest's Mind Control, a mob's Dominate Mind), once per time it
+-- starts. A secret reading (in some combat) is skipped and leaves the last known state alone
+function ScubaSounds:CheckMindControlled()
+    local charmed = UnitIsCharmed("player")
+    if issecretvalue(charmed) then
+        return
+    end
+    charmed = charmed and true or false
+    local wasCharmed = ScubaSounds.State.MindControlled
+    ScubaSounds.State.MindControlled = charmed
+    if charmed and not wasCharmed then
+        ScubaSounds:Fire("MindControlled")
+    end
+end
+
+-- Setting the hearthstone at an innkeeper (the event and the chat line both count, once per bind)
+function ScubaSounds:HandleHearthBound()
+    local last = ScubaSounds.State.LastHearthBoundAt
+    if last and GetTime() - last < ScubaSounds.Data.HearthBoundRepeatWindow then
+        return
+    end
+    ScubaSounds.State.LastHearthBoundAt = GetTime()
+    ScubaSounds:Fire("HearthBound")
+end
+
+-- Our own death: a first one at FirstDeathMinLevel+ picks its sound and posts the guild line. Returns the sound for
+-- the DIED message, so the guild plays the same one. With "Replay one-time sounds every time", later deaths at that
+-- level replay it for us only (no message), in place of our own death sound
+function ScubaSounds:CheckFirstDeath()
+    local data = ScubaSounds.Data
+    local character = ScubaSounds:FullName("player")
+    local level = UnitLevel("player")
+    if not character or issecretvalue(level) or not level or level < data.FirstDeathMinLevel then
+        return nil
+    end
+    local done = ScubaSounds_Options.FirstDeathDone
+    local replay = done[character] and ScubaSounds_Options[ScubaSounds_ReplayOneTime]
+    if done[character] and not replay then
+        return nil
+    end
+    local sound = ScubaSounds:SelectRandom(data.TriggersById.FirstDeath.sounds)
+    ScubaSounds.State.FirstDeaths[strlower(character)] = {
+        sound = sound,
+        name = character,
+        at = GetTime(),
+        replay = replay or nil
+    }
+    -- Normally our own death shows up as a death seen here (UNIT_DIED), which plays it. If that never comes, it still
+    -- plays
+    local diedAt = GetTime()
+    C_Timer.After(data.FirstDeathWait + 1, function()
+        local seenAt = ScubaSounds.State.LocalDeaths[strlower(character)]
+        if not seenAt or math.abs(seenAt - diedAt) > data.FirstDeathWait + 1 then
+            ScubaSounds:PlayFirstDeath(character)
+        end
+    end)
+    if replay then
+        return nil
+    end
+    done[character] = true
+    local shortName = UnitName("player")
+    if shortName and not issecretvalue(shortName) then
+        ScubaSounds:SendChatWhenAllowed(data.FirstDeathMessage:format(shortName), "GUILD")
+    end
+    return sound
 end
 
 -- Lava: environmental damage doesn't put you in combat, so a fatal fire hit taken out of combat is lava
 function ScubaSounds:HandlePlayerDeath()
     local lastDamage = ScubaSounds.State.LastPlayerDamage
     ScubaSounds.State.LastPlayerDamage = nil
-    ScubaSounds:BroadcastDeath(lastDamage)
+    ScubaSounds:BroadcastDeath(lastDamage, ScubaSounds:CheckFirstDeath())
     if lastDamage and not lastDamage.inCombat and lastDamage.schoolMask == ScubaSounds.Data.FireSchoolMask and GetTime() -
         lastDamage.time < 2 then
         ScubaSounds:Fire("DiedToLava")
@@ -291,6 +468,82 @@ function ScubaSounds:HandlePlayerAura()
     end
 end
 
+-- Our own chat messages, on any channel, as we send them. Both send functions are hooked since one may only be the
+-- other under an old name; a message seen twice in the same moment counts once
+-- Items we use: from the bags, an action bar, or /use (by name or bag slot). Only Data.DelightItemIds matter for now
+function ScubaSounds:HookItemUse()
+    local useContainerItem = C_Container and C_Container.UseContainerItem and "UseContainerItem"
+    local getContainerItemID = C_Container and C_Container.GetContainerItemID or GetContainerItemID
+    local function fromBag(bag, slot)
+        if not issecretvalue(bag) and not issecretvalue(slot) and getContainerItemID then
+            ScubaSounds:HandleItemUsed(getContainerItemID(bag, slot))
+        end
+    end
+    if useContainerItem then
+        hooksecurefunc(C_Container, useContainerItem, fromBag)
+    elseif UseContainerItem then
+        hooksecurefunc("UseContainerItem", fromBag)
+    end
+    hooksecurefunc("UseAction", function(slot)
+        local actionType, id = GetActionInfo(slot)
+        if actionType == "item" then
+            ScubaSounds:HandleItemUsed(id)
+        end
+    end)
+    local getItemInfoInstant = GetItemInfoInstant or (C_Item and C_Item.GetItemInfoInstant)
+    if UseItemByName and getItemInfoInstant then
+        hooksecurefunc("UseItemByName", function(name)
+            if type(name) == "string" and not issecretvalue(name) then
+                ScubaSounds:HandleItemUsed(getItemInfoInstant(name))
+            end
+        end)
+    end
+end
+
+function ScubaSounds:HandleItemUsed(itemId)
+    if issecretvalue(itemId) or not ScubaSounds.Data.DelightItemIds[itemId] then
+        return
+    end
+    local last = ScubaSounds.State.LastDelightAt
+    if last and GetTime() - last < ScubaSounds.Data.ItemUseRepeatWindow then
+        return -- the same use, seen by another hook
+    end
+    ScubaSounds.State.LastDelightAt = GetTime()
+    ScubaSounds:Fire("AteDelight")
+end
+
+function ScubaSounds:HookOutgoingChat()
+    local lastText, lastTime
+    local function onSend(text)
+        if type(text) ~= "string" or issecretvalue(text) then
+            return
+        end
+        local now = GetTime()
+        if text == lastText and now == lastTime then
+            return
+        end
+        lastText, lastTime = text, now
+        ScubaSounds:HandleOwnChatMessage(text)
+    end
+    if C_ChatInfo and C_ChatInfo.SendChatMessage then
+        hooksecurefunc(C_ChatInfo, "SendChatMessage", onSend)
+    end
+    if _G.SendChatMessage then
+        hooksecurefunc("SendChatMessage", onSend)
+    end
+end
+
+-- A profanity as a whole word ("fuck", "fucking" in any case, not "fucked")
+function ScubaSounds:HandleOwnChatMessage(text)
+    local lower = strlower(text)
+    for _, word in ipairs(ScubaSounds.Data.ProfanityWords) do
+        if lower:find("%f[%a]" .. word .. "%f[%A]") then
+            ScubaSounds:Fire("SaidProfanity")
+            return
+        end
+    end
+end
+
 -- Dying or going KillStreakWindow seconds without a kill ends the streak
 -- No event says which emote the player used, so hook the emote functions. DoEmote is deprecated in 12.0 in favor of
 -- C_ChatInfo.PerformEmote; hook whichever exist
@@ -519,7 +772,7 @@ end
 
 -- Murloc killing blow, once per account. In combat the victim usually can't be read, so check again after combat
 function ScubaSounds:HandleMurlocKill(guid)
-    if ScubaSounds_Options.MurlocKilled then
+    if ScubaSounds_Options.MurlocKilled and not ScubaSounds_Options[ScubaSounds_ReplayOneTime] then
         return
     end
     local npcId = guid and ScubaSounds:NpcIdFromGuid(guid)
@@ -553,14 +806,19 @@ function ScubaSounds:HandleCombatEnded()
         return
     end
     ScubaSounds.State.MurlocCheckPending = false
-    if not ScubaSounds_Options.MurlocKilled and ScubaSounds:IsDeadTargetMurloc(nil) then
+    if (not ScubaSounds_Options.MurlocKilled or ScubaSounds_Options[ScubaSounds_ReplayOneTime]) and
+        ScubaSounds:IsDeadTargetMurloc(nil) then
         ScubaSounds:FireMurlocKilled()
     end
 end
 
+-- After the first, only with "Replay one-time sounds every time" (see HandleMurlocKill)
 function ScubaSounds:FireMurlocKilled()
+    local replay = ScubaSounds_Options.MurlocKilled
     ScubaSounds_Options.MurlocKilled = true
-    ScubaSounds:Fire("MurlocKilled")
+    ScubaSounds:Fire("MurlocKilled", {
+        replay = replay or nil
+    })
 end
 
 -- Creature-0-[server]-[instance]-[zone]-[npc ID]-[spawn]
@@ -759,6 +1017,26 @@ function ScubaSounds:CheckGoldMilestones(canPlay)
         if not done[milestone.gold] and money >= milestone.gold * ScubaSounds.Data.CopperPerGold then
             done[milestone.gold] = true
             reached = milestone
+        end
+    end
+    -- With "Replay one-time sounds every time": climbing past a milestone already reached plays its sound again,
+    -- just for us (no guild message or chat line)
+    local lastMoney = ScubaSounds.State.LastMoney
+    ScubaSounds.State.LastMoney = money
+    if not reached and canPlay and lastMoney and ScubaSounds_Options[ScubaSounds_ReplayOneTime] then
+        local crossed
+        for _, milestone in ipairs(ScubaSounds.Data.GoldMilestones) do
+            local copper = milestone.gold * ScubaSounds.Data.CopperPerGold
+            if lastMoney < copper and money >= copper then
+                crossed = milestone
+            end
+        end
+        if crossed then
+            ScubaSounds:Fire("GoldMilestone", {
+                gold = crossed.gold,
+                sourceName = ScubaSounds:FullName("player"),
+                replay = true
+            })
         end
     end
     if not reached or not canPlay then
