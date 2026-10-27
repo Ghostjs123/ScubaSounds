@@ -1,9 +1,10 @@
 ## Interface: 16001
 ## Title: ScubaSounds
-## Version: 1.0
+## Version: 2.0
 ## Notes: Sound board addon for Scuba Cops
 ## Author: Kaymon
 ## SavedVariables: ScubaSounds_Options
+## X-Curse-Project-ID: 1165242
 
 Libs\ChatThrottleLib.lua
 Sounds\SoundInfo.lua
