@@ -107,6 +107,9 @@ ScubaSounds.Data.PotionSellerCooldown = 60 * 60 -- seconds
 ScubaSounds.Data.OutOfManaCooldown = 5 * 60 -- seconds
 -- On the frog trigger rather than the sound, so the one-time murloc kill can't be swallowed by it
 ScubaSounds.Data.FrogKilledCooldown = 2 * 60 -- seconds
+-- Gear swaps (Outfitter sets, a shirt kept for its look) can set these off over and over
+ScubaSounds.Data.ShirtRemovedCooldown = 20 * 60 -- seconds
+ScubaSounds.Data.WandEquippedCooldown = 20 * 60 -- seconds, shared by both wand sounds
 ScubaSounds.Data.LevelUpAnnounceDelay = 2 -- seconds
 -- Our own chat messages with one of these as a whole word (any case) can play Profanity
 ScubaSounds.Data.ProfanityWords = {"fuck", "fucking"}
@@ -117,6 +120,10 @@ ScubaSounds.Data.DelightItemIds = {
 }
 -- One press can reach more than one of the item-use hooks; within this many seconds it counts once
 ScubaSounds.Data.ItemUseRepeatWindow = 1
+-- Explosives we throw (spell names containing these, lowercased: Iron Grenade, Thorium Grenade, Coarse Dynamite, ...).
+-- A killing blow of ours within ExplosiveKillWindow seconds of one plays Brick
+ScubaSounds.Data.ExplosiveNames = {"grenade", "dynamite"}
+ScubaSounds.Data.ExplosiveKillWindow = 0.5
 -- The one-time sounds "Replay one-time sounds every time" plays again, for its tooltip
 ScubaSounds.Data.ReplayOneTimeSounds = {
     "Gold milestones (100g, 1000g, 5000g): when your gold climbs past one again",
@@ -364,7 +371,7 @@ ScubaSounds.Data.MacrosLoadedDelay = 10 -- seconds after entering the world
 ScubaSounds.Data.LoginBaselineDelay = 5 -- seconds after entering the world for the inventory to finish loading
 ScubaSounds.Data.SitSpamCount = 6 -- presses...
 ScubaSounds.Data.SitSpamWindow = 5 -- ...within this many seconds
-ScubaSounds.Data.SitSpamCooldown = 30 -- seconds before it can count again
+ScubaSounds.Data.SitSpamCooldown = 60 -- seconds before it can count again
 ScubaSounds.Data.SitSpamRange = 3 -- CheckInteractDistance index: duel range, about 10 yards
 
 -- Critters
@@ -516,9 +523,10 @@ ScubaSounds_PrintFormat = "|c00f7f26c%s|r"
 ScubaSounds_NumBagSlots = 4
 ScubaSounds_PlayOutsideRaid = "Play outside of raid"
 ScubaSounds_DisableSounds = "Disable Sounds"
-ScubaSounds_GuildDeaths = "Play guildmates' death sounds when they're not with you"
+ScubaSounds_GuildDeaths = "Play far-away guildmates' death sounds" -- deaths we can't see, from their DIED message
 ScubaSounds_ReplayOneTime = "Replay one-time sounds every time" -- for us only, never in guild chat
-ScubaSounds_PlayEverySound = "Play every sound" -- every guildmate's plays, with who in our chat (debugging)
+ScubaSounds_PlayEverySound = "Play every sound" -- every guildmate's plays, heard here too (debugging)
+ScubaSounds_SeeAllSounds = "See all sounds in chat" -- every guildmate's plays, with who, in our chat (debugging)
 ScubaSounds_PlayDiscoveries = "Play first discovery sounds when found" -- a guildmate's new find plays for us too
 ScubaSounds_SendGuildMessages = "Send messages in guild" -- chat players can read ("ding", "gz nigel"); addon messages always go out
 

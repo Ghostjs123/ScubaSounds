@@ -152,25 +152,28 @@ function ScubaSounds:BroadcastPlayed(sound, categoryId)
     })
 end
 
--- "Play every sound": a guildmate's play, in our chat with who played it, and heard here too. Cooldowns are skipped,
--- but a sound or tab we've turned off is left out entirely. The same sound isn't stacked on itself (a guild-wide
--- sound arrives from every client that played it), though each still gets its chat line
+-- A guildmate's play: "See all sounds in chat" says who played it in our chat, "Play every sound" plays it here too
+-- (skipping cooldowns). A sound or tab we've turned off is left out of both. The same sound isn't stacked on itself (a
+-- guild-wide sound arrives from every client that played it), though each still gets its chat line
 ScubaSounds.GuildEvents[ScubaSounds_PlayedCommand] = function(self, playerName, fields)
     local options = ScubaSounds_Options
     local sound, categoryId = fields.s and tostring(fields.s), fields.c -- tostring: ParseFields makes "67" a number
     local info = sound and ScubaSounds.Audio.SoundInfo[sound]
     local category = type(categoryId) == "string" and options.Categories[categoryId]
-    if not options[ScubaSounds_PlayEverySound] or not info or not category or ScubaSounds:IsOwnName(playerName) or
+    local playIt, showIt = options[ScubaSounds_PlayEverySound], options[ScubaSounds_SeeAllSounds]
+    if not (playIt or showIt) or not info or not category or ScubaSounds:IsOwnName(playerName) or
         (tonumber(fields.t) and GetServerTime() - tonumber(fields.t) > ScubaSounds.Data.PlayedMaxAge) then
         return
     end
     if not category.enabled or not ScubaSounds:IsSoundOn(categoryId, sound) then
         return
     end
-    ScubaSounds:SendMessage(playerName .. " played " ..
-                                ScubaSounds:DiscoveryLink(sound, ScubaSounds:CategoryName(categoryId)))
+    if showIt then
+        ScubaSounds:SendMessage(playerName .. " played " ..
+                                    ScubaSounds:DiscoveryLink(sound, ScubaSounds:CategoryName(categoryId)))
+    end
     local playing = ScubaSounds.State.EverySoundPlaying
-    if options[ScubaSounds_DisableSounds] or (playing[sound] and GetTime() < playing[sound]) then
+    if not playIt or options[ScubaSounds_DisableSounds] or (playing[sound] and GetTime() < playing[sound]) then
         return
     end
     playing[sound] = GetTime() + (info.duration or 1)

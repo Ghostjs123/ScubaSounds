@@ -127,6 +127,13 @@ ScubaSounds.Audio.SoundInfo = {
         canOverlapSelf = false,
         timeout = 1
     },
+    ["Brick"] = {
+        extension = "ogg",
+        duration = 4,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Shib"
+    },
     ["Burn"] = {
         extension = "ogg",
         duration = 2,
@@ -609,7 +616,7 @@ ScubaSounds.Audio.SoundInfo = {
         timeout = 1,
         credit = "Kaymon"
     },
-    ["Nelson"] = {
+    ["NelsonHaha"] = {
         extension = "ogg",
         duration = 1,
         canOverlapSelf = false,

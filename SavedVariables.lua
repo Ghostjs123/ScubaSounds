@@ -11,58 +11,8 @@ local issecretvalue = _G.issecretvalue
 -- Saved Options
 -- =================================================================
 
--- Old sound name -> new name. Saved plays, discoveries and settings move over to the new name
-ScubaSounds.Data.RenamedSounds = {
-    GoodBoy1 = "GoodBoy"
-}
-
-local function RenameSavedSound(options, old, new)
-    local function move(t)
-        if t and t[old] ~= nil then
-            t[new] = t[new] or t[old]
-            t[old] = nil
-        end
-    end
-    for _, entries in pairs(options.SoundsHeard or {}) do
-        move(entries)
-    end
-    move(options.GuildHeard)
-    move(options.GuildEarliest and options.GuildEarliest.sounds)
-    -- "<category ID>/<sound>" keys
-    for _, t in ipairs({options.SoundsOff or {}, options.Chance or {}}) do
-        local renamed = {}
-        for key in pairs(t) do
-            local category, sound = key:match("^(.-)/(.+)$")
-            if sound == old then
-                renamed[key] = category .. "/" .. new
-            end
-        end
-        for key, newKey in pairs(renamed) do
-            if t[newKey] == nil then
-                t[newKey] = t[key]
-            end
-            t[key] = nil
-        end
-    end
-    for _, sounds in pairs(options.RecentTriggerSounds or {}) do
-        for i, sound in ipairs(sounds) do
-            if sound == old then
-                sounds[i] = new
-            end
-        end
-    end
-    for _, play in ipairs(options.RecentPlays or {}) do
-        if play.sound == old then
-            play.sound = new
-        end
-    end
-end
-
 function ScubaSounds:InitOptions()
     local options = ScubaSounds_Options
-    for old, new in pairs(ScubaSounds.Data.RenamedSounds) do
-        RenameSavedSound(options, old, new)
-    end
     -- Sounds turned off, per tab: "<category ID>/<sound>" -> true. A sound in two tabs has a checkbox in each
     options.SoundsOff = options.SoundsOff or {}
     -- Older versions saved one on/off per sound; it carries over to every tab the sound is in
@@ -86,7 +36,7 @@ function ScubaSounds:InitOptions()
         options[ScubaSounds_SendGuildMessages] = true
     end
     if options[ScubaSounds_GuildDeaths] == nil then
-        options[ScubaSounds_GuildDeaths] = true
+        options[ScubaSounds_GuildDeaths] = false
     end
     if options[ScubaSounds_PlayDiscoveries] == nil then
         options[ScubaSounds_PlayDiscoveries] = false
@@ -96,6 +46,9 @@ function ScubaSounds:InitOptions()
     end
     if options[ScubaSounds_PlayEverySound] == nil then
         options[ScubaSounds_PlayEverySound] = false
+    end
+    if options[ScubaSounds_SeeAllSounds] == nil then
+        options[ScubaSounds_SeeAllSounds] = false
     end
     options.Categories = options.Categories or {}
     for _, category in ipairs(ScubaSounds.Data.Categories) do
@@ -265,6 +218,9 @@ function ScubaSounds:SetSoundsDisabled(disabled)
     ScubaSounds_Options[ScubaSounds_DisableSounds] = disabled
     if ScubaSounds.UI.DisableSoundsCheckbox then
         ScubaSounds.UI.DisableSoundsCheckbox:SetChecked(disabled)
+    end
+    if ScubaSounds.RefreshSoundSettings then
+        ScubaSounds:RefreshSoundSettings()
     end
     ScubaSounds:SendMessage(disabled and "Sounds disabled" or "Sounds enabled")
 end

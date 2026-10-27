@@ -26,6 +26,7 @@ ScubaSounds.Data.RelayedEvents = {} -- addon events group members may relay to u
 --   groupDiscovery: nobody in particular sets it off (a wipe, a boss kill), so the group leader announces its first
 --     discovery, without a name
 --   defaultChance: percent chance each of its sounds plays before the player changes it (default 100)
+--   cooldownGroup: triggers with the same group share one cooldown (playing one puts them all on it)
 --   cooldown: seconds after the trigger plays before it can play again, whichever of its sounds played. Over
 --     SavedCooldownMin it's per character and survives /reload and relogging
 --   noRepeat: how many of its other sounds must play before one repeats (remembered across sessions)
@@ -73,6 +74,7 @@ local function AddTrigger(id, category, text, sounds, options)
         groupDiscovery = options.groupDiscovery,
         defaultChance = options.defaultChance,
         cooldown = options.cooldown,
+        cooldownGroup = options.cooldownGroup,
         noRepeat = options.noRepeat,
         cycle = options.cycle,
         announceDelay = options.announceDelay,
@@ -169,6 +171,11 @@ AddTrigger("FirstDeath", "OtherDeaths", "QSBndWlsZCBtZW1iZXIgZGllcyBmb3IgdGhlIGZ
     newInForever = true
 })
 
+AddTrigger("ExplosiveKill", "OtherDeaths", "WW91IGxhbmQgYSBraWxsaW5nIGJsb3cgd2l0aCBhIGdyZW5hZGUgb3IgZHluYW1pdGU=", {"Brick"}, {
+    on = "ExplosiveKill",
+    newInForever = true
+})
+
 AddTrigger("CritterKilled", "OtherDeaths", "WW91IGtpbGwgYSBjcml0dGVy", {"BadMan"}, {
     on = "CritterKilled",
     when = function(critter)
@@ -177,7 +184,7 @@ AddTrigger("CritterKilled", "OtherDeaths", "WW91IGtpbGwgYSBjcml0dGVy", {"BadMan"
     newInForever = true
 })
 
-AddTrigger("SitSpam", "OtherDeaths", "WW91IHNwYW0gc2l0IG9uIGEgZGVhZCBndWlsZG1hdGUgb3IgZ3JvdXBtYXRlLCBvciBvbmUgZG9lcyBpdCB0byB5b3U=", {"Nelson"}, {
+AddTrigger("SitSpam", "OtherDeaths", "WW91IHNwYW0gc2l0IG9uIGEgZGVhZCBndWlsZG1hdGUgb3IgZ3JvdXBtYXRlLCBvciBvbmUgZG9lcyBpdCB0byB5b3U=", {"NelsonHaha"}, {
     on = "SitSpam",
     cooldown = Data.SitSpamCooldown,
     newInForever = true
@@ -436,6 +443,7 @@ AddTrigger("HugOrKiss", "Misc", "WW91IC9odWcgb3IgL2tpc3Mgc29tZW9uZQ==", {"Gay1",
     when = function(emote)
         return emote.token == "HUG" or emote.token == "KISS"
     end,
+    defaultChance = 10,
     newInForever = true
 })
 
@@ -559,6 +567,7 @@ AddTrigger("FirstRingEquipped", "Misc", "WW91IGVxdWlwIHlvdXIgZmlyc3QgcmluZyAob25
 
 AddTrigger("ShirtRemoved", "Misc", "WW91IHRha2Ugb2ZmIHlvdXIgc2hpcnQ=", {"GetThisShitOffMe"}, {
     on = "ShirtRemoved",
+    cooldown = Data.ShirtRemovedCooldown,
     newInForever = true
 })
 
@@ -567,11 +576,15 @@ AddTrigger("CraftedWandEquipped", "Misc", "WW91IGVxdWlwIGEgY3JhZnRlZCB3YW5kIChvb
     when = function(wand)
         return wand.isCrafted
     end,
+    cooldown = Data.WandEquippedCooldown,
+    cooldownGroup = "Wand",
     newInForever = true
 })
 
 AddTrigger("WandEquipped", "Misc", "WW91IGVxdWlwIGEgZGlmZmVyZW50IHdhbmQ=", {"Wizard1"}, {
     on = "WandEquipped",
+    cooldown = Data.WandEquippedCooldown,
+    cooldownGroup = "Wand",
     newInForever = true
 })
 

@@ -151,6 +151,31 @@ function ScubaSounds:CheckMindControlled()
     end
 end
 
+-- A grenade or dynamite we threw: the killing blow that follows within ExplosiveKillWindow is taken as its doing (the
+-- game doesn't say which hit landed it)
+function ScubaSounds:NoteExplosiveThrown(spellName)
+    if issecretvalue(spellName) or type(spellName) ~= "string" then
+        return
+    end
+    local lower = strlower(spellName)
+    for _, name in ipairs(ScubaSounds.Data.ExplosiveNames) do
+        if lower:find(name, 1, true) then
+            ScubaSounds.State.LastExplosiveAt = GetTime()
+            return
+        end
+    end
+end
+
+-- True when it counted as an explosive kill (so the critter sounds can stand down)
+function ScubaSounds:CheckExplosiveKill()
+    local thrownAt = ScubaSounds.State.LastExplosiveAt
+    if thrownAt and GetTime() - thrownAt <= ScubaSounds.Data.ExplosiveKillWindow then
+        ScubaSounds:Fire("ExplosiveKill")
+        return true
+    end
+    return false
+end
+
 -- Setting the hearthstone at an innkeeper (the event and the chat line both count, once per bind)
 function ScubaSounds:HandleHearthBound()
     local last = ScubaSounds.State.LastHearthBoundAt
@@ -582,7 +607,7 @@ function ScubaSounds:HookEmotes()
     end
 end
 
--- Enough sit presses in a row over a dead guildmate or groupmate: Nelson here, and whispered to them
+-- Enough sit presses in a row over a dead guildmate or groupmate: NelsonHaha here, and whispered to them
 function ScubaSounds:HandleSitPress()
     local data, state = ScubaSounds.Data, ScubaSounds.State
     local now = GetTime()

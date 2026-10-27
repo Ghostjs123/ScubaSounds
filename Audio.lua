@@ -144,20 +144,23 @@ local function SavedTriggerCooldowns(trigger)
     return saved[character]
 end
 
+-- Kept under the trigger's cooldownGroup when it has one, so the group shares it
 function ScubaSounds:IsTriggerOnCooldown(trigger)
+    local key = trigger.cooldownGroup or trigger.id
     local saved = SavedTriggerCooldowns(trigger)
     if saved then
-        return GetServerTime() < (saved[trigger.id] or 0)
+        return GetServerTime() < (saved[key] or 0)
     end
-    return GetTime() < (ScubaSounds.State.TriggerCooldowns[trigger.id] or 0)
+    return GetTime() < (ScubaSounds.State.TriggerCooldowns[key] or 0)
 end
 
 function ScubaSounds:StartTriggerCooldown(trigger)
+    local key = trigger.cooldownGroup or trigger.id
     local saved = SavedTriggerCooldowns(trigger)
     if saved then
-        saved[trigger.id] = GetServerTime() + trigger.cooldown
+        saved[key] = GetServerTime() + trigger.cooldown
     else
-        ScubaSounds.State.TriggerCooldowns[trigger.id] = GetTime() + trigger.cooldown
+        ScubaSounds.State.TriggerCooldowns[key] = GetTime() + trigger.cooldown
     end
 end
 

@@ -94,6 +94,24 @@ local RIGHT_COLUMN_X = 340 -- Options tab: the second column of checkboxes (mini
 local TEXT_PLAY_BUTTON_SIZE = 16 -- a play button inside a line of text (Stats rows, Notable Loot list headers)
 local QUESTION_MARK_ICON = 134400 -- INV_Misc_QuestionMark, for an ID the client doesn't know
 
+-- Disable Sounds turned on or off: every sound tab and the Options tab's sound settings follow straight away
+function ScubaSounds:RefreshSoundSettings()
+    local soundsOn = not ScubaSounds_Options[ScubaSounds_DisableSounds]
+    for _, setting in ipairs(ScubaSounds.UI.SoundSettings or {}) do
+        setting.checkbox:SetEnabled(soundsOn)
+        local color = soundsOn and LABEL_COLOR or DISABLED_COLOR
+        setting.label:SetTextColor(unpack(color))
+        if setting.underline then
+            setting.underline:SetColorTexture(color[1], color[2], color[3], 0.9)
+        end
+    end
+    for _, page in ipairs(ScubaSounds.UI.Pages or {}) do
+        if page.Category and not page.Category.unused then
+            ScubaSounds:RefreshCategoryPage(page)
+        end
+    end
+end
+
 -- A discovery arriving while the options window is open updates the shown tab's colours straight away
 function ScubaSounds:RefreshShownCategoryPage()
     local page = ScubaSounds.UI.Pages and ScubaSounds.UI.Pages[ScubaSounds.UI.SelectedTab]
@@ -495,8 +513,15 @@ function ScubaSounds:CreateGroup(page, item, x, y)
 end
 
 -- Category off greys out everything on its page except previews
+-- With Disable Sounds on, every setting on the page is greyed out too, the tab's own "Play ... sounds" toggle
+-- included (previews still play)
 function ScubaSounds:RefreshCategoryPage(page)
-    local enabled = ScubaSounds_Options.Categories[page.Category.id].enabled
+    local soundsOn = not ScubaSounds_Options[ScubaSounds_DisableSounds]
+    local enabled = soundsOn and ScubaSounds_Options.Categories[page.Category.id].enabled
+    if page.CategoryCheckbox then
+        page.CategoryCheckbox:SetEnabled(soundsOn)
+        page.CategoryLabel:SetTextColor(unpack(soundsOn and LABEL_COLOR or DISABLED_COLOR))
+    end
     for _, checkbox in ipairs(page.Checkboxes) do
         checkbox:SetEnabled(enabled)
     end
@@ -539,7 +564,8 @@ function ScubaSounds:CreateCategoryPage(frame, category)
             settings.enabled = checked
             ScubaSounds:RefreshCategoryPage(page)
         end)
-        ScubaSounds:CreateLabel(page, categoryCheckbox, "Play " .. category.name .. " sounds")
+        page.CategoryCheckbox = categoryCheckbox
+        page.CategoryLabel = ScubaSounds:CreateLabel(page, categoryCheckbox, "Play " .. category.name .. " sounds")
         -- Over the second column of sounds, as the first toggle is over the first
         local bgCheckbox = ScubaSounds:CreateCheckbox(page, GRID_LEFT + COLUMN_WIDTH, CATEGORY_TOGGLES_Y,
             settings.inBattlegrounds,
@@ -1191,7 +1217,16 @@ function ScubaSounds:CreateGlobalOptionsPage(frame)
         ScubaSounds_Options[ScubaSounds_PlayOutsideRaid], function(checked)
             ScubaSounds_Options[ScubaSounds_PlayOutsideRaid] = checked
         end)
-    ScubaSounds:CreateLabel(page, outsideRaid, ScubaSounds_PlayOutsideRaid)
+    -- Settings that only matter while sounds play: greyed out while Disable Sounds is on (see RefreshSoundSettings)
+    ScubaSounds.UI.SoundSettings = {}
+    local function soundSetting(checkbox, label, underline)
+        table.insert(ScubaSounds.UI.SoundSettings, {
+            checkbox = checkbox,
+            label = label,
+            underline = underline
+        })
+    end
+    soundSetting(outsideRaid, ScubaSounds:CreateLabel(page, outsideRaid, ScubaSounds_PlayOutsideRaid))
 
     local minimapButton = ScubaSounds:CreateCheckbox(page, GRID_LEFT + RIGHT_COLUMN_X, -31,
         not ScubaSounds_Options.Minimap.hidden, function(checked)
@@ -1210,7 +1245,7 @@ function ScubaSounds:CreateGlobalOptionsPage(frame)
         ScubaSounds_Options[ScubaSounds_ReplayOneTime], function(checked)
             ScubaSounds_Options[ScubaSounds_ReplayOneTime] = checked
         end)
-    ScubaSounds:CreateLabel(page, replayOneTime, ScubaSounds_ReplayOneTime)
+    soundSetting(replayOneTime, ScubaSounds:CreateLabel(page, replayOneTime, ScubaSounds_ReplayOneTime))
     -- What it replays and the spam warning, instead of the plain On/Off tooltip (kept after clicking too)
     local function showReplayTooltip(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
@@ -1235,13 +1270,14 @@ function ScubaSounds:CreateGlobalOptionsPage(frame)
         ScubaSounds_Options[ScubaSounds_GuildDeaths], function(checked)
             ScubaSounds_Options[ScubaSounds_GuildDeaths] = checked
         end)
-    ScubaSounds:CreateLabel(page, guildDeaths, ScubaSounds_GuildDeaths)
+    soundSetting(guildDeaths, ScubaSounds:CreateLabel(page, guildDeaths, ScubaSounds_GuildDeaths))
 
     local playDiscoveries = ScubaSounds:CreateCheckbox(page, GRID_LEFT, -31 - 4 * (ROW_HEIGHT + 4),
         ScubaSounds_Options[ScubaSounds_PlayDiscoveries], function(checked)
             ScubaSounds_Options[ScubaSounds_PlayDiscoveries] = checked
         end)
-    ScubaSounds:CreateLabel(page, playDiscoveries, ScubaSounds_PlayDiscoveries)
+    soundSetting(playDiscoveries, ScubaSounds:CreateLabel(page, playDiscoveries, ScubaSounds_PlayDiscoveries))
+    ScubaSounds:RefreshSoundSettings()
 
     local playEvery = ScubaSounds:CreateCheckbox(page, GRID_LEFT + RIGHT_COLUMN_X, -31 - 4 * (ROW_HEIGHT + 4),
         ScubaSounds_Options[ScubaSounds_PlayEverySound], function(checked)
@@ -1255,6 +1291,7 @@ function ScubaSounds:CreateGlobalOptionsPage(frame)
     local underline = page:CreateTexture(nil, "ARTWORK")
     underline:SetColorTexture(1, 1, 1, 0.9)
     underline:SetHeight(1)
+    soundSetting(playEvery, playEveryLabel, underline)
     local function placeUnderline()
         measure:SetText("Play ")
         local before = measure:GetStringWidth()
@@ -1269,13 +1306,32 @@ function ScubaSounds:CreateGlobalOptionsPage(frame)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
         GameTooltip:SetText(ScubaSounds_PlayEverySound .. ": " .. (self:GetChecked() and "On" or "Off"), 1, 1, 1)
         GameTooltip:AddLine("Very spammy, mostly for debugging.", 1, 0.5, 0.25, true)
-        GameTooltip:AddLine("Plays every sound any guildmate's client plays, and says who played it with the sound's " ..
-                                "link in your chat (only you see it). Cooldowns are skipped, but sounds and tabs you've " ..
-                                "turned off stay off.", 1, 0.82, 0, true)
+        GameTooltip:AddLine("Plays every sound any guildmate's client plays, skipping cooldowns. Sounds and tabs " ..
+                                "you've turned off stay off. \"See all sounds in chat\" shows who played them.", 1, 0.82,
+            0, true)
         GameTooltip:Show()
     end
     playEvery:SetScript("OnEnter", showPlayEveryTooltip)
     playEvery:HookScript("OnClick", showPlayEveryTooltip)
+    ScubaSounds:RefreshSoundSettings()
+
+    -- Not a sound setting: the chat lines still come while sounds are disabled
+    local seeAll = ScubaSounds:CreateCheckbox(page, GRID_LEFT + RIGHT_COLUMN_X, -31 - 3 * (ROW_HEIGHT + 4),
+        ScubaSounds_Options[ScubaSounds_SeeAllSounds], function(checked)
+            ScubaSounds_Options[ScubaSounds_SeeAllSounds] = checked
+        end)
+    ScubaSounds:CreateLabel(page, seeAll, ScubaSounds_SeeAllSounds)
+    local function showSeeAllTooltip(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetText(ScubaSounds_SeeAllSounds .. ": " .. (self:GetChecked() and "On" or "Off"), 1, 1, 1)
+        GameTooltip:AddLine("Very spammy, mostly for debugging.", 1, 0.5, 0.25, true)
+        GameTooltip:AddLine("Every sound any guildmate's client plays shows in your chat with who played it and the " ..
+                                "sound's link (only you see it). Sounds and tabs you've turned off are left out. Works " ..
+                                "with sounds disabled too.", 1, 0.82, 0, true)
+        GameTooltip:Show()
+    end
+    seeAll:SetScript("OnEnter", showSeeAllTooltip)
+    seeAll:HookScript("OnClick", showSeeAllTooltip)
 
     -- Only the prank target, and only once the addon has said it for him at least once. Beside "Send messages in
     -- guild" (it's guild chat too), so showing it doesn't move anything

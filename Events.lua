@@ -275,6 +275,7 @@ function ScubaSounds.Events:UNIT_SPELLCAST_SUCCEEDED(unitTarget, castGUID, spell
         ScubaSounds.State.TameBeastCastAt = GetTime()
     end
     ScubaSounds:CheckFirstCast(spellId, spellName, sourceName)
+    ScubaSounds:NoteExplosiveThrown(spellName)
     ScubaSounds:Fire("SpellCast", {
         spellId = spellId,
         spellName = not issecretvalue(spellName) and spellName or nil,
@@ -337,14 +338,22 @@ function ScubaSounds.Events:PARTY_KILL(attackerGUID, targetGUID)
         (attackerGUID ~= UnitGUID("player") and attackerGUID ~= UnitGUID("pet")) then
         return
     end
+    local isPlayerTarget = not issecretvalue(targetGUID) and targetGUID and targetGUID:find("^Player%-")
+    -- An explosive kill of an NPC plays Brick in place of the critter/frog sounds; player kills keep their own
+    -- sounds (kill streaks, Skyborne). The once-per-account murloc still plays either way
+    local explosive = attackerGUID == UnitGUID("player") and not isPlayerTarget and ScubaSounds:CheckExplosiveKill()
     if issecretvalue(targetGUID) then
         -- An NPC; only the target can tell what it was
-        ScubaSounds:HandleCritterKill(nil)
+        if not explosive then
+            ScubaSounds:HandleCritterKill(nil)
+        end
         ScubaSounds:HandleMurlocKill(nil)
-    elseif targetGUID and targetGUID:find("^Player%-") then
+    elseif isPlayerTarget then
         ScubaSounds:HandlePlayerKill(targetGUID)
     elseif targetGUID then
-        ScubaSounds:HandleCritterKill(targetGUID)
+        if not explosive then
+            ScubaSounds:HandleCritterKill(targetGUID)
+        end
         ScubaSounds:HandleMurlocKill(targetGUID)
     end
 end
