@@ -891,6 +891,10 @@ ScubaSounds.Audio.SoundInfo = {
 -- Every sound on the Level Ups tab, kept in Sounds/LevelUp. Sound -> its SoundInfo; anything left out takes
 -- LevelUpDefaults
 ScubaSounds.Data.LevelUpSounds = {
+    AddonComplete = {duration = 2},
+    BigJobHuh = {duration = 2},
+    BotwItemGet = {duration = 2},
+    ChronoTrigger = {duration = 6},
     Diablo2LevelUp = {duration = 2},
     DragonQuestLevelUp = {duration = 3},
     EldenRingVictory = {duration = 7},
@@ -900,10 +904,18 @@ ScubaSounds.Data.LevelUpSounds = {
     FireEmblemLevelUp = {duration = 2},
     FlawlessVictory = {duration = 2},
     GoldenSunVictory = {duration = 5},
+    InTheRearWithTheGear = {duration = 2},
+    JobsDone = {duration = 1},
+    JobsFinished = {duration = 1},
     Mario1Up = {duration = 1},
     Mario64StarGet = {duration = 3},
     MarioPowerUp = {duration = 1},
+    MinecraftAchievement = {duration = 6},
     MinecraftLevelUp = {duration = 2},
+    MissionPassed = {duration = 7},
+    MutationComplete = {duration = 3},
+    OdeToJoy = {duration = 10},
+    PokemonGymBadge = {duration = 6},
     PokemonLevelUp = {duration = 3},
     ProtossUpgrade = {duration = 2},
     RuneScapeLevelUp = {duration = 3},
@@ -914,19 +926,25 @@ ScubaSounds.Data.LevelUpSounds = {
         extension = "wav",
         duration = 19,
         timeout = 60,
-        credit = "Kaymon",
         delay = 0
     },
+    Trumpet = {duration = 2},
     Warcraft3LevelUp = {duration = 3},
-    YouDoButYouDont = {duration = 2},
+    WorkComplete = {duration = 1},
+    WorkWork = {duration = 1},
+    YouDoButYouDont = {
+        duration = 2,
+        credit = "Jujewmagic"
+    },
     ZeldaHeartContainer = {duration = 4},
-    ZeldaItemGet = {duration = 2}
+    ZeldaItemGet = {duration = 2},
+    ZugZug = {duration = 1}
 }
 ScubaSounds.Data.LevelUpDefaults = {
     extension = "ogg",
     canOverlapSelf = false,
     timeout = 1,
-    credit = "Jujewmagic",
+    credit = "Kaymon",
     folder = "LevelUp",
     -- Seconds after the trigger, so the jingle doesn't land on top of the game's own level-up sound
     delay = 1
