@@ -51,6 +51,10 @@ local OPTIONS_WIDTH = GRID_CONTENT_WIDTH + GRID_LEFT - GROUP_INSET - 2
 -- window keeps its width and margins
 local SCROLL_BAR_RIGHT = GRID_CONTENT_WIDTH - (GRID_LEFT + 3 * COLUMN_WIDTH - 2 * GROUP_INSET)
 local GRID_BOTTOM_INSET = 12
+-- The glow over a sound opened from a chat link: as wide as a group box's inside, pulsing until the window closes
+local HIGHLIGHT_WIDTH = COLUMN_WIDTH - 2 * GROUP_INSET
+local HIGHLIGHT_FADE_IN = 0.25 -- seconds
+local HIGHLIGHT_FADE_OUT = 0.6 -- seconds
 local TAB_PADDING = 28 -- tab width beyond its label
 local TAB_MIN_WIDTH = 56
 local TAB_HEIGHT = 26
@@ -482,6 +486,10 @@ function ScubaSounds:CreateSoundRow(page, category, sound, x, y)
     end)
     text.Sound = sound
     table.insert(page.Names, text)
+    page.RowSpots[sound] = {
+        x = x,
+        y = y
+    }
 
     if not category.unused then
         ScubaSounds:CreateChanceBox(page, category, sound, x, y)
@@ -552,6 +560,7 @@ function ScubaSounds:CreateCategoryPage(frame, category)
     page:Hide()
     page.Category = category
     page.Checkboxes, page.EditBoxes, page.Labels, page.Names = {}, {}, {}, {}
+    page.RowSpots = {} -- sound -> its row's x, y on the grid, for HighlightSound
 
     if category.unused then
         local message = page:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
@@ -604,6 +613,7 @@ function ScubaSounds:CreateCategoryPage(frame, category)
     scroll:SetScrollChild(grid)
     grid.Category = category
     grid.Checkboxes, grid.EditBoxes, grid.Labels, grid.Names = page.Checkboxes, page.EditBoxes, page.Labels, page.Names
+    grid.RowSpots = page.RowSpots
 
     local items, contentHeight = ScubaSounds:LayoutCategory(category)
     for _, item in ipairs(items) do
@@ -1491,13 +1501,76 @@ function ScubaSounds:SetUpInputFocusRelease()
     end
 end
 
-function ScubaSounds:ShowOptionsTab(tabName)
+-- sound: optional, scrolled to and lit up on that tab (a shift-clicked chat link)
+function ScubaSounds:ShowOptionsTab(tabName, sound)
     ScubaSoundsOptionsFrame:Show()
     for i, name in ipairs(ScubaSounds.UI.TabNames or {}) do
         if name == tabName then
             ScubaSounds:SelectOptionsTab(i)
+            if sound then
+                ScubaSounds:HighlightSound(ScubaSounds.UI.Pages[i], sound)
+            end
             return
         end
     end
     ScubaSounds:SelectOptionsTab(ScubaSounds.UI.SelectedTab or 1)
+end
+
+-- A gold glow over the sound's row, pulsing until the window closes. The row is scrolled into view first when the tab
+-- scrolls. One glow per tab, moved to whichever sound was asked for last
+function ScubaSounds:HighlightSound(page, sound)
+    local spot = page and page.RowSpots and page.RowSpots[sound]
+    if not spot or not page.Grid then
+        return
+    end
+    local grid = page.Grid
+    local glow = grid.Glow
+    if not glow then
+        glow = CreateFrame("Frame", nil, grid)
+        -- Over the rows and group boxes, under the scroll bar
+        glow:SetFrameLevel(grid:GetFrameLevel() + 5)
+        glow:SetSize(HIGHLIGHT_WIDTH, ROW_HEIGHT)
+        local texture = glow:CreateTexture(nil, "OVERLAY")
+        texture:SetAllPoints()
+        texture:SetTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight")
+        texture:SetBlendMode("ADD")
+        texture:SetVertexColor(1, 0.82, 0)
+        local pulse = glow:CreateAnimationGroup()
+        local fadeIn = pulse:CreateAnimation("Alpha")
+        fadeIn:SetFromAlpha(0)
+        fadeIn:SetToAlpha(1)
+        fadeIn:SetDuration(HIGHLIGHT_FADE_IN)
+        fadeIn:SetOrder(1)
+        local fadeOut = pulse:CreateAnimation("Alpha")
+        fadeOut:SetFromAlpha(1)
+        fadeOut:SetToAlpha(0)
+        fadeOut:SetDuration(HIGHLIGHT_FADE_OUT)
+        fadeOut:SetOrder(2)
+        pulse:SetLooping("REPEAT")
+        glow.Pulse = pulse
+        grid.Glow = glow
+        -- Hidden animations only pause, so closing the window ends it rather than leaving it to resume on reopening
+        ScubaSoundsOptionsFrame:HookScript("OnHide", function()
+            pulse:Stop()
+            glow:Hide()
+        end)
+    end
+    glow.Pulse:Stop()
+    glow:ClearAllPoints()
+    -- Centred on the row's name, from just left of its checkbox to the chance box's "%"
+    glow:SetPoint("TOPLEFT", grid, "TOPLEFT", spot.x - 4, spot.y - 3)
+    glow:Hide()
+    -- The scroll frame only knows its size and range once the tab has been drawn
+    C_Timer.After(0, function()
+        local scroll = page.Scroll
+        if scroll then
+            local top, height, offset = -spot.y, scroll:GetHeight(), scroll:GetVerticalScroll()
+            if top < offset or top + ROW_HEIGHT > offset + height then
+                scroll:SetVerticalScroll(math.max(0, math.min(top - (height - ROW_HEIGHT) / 2,
+                    scroll:GetVerticalScrollRange())))
+            end
+        end
+        glow:Show()
+        glow.Pulse:Play()
+    end)
 end

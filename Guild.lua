@@ -886,7 +886,7 @@ function ScubaSounds:SetUpDiscoveryLinks()
         end
         -- Shift opens the tab, ctrl opens it and plays, a plain click plays
         if IsShiftKeyDown() or IsControlKeyDown() then
-            ScubaSounds:ShowOptionsTab(tabName)
+            ScubaSounds:ShowOptionsTab(tabName, sound)
         end
         if not IsShiftKeyDown() and ScubaSounds.Audio.SoundInfo[sound] then
             ScubaSounds:PreviewSound(sound)
