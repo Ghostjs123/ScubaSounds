@@ -106,12 +106,17 @@ end
 -- on. Waits a moment so a death seen here first (UNIT_DIED, which also covers the group) isn't played twice. Only
 -- what's known from the message: no class, one-shot or bear form, so the Other Deaths sounds stay for deaths seen here
 -- A first death (fd=<sound>) is noted straight away, so a death seen here (waiting FirstDeathWait) plays it instead of
--- the death sound; a first death far away plays it for the whole guild, whatever the guild deaths option says
+-- the death sound; a first death far away plays it for the whole guild, whatever the guild deaths option says. What
+-- killed them (env=lava/fall) is noted the same way, for the Other Deaths sounds of a death seen here
 ScubaSounds.GuildEvents[ScubaSounds_DiedCommand] = function(self, playerName, fields)
     local data = ScubaSounds.Data
     if ScubaSounds:IsOwnName(playerName) or
         (tonumber(fields.t) and GetServerTime() - tonumber(fields.t) > data.GuildDeathMaxAge) then
         return
+    end
+    local environment = fields.env and tostring(fields.env)
+    if environment == "lava" or environment == "fall" then
+        ScubaSounds:NoteEnvironmentalDeath(playerName, environment)
     end
     local firstDeath = fields.fd and tostring(fields.fd)
     if firstDeath and ScubaSounds.Audio.SoundInfo[firstDeath] then
@@ -129,6 +134,7 @@ ScubaSounds.GuildEvents[ScubaSounds_DiedCommand] = function(self, playerName, fi
         if seenAt and math.abs(seenAt - heardAt) <= data.GuildDeathDuplicateWindow then
             return
         end
+        ScubaSounds:TakeEnvironmentalDeath(playerName) -- not used for deaths far away
         if ScubaSounds:PlayFirstDeath(playerName) or not ScubaSounds_Options[ScubaSounds_GuildDeaths] then
             return
         end
@@ -235,8 +241,8 @@ function ScubaSounds:BroadcastToGuild(command, fields, prio)
     ScubaSounds:SendGuildMessage(message:sub(1, 255), nil, prio)
 end
 
--- firstDeathSound: our first death's sound, so the whole guild plays the same one
-function ScubaSounds:BroadcastDeath(lastDamage, firstDeathSound)
+-- firstDeathSound: our first death's sound, so the whole guild plays the same one. environment: "lava", "fall" or nil
+function ScubaSounds:BroadcastDeath(lastDamage, firstDeathSound, environment)
     local _, instanceType, difficultyId, _, _, _, _, instanceId = GetInstanceInfo()
     local fields = {
         zone = GetRealZoneText(),
@@ -258,6 +264,7 @@ function ScubaSounds:BroadcastDeath(lastDamage, firstDeathSound)
         fields.ago = math.floor((GetTime() - lastDamage.time) * 10) / 10
     end
     fields.fd = firstDeathSound
+    fields.env = environment
     ScubaSounds:BroadcastToGuild(ScubaSounds_DiedCommand, fields, "ALERT")
 end
 

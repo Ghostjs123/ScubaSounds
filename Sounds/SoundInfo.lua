@@ -28,6 +28,13 @@ ScubaSounds.Audio.SoundInfo = {
         -- Unused tab tooltip: what it played for before Forever
         formerUse = "Used to play when you crit for 6300-6399 damage (needs the combat log)"
     },
+    ["AFewMomentsLater"] = {
+        extension = "ogg",
+        duration = 2,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Kaymon"
+    },
     ["ANewRecord"] = {
         extension = "wav",
         duration = 2,
@@ -159,6 +166,13 @@ ScubaSounds.Audio.SoundInfo = {
         canOverlapSelf = false,
         timeout = 1,
         credit = "Shib"
+    },
+    ["CoffinDance"] = {
+        extension = "ogg",
+        duration = 6,
+        canOverlapSelf = false,
+        timeout = 120,
+        credit = "Kaymon"
     },
     ["ComeOnYouApes"] = {
         extension = "ogg",
@@ -552,12 +566,26 @@ ScubaSounds.Audio.SoundInfo = {
         timeout = 1,
         credit = "Shib"
     },
+    ["Nokia"] = {
+        extension = "ogg",
+        duration = 3,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Kaymon"
+    },
     ["NoLife"] = {
         extension = "ogg",
         duration = 4,
         canOverlapSelf = false,
         timeout = 1,
         credit = "Shib"
+    },
+    ["Nope"] = {
+        extension = "ogg",
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Kaymon"
     },
     ["Nein"] = {
         extension = "wav",
@@ -612,6 +640,13 @@ ScubaSounds.Audio.SoundInfo = {
     ["NowThatsALottaDmg"] = {
         extension = "wav",
         duration = 2,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Kaymon"
+    },
+    ["Nudge"] = {
+        extension = "ogg",
+        duration = 1,
         canOverlapSelf = false,
         timeout = 1,
         credit = "Kaymon"
@@ -760,6 +795,13 @@ ScubaSounds.Audio.SoundInfo = {
         canOverlapSelf = false,
         timeout = 1
     },
+    ["Sheesh"] = {
+        extension = "ogg",
+        duration = 2,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Kaymon"
+    },
     ["ShowDog"] = {
         extension = "ogg",
         duration = 10,
@@ -787,6 +829,20 @@ ScubaSounds.Audio.SoundInfo = {
         canOverlapSelf = false,
         timeout = 1,
         credit = "Shib"
+    },
+    ["SurpriseMotherfucker"] = {
+        extension = "ogg",
+        duration = 2,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Kaymon"
+    },
+    ["TakeMyMoney"] = {
+        extension = "ogg",
+        duration = 2,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Kaymon"
     },
     ["ThanksDahfart"] = {
         extension = "mp3",
@@ -852,6 +908,20 @@ ScubaSounds.Audio.SoundInfo = {
         duration = 3,
         canOverlapSelf = false,
         timeout = 1
+    },
+    ["WhyAreYouRunning"] = {
+        extension = "ogg",
+        duration = 3,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Kaymon"
+    },
+    ["Willhelm"] = {
+        extension = "ogg",
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Kaymon"
     },
     ["Wizard1"] = {
         extension = "ogg",

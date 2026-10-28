@@ -27,9 +27,12 @@ function ScubaSounds:FireDeath(death)
         ScubaSounds:Fire("PlayerDied", death)
         return
     end
-    -- A death seen here waits for the dying player's DIED message: their first death plays its sound instead
+    -- A death seen here waits for the dying player's DIED message: their first death plays its sound instead, and it
+    -- says whether lava or a fall killed them
     C_Timer.After(ScubaSounds.Data.FirstDeathWait, function()
+        local environment = ScubaSounds:TakeEnvironmentalDeath(death.name)
         if not ScubaSounds:PlayFirstDeath(death.name) then
+            death.environment = environment
             ScubaSounds:Fire("PlayerDied", death)
         end
     end)
@@ -228,15 +231,49 @@ function ScubaSounds:CheckFirstDeath()
     return sound
 end
 
--- Lava: environmental damage doesn't put you in combat, so a fatal fire hit taken out of combat is lava
+-- What killed us, from the fatal hit: "lava" (environmental damage doesn't put you in combat, so a fire hit out of
+-- combat), "fall", or nil
+function ScubaSounds:EnvironmentalDeathKind(lastDamage)
+    if not lastDamage or GetTime() - lastDamage.time > ScubaSounds.Data.EnvironmentalDeathWindow then
+        return nil
+    end
+    if not lastDamage.inCombat and lastDamage.schoolMask == ScubaSounds.Data.FireSchoolMask then
+        return "lava"
+    end
+    return lastDamage.isFall and "fall" or nil
+end
+
+-- Noted for when the death plays (see FireDeath), and sent in our DIED message so the group knows too
 function ScubaSounds:HandlePlayerDeath()
     local lastDamage = ScubaSounds.State.LastPlayerDamage
     ScubaSounds.State.LastPlayerDamage = nil
-    ScubaSounds:BroadcastDeath(lastDamage, ScubaSounds:CheckFirstDeath())
-    if lastDamage and not lastDamage.inCombat and lastDamage.schoolMask == ScubaSounds.Data.FireSchoolMask and GetTime() -
-        lastDamage.time < 2 then
-        ScubaSounds:Fire("DiedToLava")
+    local kind = ScubaSounds:EnvironmentalDeathKind(lastDamage)
+    local character = ScubaSounds:FullName("player")
+    if kind and character then
+        ScubaSounds:NoteEnvironmentalDeath(character, kind)
     end
+    ScubaSounds:BroadcastDeath(lastDamage, ScubaSounds:CheckFirstDeath(), kind)
+end
+
+function ScubaSounds:NoteEnvironmentalDeath(name, kind)
+    ScubaSounds.State.EnvironmentalDeaths[strlower(name)] = {
+        kind = kind,
+        at = GetTime()
+    }
+end
+
+-- How a death seen here was caused ("lava", "fall" or nil), used up once read
+function ScubaSounds:TakeEnvironmentalDeath(name)
+    local key = name and strlower(name)
+    local entry = key and ScubaSounds.State.EnvironmentalDeaths[key]
+    if not entry then
+        return nil
+    end
+    ScubaSounds.State.EnvironmentalDeaths[key] = nil
+    if GetTime() - entry.at > ScubaSounds.Data.GuildDeathDuplicateWindow then
+        return nil
+    end
+    return entry.kind
 end
 
 -- =================================================================
@@ -1167,6 +1204,7 @@ function ScubaSounds:HookMerchantBuys()
         return
     end
     hooksecurefunc("BuyMerchantItem", function(index)
+        ScubaSounds:CheckExpensivePurchase(index)
         local link = GetMerchantItemLink(index)
         if issecretvalue(link) or not link then
             return
@@ -1175,6 +1213,58 @@ function ScubaSounds:HookMerchantBuys()
         if classId == ScubaSounds.Data.ConsumableItemClass and subclassId == ScubaSounds.Data.PotionItemSubclass then
             ScubaSounds:Fire("PotionBought") -- the trigger's cooldown keeps it to once an hour
         end
+    end)
+end
+
+-- A vendor item costing over ExpensiveItemMinPrice each (the price shown is for its stack). Remembered so the big-loot
+-- sound for the same item stays quiet here (see the BigLoot trigger); the rest of the guild still hears it
+function ScubaSounds:CheckExpensivePurchase(index)
+    local _, _, price, stackCount = GetMerchantItemInfo(index)
+    if issecretvalue(price) or issecretvalue(stackCount) or type(price) ~= "number" then
+        return
+    end
+    if price / math.max(stackCount or 1, 1) > ScubaSounds.Data.ExpensiveItemMinPrice then
+        ScubaSounds.State.LastExpensivePurchaseAt = GetTime()
+        ScubaSounds:Fire("ExpensiveItemBought")
+    end
+end
+
+-- True while our own big loot is the expensive item we just bought
+function ScubaSounds:IsOwnExpensivePurchase(loot)
+    local boughtAt = ScubaSounds.State.LastExpensivePurchaseAt
+    return boughtAt ~= nil and GetTime() - boughtAt <= ScubaSounds.Data.ExpensivePurchaseLootWindow and
+               loot.sourceName ~= nil and ScubaSounds:IsOwnName(loot.sourceName)
+end
+
+-- Declining a duel request or cancelling one we sent (both call CancelDuel)
+function ScubaSounds:HookDuelCancel()
+    if CancelDuel then
+        hooksecurefunc("CancelDuel", function()
+            ScubaSounds:Fire("DuelCancelled")
+        end)
+    end
+end
+
+-- Taking a flight path: picking a destination (TakeTaxiNode), counted once we're actually on the taxi, so a click that
+-- fails (not enough gold) stays quiet. Checked once a second for a few seconds
+function ScubaSounds:HookFlightPaths()
+    if not TakeTaxiNode then
+        return
+    end
+    hooksecurefunc("TakeTaxiNode", function()
+        local checksLeft = ScubaSounds.Data.FlightStartChecks
+        local function check()
+            local onTaxi = UnitOnTaxi("player")
+            if not issecretvalue(onTaxi) and onTaxi then
+                ScubaSounds:Fire("FlightStarted")
+                return
+            end
+            checksLeft = checksLeft - 1
+            if checksLeft > 0 then
+                C_Timer.After(1, check)
+            end
+        end
+        C_Timer.After(1, check)
     end)
 end
 

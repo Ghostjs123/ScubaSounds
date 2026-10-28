@@ -38,6 +38,9 @@ for _, format in ipairs({LOOT_ITEM_SELF, LOOT_ITEM_SELF_MULTIPLE, LOOT_ITEM_PUSH
 end
 ScubaSounds.Data.TradeOrMailLootGuard = 1 -- seconds after a trade or the mailbox closes that loot lines are ignored
 ScubaSounds.Data.LegendaryQuality = 5 -- Enum.ItemQuality.Legendary
+ScubaSounds.Data.EpicQuality = 4 -- Enum.ItemQuality.Epic
+-- Epics put up for rolls this close together are one drop, so its chance is rolled once
+ScubaSounds.Data.EpicRollWindow = 10 -- seconds
 ScubaSounds.Data.CraftedByPattern = FormatToPattern(ITEM_CREATED_BY) -- "<Made by %s>" tooltip line
 -- Riding skill chat lines: "Your skill in %s has increased to %d." and "You have gained the %s skill."
 ScubaSounds.Data.SkillRankUpPattern = FormatToPattern(SKILL_RANK_UP, true)
@@ -103,10 +106,26 @@ ScubaSounds.Data.BloodOfHeroesItemId = 12938
 ScubaSounds.Data.ConsumableItemClass = 0 -- Enum.ItemClass.Consumable
 ScubaSounds.Data.PotionItemSubclass = 1 -- Enum.ItemConsumableSubclass.Potion
 ScubaSounds.Data.PotionSellerCooldown = 60 * 60 -- seconds
+-- Vendor items over this price each play TakeMyMoney
+ScubaSounds.Data.ExpensiveItemMinPrice = 50 * 10000 -- copper (50 gold)
+-- Our own big loot this soon after buying an expensive item is that item, so we hear TakeMyMoney instead of HelloThere
+ScubaSounds.Data.ExpensivePurchaseLootWindow = 10 -- seconds
 -- Spamming abilities on low mana fires OutOfMana over and over, so either of its sounds puts both on cooldown
 ScubaSounds.Data.OutOfManaCooldown = 5 * 60 -- seconds
 -- On the frog trigger rather than the sound, so the one-time murloc kill can't be swallowed by it
 ScubaSounds.Data.FrogKilledCooldown = 2 * 60 -- seconds
+-- Whispers while AFK can come one after another; either sound puts both on this cooldown
+ScubaSounds.Data.AfkWhisperCooldown = 60 * 60 -- seconds
+-- Seconds after picking a flight path destination that we look for being on the taxi (once a second)
+ScubaSounds.Data.FlightStartChecks = 3
+-- Clicking the destination twice starts one flight; no flight path is this short, so a real next flight still plays
+ScubaSounds.Data.FlightStartedCooldown = 10 -- seconds
+-- One decline can call CancelDuel more than once (the button, then the popup closing)
+ScubaSounds.Data.DuelCancelledCooldown = 5 -- seconds
+-- A pack of mobs can flee at once; this keeps a second lucky roll from playing it again
+ScubaSounds.Data.MobFledCooldown = 60 -- seconds
+-- The emote a mob posts when it flees at low health ("Defias Thug attempts to run away in fear!")
+ScubaSounds.Data.MobFleeEmoteText = "attempts to run away in fear"
 -- Gear swaps (Outfitter sets, a shirt kept for its look) can set these off over and over
 ScubaSounds.Data.ShirtRemovedCooldown = 20 * 60 -- seconds
 ScubaSounds.Data.WandEquippedCooldown = 20 * 60 -- seconds, shared by both wand sounds
@@ -164,6 +183,20 @@ ScubaSounds.Data.LivingBombDebuffId = 20475
 ScubaSounds.Data.SoulStoneResurrectionSpellIds = {20707, 20762, 20763, 20764, 20765}
 ScubaSounds.Data.SoulStoneAppliedSpellId = 20707
 ScubaSounds.Data.RecklessnessSpellId = 1719
+-- Stealth openers: Cheap Shot, Ambush and Pounce (every rank). Matched by ID or by name in case Forever's IDs differ
+ScubaSounds.Data.StealthOpenerSpellIds = {
+    [1833] = true, -- Cheap Shot
+    [8676] = true, -- Ambush
+    [8724] = true,
+    [8725] = true,
+    [11267] = true,
+    [11268] = true,
+    [11269] = true,
+    [9005] = true, -- Pounce
+    [9823] = true,
+    [9827] = true
+}
+ScubaSounds.Data.StealthOpenerSpellNames = {"Cheap Shot", "Ambush", "Pounce"}
 -- Riding skills learned from the trainer. Matched by ID or by name in case Forever's IDs differ
 ScubaSounds.Data.ApprenticeRidingSpellId = 33388
 ScubaSounds.Data.ApprenticeRidingSpellName = "Apprentice Riding"
@@ -232,7 +265,12 @@ ScubaSounds.Data.RidingRankTiers = {
 }
 
 -- Damage schools
+ScubaSounds.Data.PhysicalSchoolMask = 1
 ScubaSounds.Data.FireSchoolMask = 4
+-- Environmental deaths (lava, falling) are the fatal hit landing at most this long before the death
+ScubaSounds.Data.EnvironmentalDeathWindow = 2 -- seconds
+-- Fall damage: an out-of-combat physical hit at most this long after being in the air
+ScubaSounds.Data.FallLandingWindow = 0.3 -- seconds
 -- Lava: an out-of-combat fire tick at least this big (campfires and braziers tick far lower)
 ScubaSounds.Data.LavaMinDamage = 50
 -- "Replay one-time sounds every time": a new lava entry is a tick after this long out of lava, replayed at most
@@ -582,7 +620,8 @@ ScubaSounds.Data.WowEvents = {"ADDON_LOADED", "PLAYER_DEAD", "ENCOUNTER_START", 
                               "PET_STABLE_SHOW", "PET_STABLE_CLOSED", "UNIT_DISPLAYPOWER",
                               "GROUP_ROSTER_UPDATE", "PLAYER_UNGHOST", "UNIT_HEALTH", "PLAYER_GUILD_UPDATE",
                               "UI_INFO_MESSAGE", "CHAT_MSG_COMBAT_XP_GAIN",
-                              "CHAT_MSG_COMBAT_FACTION_CHANGE", "UPDATE_FACTION"}
+                              "CHAT_MSG_COMBAT_FACTION_CHANGE", "UPDATE_FACTION", "CHAT_MSG_MONSTER_EMOTE",
+                              "START_LOOT_ROLL", "CHAT_MSG_WHISPER"}
 -- Unit tokens for you and your group, so the frequent unit events can skip everything else with one lookup
 ScubaSounds.Data.GroupUnitTokens = {
     player = true
@@ -620,9 +659,14 @@ ScubaSounds.State.LastFirstCastAt = {} -- first-cast kind -> GetTime() it last c
 ScubaSounds.State.FirstDeaths = {} -- lowercased full name -> {sound, name, at, replay}: a first death waiting to play
 ScubaSounds.State.SyncedDiscoveries = {} -- guildmate who logged in -> discoveries new to us from their push
 ScubaSounds.State.LocalDeaths = {} -- lowercased full name -> GetTime() of the last death seen here (UNIT_DIED)
+-- lowercased full name -> {kind = "lava" or "fall", at}: what killed them, from our own death or their DIED message
+ScubaSounds.State.EnvironmentalDeaths = {}
+ScubaSounds.State.LastFallingAt = nil -- GetTime() the player was last in the air
 ScubaSounds.State.ResurrectRequested = false
 ScubaSounds.State.DeadOnCorpse = false -- died and hasn't released yet, the only time a soulstone or Ankh can be used
 ScubaSounds.State.LastPlayerDamage = nil
+ScubaSounds.State.LastExpensivePurchaseAt = nil -- GetTime() we last bought a vendor item over ExpensiveItemMinPrice
+ScubaSounds.State.LastEpicRollAt = nil -- GetTime() an epic last went up for a roll
 ScubaSounds.State.KillStreak = 0
 ScubaSounds.State.LastKillTime = nil
 ScubaSounds.State.LastEmoteToken = nil

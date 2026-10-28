@@ -95,11 +95,26 @@ local Data = ScubaSounds.Data
 -- Triggers: Player Deaths
 -- =================================================================
 -- PlayerDied is exclusive: a player's own death sound wins over the generic ones in Other Deaths, except for the
--- Other Deaths trigger added here first
+-- rarer Other Deaths triggers added here first: a one-shot, then lava and fall deaths
 AddTrigger("OneShotDeath", "OtherDeaths", "WW91IG9yIGEgZ3JvdXAgbWVtYmVyIGRpZXMgZnJvbSBmdWxsIGhlYWx0aCBpbiBvbmUgaGl0", {"NowThatsALottaDmg"}, {
     on = "PlayerDied",
     when = function(death)
         return death.isOneShot and not death.isFeigning
+    end,
+    newInForever = true
+})
+
+AddTrigger("LavaDeath", "OtherDeaths", "QSBncm91cCBtZW1iZXIgZGllcyB0byBsYXZhIG91dHNpZGUgb2YgY29tYmF0", {"Omg"}, {
+    on = "PlayerDied",
+    when = function(death)
+        return death.environment == "lava"
+    end
+})
+
+AddTrigger("FallDeath", "OtherDeaths", "WW91IGRpZSBmcm9tIGZhbGwgZGFtYWdl", {"Willhelm"}, {
+    on = "PlayerDied",
+    when = function(death)
+        return death.environment == "fall" and death.guid == UnitGUID("player")
     end,
     newInForever = true
 })
@@ -145,11 +160,6 @@ AddTrigger("DruidTankDeath", "OtherDeaths", "QSBkcnVpZCB0YW5rIGluIHlvdXIgZ3JvdXA
         return death.isDruidTank
     end,
     newInForever = true
-})
-
-AddTrigger("LavaDeath", "OtherDeaths", "QSBncm91cCBtZW1iZXIgZGllcyB0byBsYXZhIG91dHNpZGUgb2YgY29tYmF0", {"Omg"}, {
-    on = "DiedToLava",
-    relay = true
 })
 
 AddTrigger("FrogKilled", "OtherDeaths", "WW91IGtpbGwgYSBmcm9nIG9yIHRvYWQ=", {"GayFrogs"}, {
@@ -264,7 +274,7 @@ AddTrigger("Recklessness", "Party", "QSByYWlkIHdhcnJpb3IgdXNlcyBSZWNrbGVzc25lc3M
     relay = true
 })
 
-AddTrigger("GroupWipe", "Party", "WW91ciBncm91cCBvZiA1KyB3aXBlcw==", {"ScreamingSheep", "LotrFlee", "RaidWipe"}, {
+AddTrigger("GroupWipe", "Party", "WW91ciBncm91cCBvZiA1KyB3aXBlcw==", {"ScreamingSheep", "LotrFlee", "RaidWipe", "CoffinDance"}, {
     on = "GroupWiped",
     groupDiscovery = true,
     when = function(wipe)
@@ -362,14 +372,14 @@ AddTrigger("WompLoot", "Loot", "WW91IGxvb3QgYSBkaXNhcHBvaW50aW5nIGl0ZW0=", {"Dow
 AddTrigger("BigLoot", "Loot", "QSBndWlsZCBtZW1iZXIgbG9vdHMgYSBsZWdlbmRhcnkgb3IgYmlnIGl0ZW0=", {"HelloThere"}, {
     on = "GuildBigLoot",
     when = function(loot)
-        return not loot.isTriple
+        return not loot.isTriple and not ScubaSounds:IsOwnExpensivePurchase(loot)
     end
 })
 
 AddTrigger("BigLootTriple", "Loot", "VGhlIGd1aWxkIGxvb3RzIDMgYmlnIGl0ZW1zIHdpdGhpbiBhIG1pbnV0ZQ==", {"OhBabyATriple"}, {
     on = "GuildBigLoot",
     when = function(loot)
-        return loot.isTriple
+        return loot.isTriple and not ScubaSounds:IsOwnExpensivePurchase(loot)
     end
 })
 
@@ -377,6 +387,18 @@ AddTrigger("BigLootTriple", "Loot", "VGhlIGd1aWxkIGxvb3RzIDMgYmlnIGl0ZW1zIHdpdGh
 AddTrigger("FirstPotionBought", "Loot", "WW91IGJ1eSBhIHBvdGlvbiBmcm9tIGEgdmVuZG9yIChhdCBtb3N0IG9uY2UgYW4gaG91ciBwZXIgY2hhcmFjdGVyKQ==", {"PotionSeller"}, {
     on = "PotionBought",
     cooldown = Data.PotionSellerCooldown,
+    newInForever = true
+})
+
+AddTrigger("EpicRoll", "Loot", "QW4gZXBpYyBpdGVtIGdvZXMgdXAgZm9yIG5lZWQvZ3JlZWQgaW4gYSBncm91cCAobm90IGEgcmFpZCk=", {"Sheesh"}, {
+    on = "EpicRollStarted",
+    defaultChance = 20,
+    newInForever = true
+})
+
+-- Wins over HelloThere for an expensive big-loot item (a vendor mount), but only here: the guild still hears HelloThere
+AddTrigger("ExpensiveItemBought", "Loot", "WW91IGJ1eSBhbiBpdGVtIHdvcnRoIG92ZXIgNTAgZ29sZCBmcm9tIGEgdmVuZG9y", {"TakeMyMoney"}, {
+    on = "ExpensiveItemBought",
     newInForever = true
 })
 
@@ -518,6 +540,52 @@ AddTrigger("Bow", "Misc", "WW91IC9ib3c=", {"Sensei"}, {
         return emote.token == "BOW"
     end,
     defaultChance = 5,
+    newInForever = true
+})
+
+AddTrigger("StealthOpener", "Misc", "WW91IG9wZW4gd2l0aCBDaGVhcCBTaG90LCBBbWJ1c2ggb3IgUG91bmNl", {"SurpriseMotherfucker"}, {
+    on = "SpellCast",
+    when = function(cast)
+        if not cast.isPlayer then
+            return false
+        end
+        if Data.StealthOpenerSpellIds[cast.spellId] then
+            return true
+        end
+        for _, name in ipairs(Data.StealthOpenerSpellNames) do
+            if cast.spellName and ScubaSounds:EqualsIgnoreCase(cast.spellName, name) then
+                return true
+            end
+        end
+        return false
+    end,
+    defaultChance = 10,
+    newInForever = true
+})
+
+AddTrigger("MobFled", "Misc", "QSBtb2IgZmxlZXMgaW4gZmVhciB3aGlsZSB5b3UgYXJlIGluIGNvbWJhdA==", {"WhyAreYouRunning"}, {
+    on = "MobFled",
+    defaultChance = 1,
+    cooldown = Data.MobFledCooldown,
+    newInForever = true
+})
+
+AddTrigger("DuelCancelled", "Misc", "WW91IGRlY2xpbmUgb3IgY2FuY2VsIGEgZHVlbA==", {"Nope"}, {
+    on = "DuelCancelled",
+    defaultChance = 5,
+    cooldown = Data.DuelCancelledCooldown,
+    newInForever = true
+})
+
+AddTrigger("AfkWhisper", "Misc", "U29tZW9uZSB3aGlzcGVycyB5b3Ugd2hpbGUgeW91IGFyZSBBRks=", {"Nudge", "Nokia"}, {
+    on = "AfkWhisperReceived",
+    cooldown = Data.AfkWhisperCooldown,
+    newInForever = true
+})
+
+AddTrigger("FlightStarted", "Misc", "WW91IHRha2UgYSBmbGlnaHQgcGF0aA==", {"AFewMomentsLater"}, {
+    on = "FlightStarted",
+    cooldown = Data.FlightStartedCooldown,
     newInForever = true
 })
 

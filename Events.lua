@@ -47,6 +47,14 @@ end
 
 ScubaSounds_EventFrame:SetScript("OnEvent", ScubaSounds_OnEvent)
 
+-- When we were last in the air, so a physical hit right after landing counts as fall damage (UNIT_COMBAT doesn't say)
+ScubaSounds_EventFrame:SetScript("OnUpdate", function()
+    local falling = IsFalling()
+    if not issecretvalue(falling) and falling then
+        ScubaSounds.State.LastFallingAt = GetTime()
+    end
+end)
+
 -- Setup timers
 C_Timer.After(5, function()
     ScubaSounds.State.PreviousGuildMemberCount = GetNumGuildMembers()
@@ -114,6 +122,8 @@ function ScubaSounds.Events:ADDON_LOADED(addonName)
         ScubaSounds:SetUpDiscoveryLinks()
         ScubaSounds:SetUpWhisperNameCompletion()
         ScubaSounds:HookDismounts()
+        ScubaSounds:HookDuelCancel()
+        ScubaSounds:HookFlightPaths()
         ScubaSounds:SetUpInputFocusRelease()
         ScubaSounds:HookMerchantBuys()
         ScubaSounds:BuildOptionsFrame()
@@ -506,12 +516,17 @@ function ScubaSounds.Events:UNIT_COMBAT(unitTarget, action, flagText, amount, sc
     if issecretvalue(action) or issecretvalue(schoolMask) or action ~= "WOUND" then
         return
     end
+    local now, inCombat = GetTime(), UnitAffectingCombat("player")
+    local fellAt = ScubaSounds.State.LastFallingAt
     ScubaSounds.State.LastPlayerDamage = {
-        time = GetTime(),
+        time = now,
         schoolMask = schoolMask,
         amount = not issecretvalue(amount) and amount or nil,
         isCrit = not issecretvalue(flagText) and flagText == "CRITICAL",
-        inCombat = UnitAffectingCombat("player")
+        inCombat = inCombat,
+        -- Falling doesn't put you in combat
+        isFall = not inCombat and schoolMask == ScubaSounds.Data.PhysicalSchoolMask and fellAt ~= nil and now - fellAt <=
+            ScubaSounds.Data.FallLandingWindow
     }
     ScubaSounds:HandleLavaDamage(ScubaSounds.State.LastPlayerDamage)
 end
@@ -576,6 +591,42 @@ function ScubaSounds.Events:CHAT_MSG_SYSTEM(message)
     end
     ScubaSounds:HandleExploredMessage(message)
     ScubaSounds:HandleFactionStandingMessage(message)
+end
+
+-- An in-game whisper while we're flagged AFK
+function ScubaSounds.Events:CHAT_MSG_WHISPER()
+    local afk = UnitIsAFK("player")
+    if not issecretvalue(afk) and afk then
+        ScubaSounds:Fire("AfkWhisperReceived")
+    end
+end
+
+-- An epic up for need/greed in a party (not a raid). Epics from one drop open their rolls together and count once
+function ScubaSounds.Events:START_LOOT_ROLL(rollId)
+    if issecretvalue(rollId) or not IsInGroup() or IsInRaid() then
+        return
+    end
+    local _, _, _, quality = GetLootRollItemInfo(rollId)
+    if issecretvalue(quality) or quality ~= ScubaSounds.Data.EpicQuality then
+        return
+    end
+    local last = ScubaSounds.State.LastEpicRollAt
+    ScubaSounds.State.LastEpicRollAt = GetTime()
+    if not last or GetTime() - last > ScubaSounds.Data.EpicRollWindow then
+        ScubaSounds:Fire("EpicRollStarted")
+    end
+end
+
+-- A mob fleeing in fear while we're in combat (any nearby one, so it can be one the group is fighting)
+function ScubaSounds.Events:CHAT_MSG_MONSTER_EMOTE(message, mobName)
+    if issecretvalue(message) or type(message) ~= "string" or not UnitAffectingCombat("player") then
+        return
+    end
+    if message:find(ScubaSounds.Data.MobFleeEmoteText, 1, true) then
+        ScubaSounds:Fire("MobFled", {
+            name = not issecretvalue(mobName) and mobName or nil
+        })
+    end
 end
 
 -- The standing-change line may come as either a system or a faction message, depending on the client
