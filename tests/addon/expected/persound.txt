@@ -1,0 +1,11 @@
+Options.lua parses
+chat: Me-X discovered a sound: Mario1Up (Level Ups tab)
+chat: Me-X discovered a sound: FF7Victory (Level Ups tab)
+chat: Me-X discovered a sound: SunshineShineGet (Level Ups tab)
+chat: Me-X discovered a sound: GoodBoy (Misc tab)
+chat: Me-X discovered a sound: PapaMeat (Misc tab)
+away: ZeldaItemGet
+chat: Me-X discovered a sound: BigJobHuh (Level Ups tab)
+chat: Me-X discovered a sound: PokemonLevelUp (Level Ups tab)
+chat: Me-X brought 2 sound discoveries:
+chat: [BigJobHuh (Level Ups tab)], [PokemonLevelUp (Level Ups tab)]

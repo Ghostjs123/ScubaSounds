@@ -1,0 +1,8 @@
+default chance 1
+plays in 20000 flees (each 2 min apart): 210
+flee in combat (chance 100): WhyAreYouRunning
+second mob flees 5s later: nil
+another flees 65s after the first: WhyAreYouRunning
+flee while out of combat: nil
+other monster emote: nil
+secret message: nil

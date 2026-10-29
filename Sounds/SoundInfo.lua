@@ -216,7 +216,8 @@ ScubaSounds.Audio.SoundInfo = {
         extension = "ogg",
         duration = 1,
         canOverlapSelf = true,
-        timeout = 1
+        timeout = 1,
+        formerUse = "Used to play when Beaten died"
     },
     ["Dominating"] = {
         extension = "wav",
@@ -335,7 +336,8 @@ ScubaSounds.Audio.SoundInfo = {
         extension = "ogg",
         duration = 1,
         canOverlapSelf = false,
-        timeout = 1
+        timeout = 1,
+        formerUse = "Used to play when Nigel died"
     },
     ["HeLipped"] = {
         extension = "wav",
@@ -407,6 +409,13 @@ ScubaSounds.Audio.SoundInfo = {
         duration = 1,
         canOverlapSelf = false,
         timeout = 1
+    },
+    ["Irrelevant"] = {
+        extension = "ogg",
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Beaten"
     },
     ["IWasChosen"] = {
         extension = "wav",
@@ -492,6 +501,13 @@ ScubaSounds.Audio.SoundInfo = {
         canOverlapSelf = false,
         timeout = 1,
         credit = "Shib"
+    },
+    ["Mario"] = {
+        extension = "ogg",
+        duration = 2,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Nigel"
     },
     ["MindOfItsOwn"] = {
         extension = "ogg",
@@ -724,6 +740,13 @@ ScubaSounds.Audio.SoundInfo = {
         canOverlapSelf = false,
         timeout = 1
     },
+    ["PodRacing"] = {
+        extension = "ogg",
+        duration = 2,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Fahb"
+    },
     ["PotionSeller"] = {
         extension = "ogg",
         duration = 7,
@@ -850,6 +873,13 @@ ScubaSounds.Audio.SoundInfo = {
         canOverlapSelf = false,
         timeout = 1
     },
+    ["Tyler1Driving"] = {
+        extension = "ogg",
+        duration = 4,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Fahb"
+    },
     ["UnderTheWater"] = {
         extension = "ogg",
         duration = 3,
@@ -955,6 +985,13 @@ ScubaSounds.Audio.SoundInfo = {
         duration = 2,
         canOverlapSelf = false,
         timeout = 1
+    },
+    ["ZeldaItem"] = {
+        extension = "ogg",
+        duration = 3,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Nigel"
     }
 }
 

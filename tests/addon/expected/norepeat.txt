@@ -1,0 +1,3 @@
+PetTamed all on: repeats 0  GoodBoy PapaMeat BomboClatt GoodBoy PapaMeat BomboClatt PapaMeat GoodBoy
+LevelUp 2 on: repeats 0  FF7Victory Mario1Up FF7Victory Mario1Up FF7Victory Mario1Up FF7Victory Mario1Up
+LevelUp 1 on: repeats 4  Mario1Up Mario1Up Mario1Up Mario1Up Mario1Up

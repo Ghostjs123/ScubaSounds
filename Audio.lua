@@ -26,7 +26,7 @@ function ScubaSounds:ShouldPlay(sound)
         return false
     end
 
-    if not ScubaSounds:IsInClassicRaid() and ScubaSounds_Options[ScubaSounds_PlayOutsideRaid] == false then
+    if not ScubaSounds:IsInRaidInstance() and ScubaSounds_Options[ScubaSounds_PlayOutsideRaid] == false then
         return false
     end
 
@@ -83,15 +83,23 @@ function ScubaSounds:Fire(event, ctx)
     end
 end
 
--- Percent chance a sound plays when its trigger fires: the player's setting for it in that tab, else the trigger's
--- default. Kept per tab like SoundsOff, so one box covers every trigger of that sound in the tab
+-- Percent chance a trigger plays when it fires: the player's setting, else the trigger's default. A single-sound
+-- trigger's is kept per sound and tab like SoundsOff, so one box covers every such trigger of that sound in the tab
 -- A secret plays at its default chance until it's discovered, whatever was saved before (the box is locked till then)
 function ScubaSounds:GetChance(trigger, sound)
     local default = trigger.defaultChance or 100
     if ScubaSounds:IsHiddenSecret(trigger) then
         return default
     end
-    return ScubaSounds_Options.Chance[trigger.category .. "/" .. sound] or default
+    return ScubaSounds_Options.Chance[ScubaSounds:ChanceKey(trigger, sound)] or default
+end
+
+-- A trigger with several sounds has one chance for the whole trigger, whichever sound it picks
+function ScubaSounds:ChanceKey(trigger, sound)
+    if #trigger.sounds > 1 then
+        return trigger.category .. "/trigger:" .. trigger.id
+    end
+    return trigger.category .. "/" .. sound
 end
 
 -- Checks the trigger's category (and its battleground setting) and chance, then plays one of its playable sounds
@@ -201,13 +209,7 @@ function ScubaSounds:PlayTrigger(triggerId, pickedSound, ctx)
     if cycle then
         candidates = ScubaSounds:CycleRemaining(cycle, candidates)
     end
-    -- Each sound rolls its own chance, so a sound turned down leaves the pick to the others
-    local playable = {}
-    for _, sound in ipairs(candidates) do
-        if math.random(1, 100) <= ScubaSounds:GetChance(trigger, sound) then
-            table.insert(playable, sound)
-        end
-    end
+    local playable = candidates
     local recent = trigger.noRepeat and ScubaSounds:RecentTriggerSounds(trigger)
     if recent then
         local fresh = {}
@@ -219,8 +221,8 @@ function ScubaSounds:PlayTrigger(triggerId, pickedSound, ctx)
         if #fresh > 0 then
             playable = fresh
         elseif #playable > 1 then
-            -- Every playable sound played recently (most of them are turned off): the one heard longest ago, so the
-            -- same one still never plays twice in a row. A lone playable sound plays every time
+            -- Every candidate played recently (most of them are turned off): the one heard longest ago, so the
+            -- same one still never plays twice in a row. A lone candidate plays every time
             local oldest, oldestIndex
             for _, playableSound in ipairs(playable) do
                 local lastIndex = 0
@@ -236,8 +238,10 @@ function ScubaSounds:PlayTrigger(triggerId, pickedSound, ctx)
             playable = {oldest}
         end
     end
+    -- One roll per trigger: pick the sound, then roll its chance, so adding sounds doesn't make the trigger play more
     local sound = ScubaSounds:HasValue(playable, pickedSound) and pickedSound or ScubaSounds:SelectRandom(playable)
-    if sound == nil or not ScubaSounds:PlaySound(sound) then
+    if sound == nil or math.random(1, 100) > ScubaSounds:GetChance(trigger, sound) or
+        not ScubaSounds:PlaySound(sound) then
         return false
     end
     ScubaSounds:BroadcastPlayed(sound, trigger.category)

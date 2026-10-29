@@ -1,0 +1,4 @@
+msg: Open the options window first (/ss o)
+msg: Hidden options shown until the window closes
+flag true
+after close flag false

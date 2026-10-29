@@ -1,0 +1,8 @@
+whisper while AFK: Nudge
+second whisper 5s later: nil
+30 min later: nil
+61 min after the first: Nokia
+not AFK: nil
+AFK flag secret: nil
+Nudge 98
+Nokia 102

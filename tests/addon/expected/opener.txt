@@ -1,0 +1,6 @@
+chance 10, sound SurpriseMotherfucker, info true
+Cheap Shot by id: true
+Pounce rank 3 by id: true
+Pounce by name, unknown id: true
+Sinister Strike: false
+relayed Cheap Shot: false

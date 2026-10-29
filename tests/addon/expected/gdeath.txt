@@ -1,0 +1,6 @@
+Options.lua parses
+far away guildmate: silent
+own message echoed: silent
+PlayerDied Kay Mon-X trueName=x own=false
+seen here too: silent
+option off: silent

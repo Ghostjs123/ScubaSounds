@@ -1,0 +1,12 @@
+-- Mario1Up
+timer 1
+timer 2
+timer 1
+-- SuperSaiyan
+play now SuperSaiyan.wav
+timer 19
+timer 60
+-- BadMan
+play now BadMan.ogg
+timer 3
+timer 120

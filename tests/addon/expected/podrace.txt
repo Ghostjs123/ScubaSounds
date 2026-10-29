@@ -1,0 +1,17 @@
+30% speed, 20 stacks: silent
+hits 60% cap (60 stacks): PodRacing
+still at cap: silent
+slowed below cap: silent
+back at cap within 5 min: silent
+back at cap after 5 min: Tyler1Driving
+cap with boots enchant (52 stacks): Tyler1Driving
+Dash at 10 stacks: silent
+fast without Plainsrunning: silent
+mounted: silent
+on a flight path: silent
+secret speed: silent
+secret stacks at cap: PodRacing
+EpicRoll plays 19.9% (Sheesh 1974, ZeldaItem 2001)
+HugOrKiss plays 10.1%
+EpicRoll with ZeldaItem at 0%: 20.1%
+PetTamed (100%, noRepeat) plays 200/200, back-to-back repeats 0

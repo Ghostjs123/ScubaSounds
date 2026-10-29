@@ -1,0 +1,9 @@
+what the fuck    -> rolls the chance
+FUCKING hell     -> rolls the chance
+fuck.            -> rolls the chance
+that's fucked    -> nothing
+fuckwit          -> nothing
+motherfucker     -> nothing
+duck             -> nothing
+no swearing      -> nothing
+trigger: Misc, default chance 1, new in Forever true

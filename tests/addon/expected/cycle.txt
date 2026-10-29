@@ -1,0 +1,5 @@
+all on (40): each round has every sound=true, back-to-back=0
+8 off after 2 plays: BigJobHuh, AddonComplete, BigJobHuh, AddonComplete, BotwItemGet, BigJobHuh
+one back on: BotwItemGet, ZugZug, AddonComplete, ZugZug
+all but one at 0%: Diablo2LevelUp, SkyrimLevelUp, PokemonGymBadge
+two on: BigJobHuh, AddonComplete, BigJobHuh, AddonComplete, BigJobHuh, AddonComplete

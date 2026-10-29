@@ -1,0 +1,6 @@
+msg: Kay Mon-X logged in with 3 new sound discoveries:
+      BadMan(Other Deaths), FF7Victory(Level Ups)
+      Mario1Up(Level Ups)
+--
+-- (nothing above = silent)
+-- (nothing for Bob or Zed = silent)

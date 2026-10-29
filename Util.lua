@@ -109,18 +109,15 @@ function ScubaSounds:ItemIdFromItemLink(itemLink)
     return tonumber(itemLink:match("item:(%d+)"))
 end
 
-function ScubaSounds:IsInClassicRaid()
-    local instanceId = select(8, GetInstanceInfo())
-    if not issecretvalue(instanceId) and ScubaSounds.Data.RaidIds[instanceId] ~= nil then
-        return true
+-- Any instance the game calls a raid, so Forever's new raids count without a list. In an encounter the type can come
+-- back secret; then the last answer that could be read stands
+function ScubaSounds:IsInRaidInstance()
+    local _, instanceType = GetInstanceInfo()
+    if issecretvalue(instanceType) then
+        return ScubaSounds.State.InRaidInstance
     end
-    local zoneName = GetRealZoneText()
-    for raidZoneName in pairs(ScubaSounds.Data.RaidZoneNames) do
-        if ScubaSounds:EqualsIgnoreCase(zoneName, raidZoneName) then
-            return true
-        end
-    end
-    return false
+    ScubaSounds.State.InRaidInstance = instanceType == "raid"
+    return ScubaSounds.State.InRaidInstance
 end
 
 -- Game text (zones, spells, buffs) is compared ignoring case in case Forever capitalizes differently

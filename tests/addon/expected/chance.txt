@@ -1,0 +1,8 @@
+Options.lua parses
+Misc/Brando=40
+Misc/DoYouSeeMyMana=50
+Misc/YouHaveNoMana=50
+OutOfMana DoYouSeeMyMana 1
+OutOfMana silent 1999
+both 0: nil
+Lick default 10

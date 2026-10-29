@@ -48,10 +48,17 @@ end
 ScubaSounds_EventFrame:SetScript("OnEvent", ScubaSounds_OnEvent)
 
 -- When we were last in the air, so a physical hit right after landing counts as fall damage (UNIT_COMBAT doesn't say)
+-- Run speed has no event, so it's polled here too
 ScubaSounds_EventFrame:SetScript("OnUpdate", function()
+    local state = ScubaSounds.State
+    local now = GetTime()
     local falling = IsFalling()
     if not issecretvalue(falling) and falling then
-        ScubaSounds.State.LastFallingAt = GetTime()
+        state.LastFallingAt = now
+    end
+    if now - state.LastSpeedCheckAt >= ScubaSounds.Data.SpeedCheckInterval then
+        state.LastSpeedCheckAt = now
+        ScubaSounds:CheckPlainsrunningCap()
     end
 end)
 

@@ -81,14 +81,16 @@ end
 -- Every addon message goes through ChatThrottleLib, which paces our traffic together with every other addon that
 -- embeds it. prio: "ALERT" (live sounds), "NORMAL" (sync replies, the default) or "BULK" (login push, FIRSTS).
 -- ChatThrottleLib retries its own throttling but drops channel throttle and lockdown (boss encounters); we resend those
--- once a second for up to maxRetries seconds (default MaxRelayRetries), then call onDone (sent or gave up)
-function ScubaSounds:SendAddonMessage(message, channel, target, onDone, maxRetries, prio)
+-- once a second for up to maxRetries seconds (default MaxRelayRetries), then call onDone (sent or gave up).
+-- prefix: the addon message prefix, ScubaSounds_ADDON_PREFIX unless given (the raid tracking sync has its own)
+function ScubaSounds:SendAddonMessage(message, channel, target, onDone, maxRetries, prio, prefix)
     local retries = 0
     maxRetries = maxRetries or ScubaSounds.Data.MaxRelayRetries
+    prefix = prefix or ScubaSounds_ADDON_PREFIX
     -- One queue per destination, so a long report to one player doesn't hold up messages to anyone else
-    local queueName = ScubaSounds_ADDON_PREFIX .. channel .. (target or "")
+    local queueName = prefix .. channel .. (target or "")
     local function trySend()
-        ChatThrottleLib:SendAddonMessage(prio or "NORMAL", ScubaSounds_ADDON_PREFIX, message, channel, target, queueName,
+        ChatThrottleLib:SendAddonMessage(prio or "NORMAL", prefix, message, channel, target, queueName,
             function(_, didSend, result)
                 if not didSend and ScubaSounds.Data.RetryableSendResults[result] and retries < maxRetries then
                     retries = retries + 1

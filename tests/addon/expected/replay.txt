@@ -1,0 +1,32 @@
+Options.lua parses
+option OFF: earn to 1200g (first 1000g)
+   plays RichBitch
+   GUILD ADDON MSG: PLAYED:Hunter-X:s=RichBitch;t=1;c=Loot;v=table: ADDRESS
+   DISCOVERY ANNOUNCED: RichBitch
+   GUILD ADDON MSG: GOLD:Hunter-X:g=1000
+   GUILD CHAT: 1000g
+option OFF: dip to 900g and back to 1100g
+option OFF: first Bestial Wrath, then a second
+   plays BeastObeyMe
+   GUILD ADDON MSG: PLAYED:Hunter-X:s=BeastObeyMe;t=1;c=Misc;v=table: ADDRESS
+   DISCOVERY ANNOUNCED: BeastObeyMe
+option ON: dip to 900g and back to 1100g
+   plays RichBitch
+   GUILD ADDON MSG: PLAYED:Hunter-X:s=RichBitch;t=1;c=Loot;v=table: ADDRESS
+option ON: Bestial Wrath again
+   plays BeastObeyMe
+   GUILD ADDON MSG: PLAYED:Hunter-X:s=BeastObeyMe;t=1;c=Misc;v=table: ADDRESS
+option ON: swap ring off and back (worn before)
+option ON: brand new ring
+   plays Precious
+   GUILD ADDON MSG: PLAYED:Hunter-X:s=Precious;t=1;c=Misc;v=table: ADDRESS
+option ON: Outfitter swaps back to the first ring
+option ON: murloc kill (first ever)
+   plays GayFrogs
+   GUILD ADDON MSG: PLAYED:Hunter-X:s=GayFrogs;t=1;c=OtherDeaths;v=table: ADDRESS
+   DISCOVERY ANNOUNCED: GayFrogs
+option ON: another murloc kill
+   plays GayFrogs
+   GUILD ADDON MSG: PLAYED:Hunter-X:s=GayFrogs;t=1;c=OtherDeaths;v=table: ADDRESS
+option OFF again: murloc kill
+option OFF again: Bestial Wrath

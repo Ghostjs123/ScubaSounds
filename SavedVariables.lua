@@ -97,6 +97,29 @@ function ScubaSounds:InitOptions()
     options.GuildEarliest.triggers = options.GuildEarliest.triggers or {}
     ScubaSounds:SeedEarliest()
     options.StatsView = options.StatsView or "guild" -- Stats tab: "guild" or "myself"
+    -- Raids tab: lockouts open (lockout ID -> true), bosses closed ("lockout|boss" -> true), the raid filter (a raid's
+    -- name, or "all") and the "Last 3 months only" checkbox
+    options.RaidsOpen = options.RaidsOpen or {}
+    options.RaidBossesClosed = options.RaidBossesClosed or {}
+    options.RaidFilter = options.RaidFilter or "all"
+    if options.RaidRecentOnly == nil then
+        options.RaidRecentOnly = true
+    end
+    -- The officers' tab: Characters or People, the sorted column, raids that don't count (raid name -> true) and its own
+    -- "Last 3 months only"
+    options.OfficerView = options.OfficerView or "characters"
+    options.OfficerSort = options.OfficerSort or {
+        column = "name",
+        ascending = true
+    }
+    options.OfficerRaidsOff = options.OfficerRaidsOff or {}
+    if options.OfficerRecentOnly == nil then
+        options.OfficerRecentOnly = true
+    end
+    -- Sample raids in the Raids tab, on until each player turns them off (Forever's raids release a month after launch)
+    if options.RaidSample == nil then
+        options.RaidSample = true
+    end
     -- The minimap button: angle around the minimap in degrees (225 = bottom left), hidden from the Options tab
     options.Minimap = options.Minimap or {
         angle = 225,

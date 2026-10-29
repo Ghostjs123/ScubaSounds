@@ -1,0 +1,11 @@
+campfire tick (8 fire damage)                        -> silent
+frost damage 300 out of combat                       -> silent
+300 fire in combat (a mob's spell)                   -> silent
+first lava tick (300 fire, out of combat)            -> first
+more ticks while standing in it                      -> silent
+step out and back in after 10s (option off)          -> silent
+option on: back in after 10s (within 3 min of the first) -> silent
+option on: back in 4 minutes later                   -> replay
+option on: still standing in it                      -> silent
+option on: out and back in 30s later (cooldown)      -> silent
+option on: back in 3+ minutes later                  -> replay

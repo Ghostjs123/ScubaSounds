@@ -1,0 +1,6 @@
+open world (none)                  inRaid=false plays=false
+Forever's new raid (raid)          inRaid=true  plays=true
+encounter, type secret             inRaid=true  plays=true
+dungeon (party)                    inRaid=false plays=false
+dungeon, type secret               inRaid=false plays=false
+option on, open world              inRaid=false plays=true

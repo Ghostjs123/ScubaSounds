@@ -1,0 +1,14 @@
+Level up 1 of 40 this round: AddonComplete
+Level up 2 of 40 this round: EldenRingVictory
+Level up 3 of 40 this round: SunshineShineGet
+Level up 4 of 40 this round: MarioPowerUp
+Level up 5 of 40 this round: MutationComplete
+Level up 6 of 40 this round: Fallout3LevelUp
+Level up 7 of 40 this round: BotwItemGet
+Level up 8 of 40 this round: SkyrimLevelUp
+Level up 9 of 40 this round: RuneScapeLevelUp
+Level up 10 of 40 this round: ZeldaHeartContainer
+Level up 11 of 40 this round: JobsFinished
+Level up 12 of 40 this round: MissionPassed
+previews=12 real round untouched=true
+Every Level Ups sound is off

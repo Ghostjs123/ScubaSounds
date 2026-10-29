@@ -31,6 +31,7 @@ local Leaflix = "Leaflix"
 local Nacho = "Nacho"
 local Nigel = "Nigel"
 local Nips = "Nips"
+local Pigglywiggly = "Pigglywiggly"
 local Rizka = "Rizka"
 local Scharf = "Scharf"
 local Sevvy = "Sevvy"
@@ -51,26 +52,27 @@ ScubaSounds.Data.PlayerNames = {
     [Beaten] = {"Bbofire", "Vbc", "Brotandre", "Bbqspice"},
     [Bobmoney] = {"Bobmoney"},
     [Brutezy] = {"Brutezy"},
-    [Chaka] = {"Chaka", "Chakaog"},
-    [Cousy] = {"Cousy"},
+    [Chaka] = {"Chaka", "Chakaog", "An Nelf"},
+    [Cousy] = {"Cousy", "Cousy Forever", "Cousy Nostalrius"},
     [Dahhart] = {"Dahhart"},
     [Device] = {"Device"},
     [Doppel] = {"Doppel"},
-    [Fahb] = {"Fahbulous", "Resistofcofc", "Theemus", "Magev", "Resistofc"},
-    [Fishy] = {"Fishy", "Caprademon"},
+    [Fahb] = {"Fahbulous", "Resistofcofc", "Theemus", "Magev", "Resistofc", "Fahbulous Grumble", "Fahbulous Benry"},
+    [Fishy] = {"Fishy", "Caprademon", "Fishy Fishy", "Scuba Fish"},
     [Germanicus] = {"Germanicus"},
     [Hellexus] = {"Hellexus"},
-    [Hippie] = {"Hippie"},
+    [Hippie] = {"Hippie", "Jeraldine Garcia", "Beary Garcia", "Hippie Dots"},
     [Jackson] = {"Grandmasterb", "Gaymasterb", "Combyobeard"},
     [Junny] = {"Junny"},
     [Kaemo] = {"Kaemo"},
-    [Kaymon] = {"Kaymon"},
-    [Keyteor] = {"Keytor", "Seiken"},
+    [Kaymon] = {"Kaymon", "Bear Mon", "Vellwynde"},
+    [Keyteor] = {"Keytor", "Seiken", "Keyteor Densetsu"},
     [Laak] = {"Laak"},
     [Leaflix] = {"Leaflix"},
     [Nacho] = {"Nachô"},
-    [Nigel] = {"Nigelsworth", "Nigel"},
+    [Nigel] = {"Nigelsworth", "Nigel", "Nigel Mcdoogle"},
     [Nips] = {"Nips", "Lx", "Px"},
+    [Pigglywiggly] = {"Piggly Wiggly", "Cosmic Creeper"},
     [Rizka] = {"Rizka", "Rizkuh"},
     [Scharf] = {"Bostwain", "Hotassrandy", "Swabiton", "Frostwain"},
     [Sevvy] = {"Sevvy", "Blowies"},
@@ -80,10 +82,10 @@ ScubaSounds.Data.PlayerNames = {
     [Stavis] = {"Stavis"},
     [Stud] = {"Bitcoins"},
     [Sweatyhaung] = {"Sweatyhaung"},
-    [Uncletouches] = {"Cuckletonn"},
+    [Uncletouches] = {"Cuckletonn", "Cuck Leton"},
     [Vimy] = {"Vimy"},
-    [Vitoli] = {"Vitoli", "Uglyvit"},
-    [Shib] = {"Shib"},
+    [Vitoli] = {"Vitoli", "Uglyvit", "Vitoli Ravioli"},
+    [Shib] = {"Shib", "Shibly Wibbly", "Shibl Wibbil", "Shib Meister"},
     [Zarix] = {"Yellowfilth"}
 }
 
@@ -99,7 +101,6 @@ end
 
 ScubaSounds.Data.DeathSoundMap = {
     [Arenthis] = {"ImRetarded"},
-    [Beaten] = {"Divine"},
     [Bobmoney] = {"DownTheWell"},
     [Brutezy] = {"RetardAlert"},
     [Chaka] = {"LegoYoda"},
@@ -119,7 +120,7 @@ ScubaSounds.Data.DeathSoundMap = {
     [Laak] = {"Minecraft", "FirstBeer"},
     [Leaflix] = {"ANewRecord", "Failure", "Rat"},
     [Nacho] = {"Goofy"},
-    [Nigel] = {"GreatSuccess", "Weeaboo"},
+    [Nigel] = {"Mario", "Weeaboo"},
     [Nips] = {"CopCuties"},
     [Rizka] = {"Oof"},
     [Scharf] = {"How"},
@@ -167,6 +168,7 @@ ScubaSounds.Data.TrueNames = {
     Nacho = Nacho,
     Nigel = Nigel,
     Nips = Nips,
+    Pigglywiggly = Pigglywiggly,
     Rizka = Rizka,
     Scharf = Scharf,
     Sevvy = Sevvy,
@@ -190,6 +192,12 @@ ScubaSounds_GzNigelSenders = {
     [Zarix] = true,
     ["Fahbulous"] = true,
     ["Mangan"] = true,
+    [Kaymon] = true
+}
+
+-- Raid tracking officers by person (every one of their characters counts), on top of the officer guild ranks (see
+-- RaidTracking\Raids.lua)
+ScubaSounds.Data.RaidOfficers = {
     [Kaymon] = true
 }
 

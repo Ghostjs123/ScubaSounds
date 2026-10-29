@@ -1,0 +1,5 @@
+hooked: true, default chance 5
+plays in 20000 declines: 950
+decline (chance 100): Nope
+same click calls CancelDuel again: nil
+next decline 6s later: Nope

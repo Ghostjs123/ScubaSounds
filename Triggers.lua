@@ -25,7 +25,8 @@ ScubaSounds.Data.RelayedEvents = {} -- addon events group members may relay to u
 --   together: relay first and play once the message is out, so the group hears it at the same moment
 --   groupDiscovery: nobody in particular sets it off (a wipe, a boss kill), so the group leader announces its first
 --     discovery, without a name
---   defaultChance: percent chance each of its sounds plays before the player changes it (default 100)
+--   defaultChance: percent chance it plays before the player changes it (default 100). It picks one of its sounds,
+--     then rolls that sound's chance once
 --   cooldownGroup: triggers with the same group share one cooldown (playing one puts them all on it)
 --   cooldown: seconds after the trigger plays before it can play again, whichever of its sounds played. Over
 --     SavedCooldownMin it's per character and survives /reload and relogging
@@ -53,6 +54,10 @@ local function DecodeText(encoded)
     return (bits:gsub("%d%d%d%d%d%d%d%d", function(byte)
         return string.char(tonumber(byte, 2))
     end))
+end
+
+function ScubaSounds:DecodeText(encoded)
+    return DecodeText(encoded)
 end
 
 function ScubaSounds:TriggerText(trigger)
@@ -390,7 +395,7 @@ AddTrigger("FirstPotionBought", "Loot", "WW91IGJ1eSBhIHBvdGlvbiBmcm9tIGEgdmVuZG9
     newInForever = true
 })
 
-AddTrigger("EpicRoll", "Loot", "QW4gZXBpYyBpdGVtIGdvZXMgdXAgZm9yIG5lZWQvZ3JlZWQgaW4gYSBncm91cCAobm90IGEgcmFpZCk=", {"Sheesh"}, {
+AddTrigger("EpicRoll", "Loot", "QW4gZXBpYyBpdGVtIGdvZXMgdXAgZm9yIG5lZWQvZ3JlZWQgaW4gYSBncm91cCAobm90IGEgcmFpZCk=", {"Sheesh", "ZeldaItem"}, {
     on = "EpicRollStarted",
     defaultChance = 20,
     newInForever = true
@@ -702,6 +707,12 @@ AddTrigger("LevelUp", "LevelUps", "WW91IG9yIHlvdXIgcGV0IGxldmVsIHVw", levelUpSou
 
 AddTrigger("DazedOffMount", "Misc", "WW91IGdldCBkYXplZCBvZmYgeW91ciBtb3VudA==", {"NoGas"}, {
     on = "DazedOffMount",
+    newInForever = true
+})
+
+AddTrigger("PlainsrunningCap", "Misc", "WW91IHJlYWNoIHRoZSBQbGFpbnNydW5uaW5nIHNwZWVkIGNhcA==", {"PodRacing", "Tyler1Driving"}, {
+    on = "PlainsrunningCapped",
+    cooldown = 5 * 60,
     newInForever = true
 })
 

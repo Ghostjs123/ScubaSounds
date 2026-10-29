@@ -1,0 +1,8 @@
+default chance 20
+plays in 20000 epic rolls: 3976
+epic in a party: silent
+blue in a party: silent
+two epics from one drop: silent
+epic in a raid: silent
+epic while solo: silent
+secret quality: silent

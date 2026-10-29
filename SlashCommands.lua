@@ -38,6 +38,8 @@ function SlashCmdList.SCUBASOUNDS(args)
         ScubaSounds:PrintRecentPlays()
     elseif words[1] == "stats" then
         ScubaSounds:ShowOptionsTab("Stats")
+    elseif words[1] == "raids" or words[1] == "r" then
+        ScubaSounds:ShowOptionsTab("Raids")
     elseif words[1] == "o" or ScubaSounds:HasValue(words, "options") or ScubaSounds:HasValue(words, "option") then
         ScubaSounds:ShowOptions()
     elseif ScubaSounds:HasValue(words, "on") then
@@ -48,6 +50,7 @@ function SlashCmdList.SCUBASOUNDS(args)
         ScubaSounds:PrintCommands("Commands:", {
             {"/ss options (or /ss o)", "open the options window"},
             {"/ss stats", "open the options window on the Stats tab"},
+            {"/ss raids (or /ss r)", "open the options window on the Raids tab"},
             {"/ss on", "turn sounds on"},
             {"/ss off", "turn sounds off"},
             {"/ss recent", "the last 10 sounds played"},
@@ -294,6 +297,14 @@ function ScubaSounds:DebugCommand(words)
             state.TracePet and "on" or "off", tostring(state.PetLevel), state.PetGuid and "" or " (no pet remembered)",
             (issecretvalue(guid) or issecretvalue(level)) and "secret" or
                 (guid and ("level " .. tostring(level)) or "no pet out")))
+    elseif words[2] == "raidlog" then
+        -- /ss debug raidlog [clear]: turns the raid tracking diagnostic on or off (it stays on across sessions), or
+        -- deletes what it recorded (see RaidTracking\RaidLog.lua)
+        if words[3] == "clear" then
+            ScubaSounds:ClearRaidLog()
+        else
+            ScubaSounds:ToggleRaidLog()
+        end
     else
         ScubaSounds:PrintCommands("Debug commands (only print here, nothing is sent or unlocked):", {
             {"/ss debug chatlink <sound>", "the sound's link for each of its tabs"},
@@ -301,7 +312,8 @@ function ScubaSounds:DebugCommand(words)
             {"/ss debug awaydiscoveries (or ao) [count]", "the login summary, for count random sounds (default 12)"},
             {"/ss debug levelup (or lo)", "play the next level-up jingle of a pretend round"},
             {"/ss debug hidden", "show or hide options other characters get, while the options window is open"},
-            {"/ss debug pet", "print every pet level check, to see why a pet level up did or didn't play"}
+            {"/ss debug pet", "print every pet level check, to see why a pet level up did or didn't play"},
+            {"/ss debug raidlog [clear]", "record raid, loot, trade and vendor events for raid tracking (or delete them)"}
         })
     end
 end

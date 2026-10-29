@@ -1,0 +1,25 @@
+== nothing found
+  Can be spammy. Only you hear the replays; nothing goes to guild chat or your group.
+  More show up here as they're found
+== 1000g, first bag, lava found
+  Can be spammy. Only you hear the replays; nothing goes to guild chat or your group.
+  - Reaching 1000g: when your gold climbs past it again
+  - First bag: any bag this character hasn't worn before
+  - Swapping to gear you've already worn (like an Outfitter set) stays quiet
+  - First lava damage (MansNotHot): each new step into lava, at most every 3 minutes
+  More show up here as they're found
+== everything found
+  Can be spammy. Only you hear the replays; nothing goes to guild chat or your group.
+  - Reaching 100g: when your gold climbs past it again
+  - Reaching 1000g: when your gold climbs past it again
+  - Reaching 5000g: when your gold climbs past it again
+  - First ring: any ring this character hasn't worn before
+  - First bag: any bag this character hasn't worn before
+  - First green or better weapon: any one this character hasn't worn before
+  - Swapping to gear you've already worn (like an Outfitter set) stays quiet
+  - First Bestial Wrath: every cast
+  - First Arcane Missiles: every cast
+  - First murloc kill: every murloc killing blow
+  - First lava damage (MansNotHot): each new step into lava, at most every 3 minutes
+  - Discovering Raven Hill (Cemetery): each visit to Raven Hill or its cemetery, at most every 3 minutes
+  - First death at level 12+ (StupidMistakes, OhNo): every death at 12+, and it replaces your own death sound

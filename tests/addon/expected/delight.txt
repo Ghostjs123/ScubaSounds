@@ -1,0 +1,7 @@
+Deviate Delight clicked in bags                -> rolls 5%
+Whimsyfin Delight on an action bar             -> rolls 5%
+/use Savory Deviate Delight                    -> rolls 5%
+one press seen by two hooks at once            -> rolls 5%
+other food from the bags                       -> nothing
+other item on an action bar                    -> nothing
+trigger: Misc, default chance 5, sounds AnotherDude

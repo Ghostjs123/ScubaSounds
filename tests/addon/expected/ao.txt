@@ -1,0 +1,4 @@
+debug ao 20 => msg: 20 sounds discovered while you were away. Too many to list here: /ss stats shows them all. (+0 link lines)
+debug awaydiscoveries 3 => msg: 3 sounds discovered while you were away: (+2 link lines)
+debug ao => msg: 12 sounds discovered while you were away: (+6 link lines)
+debug ao 500 => msg: 182 sounds discovered while you were away. Too many to list here: /ss stats shows them all. (+0 link lines)

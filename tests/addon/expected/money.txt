@@ -1,0 +1,8 @@
+Horse: TakeMyMoney
+Arrows x200: silent
+Exactly 50g: silent
+Pricey stack (60g for 5): TakeMyMoney
+Secret price: silent
+Horse (big loot from Me-X): TakeMyMoney
+guildmate's big loot, nothing bought here: HelloThere
+we buy a horse while a guildmate loots big: TakeMyMoney, OhBabyATriple

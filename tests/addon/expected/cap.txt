@@ -1,0 +1,11 @@
+msg: 15 sounds discovered while you were away:
+line:   S1, S2
+line:   S3, S4
+line:   S5, S6
+line:   S7, S8
+line:   S9, S10
+line:   S11, S12
+line:   S13, S14
+line:   S15
+----
+msg: Your new guild has discovered 16 sounds. Too many to list here: /ss stats shows them all.

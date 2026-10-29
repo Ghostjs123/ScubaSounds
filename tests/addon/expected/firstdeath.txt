@@ -1,0 +1,19 @@
+level 11 death (too low):
+   Kaymon-X hears BreakingNews
+first death at level 30:
+   GUILD chat: Alert: Retard (Kay Mon) has died
+   Kaymon-X hears OhNo
+   DIED message carries fd=OhNo
+  a guildmate nearby:
+   Near-X hears OhNo
+  a guildmate far away:
+   Far-X hears OhNo
+second death at level 30:
+   Kaymon-X hears BreakingNews
+  a guildmate nearby:
+   Near-X hears BreakingNews
+replay option on, third death:
+   Kaymon-X hears StupidMistakes
+   DIED message fd=nil
+  a guildmate nearby:
+   Near-X hears BreakingNews

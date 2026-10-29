@@ -1313,6 +1313,25 @@ function ScubaSounds:CheckDismount()
     end)
 end
 
+function ScubaSounds:CheckPlainsrunningCap()
+    local data = ScubaSounds.Data
+    local state = ScubaSounds.State
+    local speed = GetUnitSpeed("player")
+    local mounted, onTaxi = IsMounted(), UnitOnTaxi("player")
+    if issecretvalue(speed) or issecretvalue(mounted) or issecretvalue(onTaxi) then
+        return
+    end
+    local aura = ScubaSounds:FindAura("player", data.PlainsrunningSpellId)
+    local stacks = aura and aura.applications
+    local capped = aura ~= nil and not mounted and not onTaxi and
+                       speed >= data.BaseRunSpeed * data.PlainsrunningSpeedCap - data.SpeedTolerance and
+                       (issecretvalue(stacks) or not stacks or stacks >= data.PlainsrunningMinStacks)
+    if capped and not state.PlainsrunningCapped then
+        ScubaSounds:Fire("PlainsrunningCapped")
+    end
+    state.PlainsrunningCapped = capped
+end
+
 -- true / false, or nil when the game won't say (secret)
 function ScubaSounds:IsDazed()
     local data = ScubaSounds.Data

@@ -1,0 +1,7 @@
+AddonComplete: row y=-1, scroll=0, glow at (20, -4), shown=true, pulsing=true, looping=REPEAT
+ZugZug: row y=-199, scroll=158, glow at (476, -202), shown=true, pulsing=true, looping=REPEAT
+SkyrimLevelUp: row y=-1, scroll=0, glow at (476, -4), shown=true, pulsing=true, looping=REPEAT
+while the window is open: shown=true, pulsing=true
+after closing the window: shown=false, pulsing=false
+next link click: shown=true, pulsing=true
+unknown sound: no error

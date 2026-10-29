@@ -1,0 +1,9 @@
+discover a different area                                    -> silent
+walk into Raven Hill, then discover it (center message + XP chat) -> discovery
+walk out and back in (option off)                            -> silent
+option on: out and into the cemetery right away (within 3 min) -> silent
+option on: back 4 minutes later                              -> replay
+option on: moving between Raven Hill and its cemetery        -> silent
+alt that explored it before installing: walks in, no message -> silent
+   alt now counted as found: true
+new character: older client puts the message first           -> discovery

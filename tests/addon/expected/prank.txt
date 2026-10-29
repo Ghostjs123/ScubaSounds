@@ -1,0 +1,10 @@
+guildless presses: 0
+joined, before save: 0
+after save, Old: 1
+Old again: 1
+New: 2
+new macro in guild: 3
+all again after save: 3
+left guild, Fourth: 3
+rejoined no save: 3
+rejoined + save: 4

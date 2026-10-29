@@ -1,0 +1,15 @@
+after load: enabled=false events=0 listening=false
+on: listening LOOT_OPENED=true spellcast=true msg=Raid log on (2 events). It records raid, loot, trade and vendor events until you turn it off. /reload or log out to save it to disk
+raid reminder: Raid log is on (3 events). /ss debug raidlog to stop
+kinds: SESSION_START,BAG_EPIC,PLAYER_ENTERING_WORLD,ENCOUNTER_START,ENCOUNTER_END,LOOT_OPENED,START_LOOT_ROLL,CHAT_MSG_LOOT,TRADE_ACCEPT_UPDATE,UNIT_SPELLCAST_SUCCEEDED,MERCHANT_SHOW,USE_CONTAINER_ITEM,BUYBACK_ITEM,MERCHANT_CLOSED,SOME_UNKNOWN_EVENT
+encounter end: args=Hakkar roster1=Bear Mon roster2name=<secret> zone=Zul'Gurub lockout=123456 rank=1 combat=<secret>
+loot slot1: Fang of the Faceless q=4 source=Creature-0-1-309-1-14834-ABC cands=3 | slot2 info=<error: [string "<python>"]:22: boom>
+roll: id=77 handle=<secret> item=Touch of Chaos
+disenchant flag: true use: targeting=true merchant=true link=|Hitem:19859|h[Fang]|h
+bag epics logged once: 1
+unknown event: <secret> trade partner=Scuba Fish
+after 5200 more: count=4715 trimmed=500 last=spam 5200
+off: last kind=SESSION_END listening=false msg=Raid log off (4716 events kept). /ss debug raidlog clear to delete them
+nothing recorded while off: true
+cleared: 0 Raid log cleared
+no reminder in a dungeon: true

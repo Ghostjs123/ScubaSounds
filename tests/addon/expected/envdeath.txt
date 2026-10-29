@@ -1,0 +1,27 @@
+fall death, out of combat:
+   Kaymon-X hears Willhelm
+   DIED env=fall
+fall death from full health (one-shot):
+   Kaymon-X hears NowThatsALottaDmg
+   DIED env=fall
+landing hit 1s after falling (too late to count):
+   Kaymon-X hears BreakingNews
+   DIED env=nil
+physical death in combat right after a jump:
+   Kaymon-X hears BreakingNews
+   DIED env=nil
+melee death out of combat, no fall:
+   Kaymon-X hears BreakingNews
+   DIED env=nil
+lava death (fire, out of combat):
+   Kaymon-X hears Omg
+   DIED env=lava
+fire death in combat (a mage):
+   Kaymon-X hears BreakingNews
+   DIED env=nil
+guildmate sees Bobmoney die to lava:
+   Near-X hears Omg
+guildmate sees Bobmoney fall to his death:
+   Near-X hears DownTheWell
+guildmate sees Bobmoney die normally:
+   Near-X hears DownTheWell

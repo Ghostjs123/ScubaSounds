@@ -1,0 +1,5 @@
+Options.lua parses
+default angle 225 at (-57, -57), shown true
+dragged above: angle 90 at (0, 80)
+clicks: options, tab Stats; window shown after 2 left-clicks: false
+hidden: shown=false saved hidden=true

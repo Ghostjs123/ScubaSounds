@@ -1,0 +1,9 @@
+Pet level tracing on. Remembered: level 10. Now: level 10
+Pet check (UNIT_LEVEL): level 10 -> 10, same pet true, with your level up false, option true: no sound
+Pet check (UNIT_LEVEL +0.5s): level 10 -> 11, same pet true, with your level up false, option true: plays
+  >> LeveledUp
+Pet check (UNIT_LEVEL +2s): level 11 -> 11, same pet true, with your level up false, option true: no sound
+Pet check (UNIT_PET_EXPERIENCE): level 11 -> 12, same pet true, with your level up false, option true: plays
+  >> LeveledUp
+Pet check (UNIT_LEVEL): fired for your pet as "nameplate3", not "pet"
+Pet level tracing off. Remembered: level 12. Now: level 12

@@ -1,0 +1,13 @@
+Options.lua parses
+my own play is broadcast
+option off: a guildmate's play
+option on: a guildmate's play
+   hears Brando
+same sound from 3 more clients at once (guild-wide)
+numeric sound name 67
+   hears 67
+my own echo
+stale (held by lockdown)
+sound turned off by me
+tab turned off by me
+Disable Sounds on: chat line, no audio

@@ -1,0 +1,6 @@
+UNIT_LEVEL readable -> plays
+UNIT_PET before UNIT_LEVEL -> plays
+then UNIT_LEVEL -> silent
+in combat, secret -> silent
+combat ends -> plays
+combat ends again -> silent

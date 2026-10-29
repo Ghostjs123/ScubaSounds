@@ -1,0 +1,6 @@
+not an officer: Player Deaths, Other Deaths, Party/Raid, PvP, Loot & Guild, Misc, Level Ups, Unused, Notable Loot, Raids, Stats, Options | Stats follows Raids
+saved last tab Officer opens: Player Deaths
+selecting the Officer tab anyway opens: Player Deaths
+officer, after reopening: Player Deaths, Other Deaths, Party/Raid, PvP, Loot & Guild, Misc, Level Ups, Unused, Notable Loot, Raids, Officer, Stats, Options | Stats follows Officer
+officer selects: Officer
+demoted, after reopening: Player Deaths, Other Deaths, Party/Raid, PvP, Loot & Guild, Misc, Level Ups, Unused, Notable Loot, Raids, Stats, Options | Stats follows Raids, open: Player Deaths

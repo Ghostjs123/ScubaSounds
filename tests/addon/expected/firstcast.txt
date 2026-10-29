@@ -1,0 +1,10 @@
+old save carried over: true, old table gone: true
+Bestial Wrath (already done in the old save)
+first Arcane Missiles rank 5, reported as channel start then succeeded
+   plays MagicMissle
+second Arcane Missiles
+Arcane Missiles under an unknown Forever ID, by name
+replay on: Arcane Missiles reported twice
+   plays MagicMissle
+replay on: another one later
+   plays MagicMissle

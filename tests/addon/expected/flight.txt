@@ -1,0 +1,9 @@
+take a flight (on the taxi at once):
+   1.0s: plays AFewMomentsLater
+on the taxi only after 2.5s:
+   3.0s: plays AFewMomentsLater
+not enough gold (never boards):
+double-click the destination:
+   1.0s: plays AFewMomentsLater
+next flight:
+   1.0s: plays AFewMomentsLater

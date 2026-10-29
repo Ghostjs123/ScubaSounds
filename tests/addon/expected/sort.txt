@@ -1,0 +1,5 @@
+sound asc arrowShown=true up=true: 67, AddonComplete, AFewMomentsLater
+sound desc arrowShown=true up=false: ZugZug, ZeldaItemGet, ZeldaItem
+plays desc arrowShown=true up=false: BadMan, Brando, Oof, 67
+first asc arrowShown=true up=true: BadMan, Oof, Brando, 67
+first desc arrowShown=true up=false: Brando, Oof, BadMan, 67

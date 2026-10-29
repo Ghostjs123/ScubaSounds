@@ -3,13 +3,17 @@
 ## Version: 2.0
 ## Notes: Sound board addon for Scuba Cops
 ## Author: Kaymon
-## SavedVariables: ScubaSounds_Options
+## SavedVariables: ScubaSounds_Options, ScubaSounds_RaidLog, ScubaSounds_Ledger
 ## X-Curse-Project-ID: 1165242
 
 Libs\ChatThrottleLib.lua
+Libs\LibStub\LibStub.lua
+Libs\LibSerialize\LibSerialize.lua
+Libs\LibDeflate\LibDeflate.lua
 Sounds\SoundInfo.lua
-PlayerNames.lua
-NotableLoot.lua
+Data\PlayerNames.lua
+Data\NotableLoot.lua
+Data\DropSources.lua
 ScubaSounds.lua
 Triggers.lua
 Util.lua
@@ -18,7 +22,25 @@ SavedVariables.lua
 Guild.lua
 Detectors.lua
 Events.lua
+RaidTracking\RaidLog.lua
+RaidTracking\Ledger\LedgerStore.lua
+RaidTracking\Ledger\LedgerComms.lua
+RaidTracking\Ledger\LedgerSync.lua
+RaidTracking\Ledger\Ledger.lua
+RaidTracking\RaidEntries.lua
+RaidTracking\RaidReplay.lua
+RaidTracking\RaidSample.lua
+RaidTracking\RaidEquip.lua
+RaidTracking\Raids.lua
+RaidTracking\RaidRecorder.lua
 SlashCommands.lua
-MinimapButton.lua
-Options.lua
-ScubaSounds.xml
+UI\MinimapButton.lua
+UI\Style.lua
+UI\Options.lua
+UI\NotableLootTab.lua
+UI\PopupMenu.lua
+UI\RaidsTab.lua
+UI\OfficerTab.lua
+UI\StatsTab.lua
+UI\OptionsTab.lua
+UI\ScubaSounds.xml

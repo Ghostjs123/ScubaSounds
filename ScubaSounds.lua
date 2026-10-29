@@ -10,7 +10,7 @@ local issecretvalue = _G.issecretvalue
 -- Main Addon Namespace & Architecture
 -- =================================================================
 ScubaSounds = ScubaSounds or {}
-ScubaSounds.Data = ScubaSounds.Data or {} -- Sounds\SoundInfo.lua, PlayerNames.lua and NotableLoot.lua load first
+ScubaSounds.Data = ScubaSounds.Data or {} -- Sounds\SoundInfo.lua, Data\PlayerNames.lua and Data\NotableLoot.lua load first
 ScubaSounds.Audio = ScubaSounds.Audio or {}
 ScubaSounds.Events = {}
 ScubaSounds.State = {}
@@ -29,6 +29,7 @@ local function FormatToPattern(format, capture)
     local pattern = format:gsub("([%(%)%.%+%-%*%?%[%]%^%$])", "%%%1"):gsub("%%s", text):gsub("%%d", number)
     return "^" .. pattern .. "$"
 end
+ScubaSounds.FormatToPattern = FormatToPattern
 
 -- The player's own loot chat lines: looted, received (vendors, quest rewards) and created, single and stacks
 ScubaSounds.Data.OwnLootPatterns = {}
@@ -143,17 +144,48 @@ ScubaSounds.Data.ItemUseRepeatWindow = 1
 -- A killing blow of ours within ExplosiveKillWindow seconds of one plays Brick
 ScubaSounds.Data.ExplosiveNames = {"grenade", "dynamite"}
 ScubaSounds.Data.ExplosiveKillWindow = 0.5
--- The one-time sounds "Replay one-time sounds every time" plays again, for its tooltip
-ScubaSounds.Data.ReplayOneTimeSounds = {
-    "Gold milestones (100g, 1000g, 5000g): when your gold climbs past one again",
-    "First ring, first bag, first green or better weapon: any one this character hasn't worn before (swapping gear " ..
-        "you've already worn, like an Outfitter set, stays quiet)",
-    "First Bestial Wrath, first Arcane Missiles: every cast",
-    "First murloc kill: every murloc killing blow",
-    "First lava damage (MansNotHot): each new step into lava, at most every 3 minutes",
-    "Discovering Raven Hill (Cemetery): each visit to Raven Hill or its cemetery, at most every 3 minutes",
-    "First death at level 12+ (StupidMistakes, OhNo): every death at 12+, and it replaces your own death sound"
-}
+-- The one-time sounds "Replay one-time sounds every time" plays again, for its tooltip. A line only shows once one of
+-- its triggers is discovered, so the list is complete once they all are. Base64 like trigger texts
+ScubaSounds.Data.ReplayOneTimeSounds = {{
+    triggers = {"Gold:100"},
+    text = "UmVhY2hpbmcgMTAwZzogd2hlbiB5b3VyIGdvbGQgY2xpbWJzIHBhc3QgaXQgYWdhaW4="
+}, {
+    triggers = {"Gold:1000"},
+    text = "UmVhY2hpbmcgMTAwMGc6IHdoZW4geW91ciBnb2xkIGNsaW1icyBwYXN0IGl0IGFnYWlu"
+}, {
+    triggers = {"Gold:5000"},
+    text = "UmVhY2hpbmcgNTAwMGc6IHdoZW4geW91ciBnb2xkIGNsaW1icyBwYXN0IGl0IGFnYWlu"
+}, {
+    triggers = {"FirstRingEquipped"},
+    text = "Rmlyc3QgcmluZzogYW55IHJpbmcgdGhpcyBjaGFyYWN0ZXIgaGFzbid0IHdvcm4gYmVmb3Jl"
+}, {
+    triggers = {"FirstBagEquipped"},
+    text = "Rmlyc3QgYmFnOiBhbnkgYmFnIHRoaXMgY2hhcmFjdGVyIGhhc24ndCB3b3JuIGJlZm9yZQ=="
+}, {
+    triggers = {"FirstGreenWeaponEquipped"},
+    text = "Rmlyc3QgZ3JlZW4gb3IgYmV0dGVyIHdlYXBvbjogYW55IG9uZSB0aGlzIGNoYXJhY3RlciBoYXNuJ3Qgd29ybiBiZWZvcmU="
+}, {
+    triggers = {"FirstRingEquipped", "FirstBagEquipped", "FirstGreenWeaponEquipped"},
+    text = "U3dhcHBpbmcgdG8gZ2VhciB5b3UndmUgYWxyZWFkeSB3b3JuIChsaWtlIGFuIE91dGZpdHRlciBzZXQpIHN0YXlzIHF1aWV0"
+}, {
+    triggers = {"FirstBestialWrath"},
+    text = "Rmlyc3QgQmVzdGlhbCBXcmF0aDogZXZlcnkgY2FzdA=="
+}, {
+    triggers = {"FirstArcaneMissiles"},
+    text = "Rmlyc3QgQXJjYW5lIE1pc3NpbGVzOiBldmVyeSBjYXN0"
+}, {
+    triggers = {"MurlocKilled"},
+    text = "Rmlyc3QgbXVybG9jIGtpbGw6IGV2ZXJ5IG11cmxvYyBraWxsaW5nIGJsb3c="
+}, {
+    triggers = {"FirstLava"},
+    text = "Rmlyc3QgbGF2YSBkYW1hZ2UgKE1hbnNOb3RIb3QpOiBlYWNoIG5ldyBzdGVwIGludG8gbGF2YSwgYXQgbW9zdCBldmVyeSAzIG1pbnV0ZXM="
+}, {
+    triggers = {"CemeteryDiscovered"},
+    text = "RGlzY292ZXJpbmcgUmF2ZW4gSGlsbCAoQ2VtZXRlcnkpOiBlYWNoIHZpc2l0IHRvIFJhdmVuIEhpbGwgb3IgaXRzIGNlbWV0ZXJ5LCBhdCBtb3N0IGV2ZXJ5IDMgbWludXRlcw=="
+}, {
+    triggers = {"FirstDeath"},
+    text = "Rmlyc3QgZGVhdGggYXQgbGV2ZWwgMTIrIChTdHVwaWRNaXN0YWtlcywgT2hObyk6IGV2ZXJ5IGRlYXRoIGF0IDEyKywgYW5kIGl0IHJlcGxhY2VzIHlvdXIgb3duIGRlYXRoIHNvdW5k"
+}}
 -- Trigger cooldowns longer than this many seconds are saved, so a /reload doesn't reset them
 ScubaSounds.Data.SavedCooldownMin = 60
 
@@ -305,6 +337,14 @@ ScubaSounds.Data.DazedSpellId = 1604
 ScubaSounds.Data.DazedSpellName = "Dazed"
 ScubaSounds.Data.DazedCheckDelay = 0.2 -- seconds after the mount goes, so the debuff has landed
 ScubaSounds.Data.OwnDismountWindow = 1 -- seconds after a /dismount, cancelled buff or cast start that a dismount is ours
+-- Plainsrunning (Tauren): on foot with it up and running at the speed cap. The cap is on speed, not stacks, so a run
+-- speed enchant reaches it with fewer stacks
+ScubaSounds.Data.PlainsrunningSpellId = 1259918
+ScubaSounds.Data.PlainsrunningSpeedCap = 1.6 -- times base run speed
+ScubaSounds.Data.PlainsrunningMinStacks = 30 -- below this the speed is from something else (Dash)
+ScubaSounds.Data.BaseRunSpeed = BASE_MOVEMENT_SPEED or 7 -- yards per second
+ScubaSounds.Data.SpeedTolerance = 0.05 -- yards per second
+ScubaSounds.Data.SpeedCheckInterval = 0.5 -- seconds
 ScubaSounds.Data.RingSlots = {
     [INVSLOT_FINGER1 or 11] = true,
     [INVSLOT_FINGER2 or 12] = true
@@ -424,24 +464,6 @@ ScubaSounds.Data.WarsongInstanceId = 489
 ScubaSounds.Data.OnyxiasLairInstanceId = 249
 ScubaSounds.Data.AlteracValleyInstanceId = 30
 ScubaSounds.Data.ZoneEnteredDelay = 2 -- seconds after zoning, so the loading screen is gone and the zone has updated
-ScubaSounds.Data.RaidIds = {
-    [409] = "Molten Core",
-    [469] = "Blackwing Lair",
-    [509] = "Ruins of Ahn'Qiraj",
-    [531] = "Temple of Ahn'Qiraj",
-    [533] = "Naxxramas",
-    [249] = "Onyxia's Lair",
-    [309] = "Zul'Gurub"
-}
-ScubaSounds.Data.RaidZoneNames = {
-    ["Molten Core"] = true,
-    ["Blackwing Lair"] = true,
-    ["Ruins of Ahn'Qiraj"] = true,
-    ["Temple of Ahn'Qiraj"] = true,
-    ["Naxxramas"] = true,
-    ["Onyxia's Lair"] = true,
-    ["Zul'Gurub"] = true
-}
 
 -- =================================================================
 -- Addon Messages
@@ -674,6 +696,9 @@ ScubaSounds.State.LastEmoteTime = 0
 ScubaSounds.State.SitPresses = {} -- GetTime() of recent sit presses
 ScubaSounds.State.LastSitSpam = 0
 ScubaSounds.State.WasMounted = false
+ScubaSounds.State.InRaidInstance = false -- the last readable answer of IsInRaidInstance
+ScubaSounds.State.LastSpeedCheckAt = 0
+ScubaSounds.State.PlainsrunningCapped = false -- at the cap on the last check, so it plays once per time reaching it
 -- First-equip and gold milestone events are ignored until gear and gold already there at login have been silently
 -- counted; bag updates and money changes can fire while logging in, before PLAYER_ENTERING_WORLD
 ScubaSounds.State.LoginBaselineDone = false
