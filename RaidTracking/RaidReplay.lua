@@ -168,6 +168,7 @@ function Replay.Build(entries, opts)
     -- Every presence entry of each author, in any lockout, for capping spans that were never closed
     local presenceByAuthor = {}
     local steps, fixes, tradeReceipts = {}, {}, {}
+    local deletedLockouts = {}
 
     -- =================================================================
     -- 1. Collect
@@ -184,6 +185,7 @@ function Replay.Build(entries, opts)
             if d.n then
                 lockout.bossTotal = math.max(lockout.bossTotal or 0, d.n)
             end
+            lockout.test = lockout.test or d.z == true
             local kill = lockout.killByEncounter[d.e]
             if kill then
                 Union(kill.roster, roster)
@@ -312,7 +314,14 @@ function Replay.Build(entries, opts)
             })
         elseif kind == "del" then
             Lockout(d.l).deleted[d.x] = true
+        elseif kind == "delraid" then
+            deletedLockouts[d.l] = true
         end
+    end
+    -- A deleted lockout is gone for good, with everything in it (entries for it arriving later change nothing). Later
+    -- steps and corrections naming its drops find nothing to apply to
+    for id in pairs(deletedLockouts) do
+        state.lockouts[id] = nil
     end
 
     -- =================================================================
@@ -376,7 +385,8 @@ function Replay.Build(entries, opts)
                         break
                     end
                 end
-                table.insert(spans, {openedAt, ends})
+                -- Still open: they may be inside right now (see InsideAt)
+                table.insert(spans, {openedAt, ends, open = true})
             end
             lockout.spans[person] = spans
         end
@@ -663,6 +673,38 @@ function Replay.PresentAt(lockout, t, roster)
         end
     end
     return present
+end
+
+-- Name keys still inside the instance at a time: a presence span opened and not closed by then
+function Replay.InsideAt(lockout, t)
+    local inside = {}
+    for person, spans in pairs(lockout.spans or {}) do
+        for _, span in ipairs(spans) do
+            if span.open and span[1] <= t and t <= span[2] then
+                inside[person] = true
+                break
+            end
+        end
+    end
+    return inside
+end
+
+-- When anything last happened in a lockout (a kill, drop, receipt or someone entering or leaving), for the Raids
+-- tab's Live tag
+function Replay.LastActivity(lockout)
+    local last = lockout.firstKill or 0
+    for _, kill in ipairs(lockout.kills) do
+        last = math.max(last, kill.t)
+    end
+    for _, drop in ipairs(lockout.drops) do
+        last = math.max(last, drop.t, drop.receipt and drop.receipt.t or 0)
+    end
+    for _, events in pairs(lockout.presence or {}) do
+        for _, event in ipairs(events) do
+            last = math.max(last, event.t)
+        end
+    end
+    return last
 end
 
 -- Which boss a drop shows under (docs\RAID_TRACKING_DESIGN.md, "Drop sources"): the table's one source; or with

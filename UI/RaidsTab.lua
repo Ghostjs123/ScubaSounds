@@ -27,8 +27,14 @@ local Shown = Raids.Shown -- the guild's raids, or the sample raids
 local Store = ScubaSounds.LedgerStore
 
 local DAY = 86400
-local RECENT_DAYS = 90 -- "Last 3 months only"
+local RECENT_DAYS = 120 -- "Last 4 months only"
 local ASKED_SECONDS = 15 -- a lockout's Sync button reads "Asked" this long after a click
+local LIVE_FOR = 15 * 60 -- a lockout with activity this recently (or anyone still inside) is Live
+local LIVE_REFRESH = 60 -- seconds between redraws while a Live lockout shows, for its "inside now" count
+local NEW_GLOW = 8 -- seconds a drop that arrived while the tab was open stays lit up
+local GREEN = "|cff40ff40"
+local HEADER_BG, HEADER_BORDER = {0.23, 0.2, 0.15}, {0.56, 0.48, 0.29}
+local LIVE_BG, LIVE_BORDER = {0.1, 0.24, 0.1}, {0.3, 0.75, 0.3} -- a Live lockout's header
 local GREY = "|cffa8a8a8"
 local ORANGE = "|cffff8040"
 local OUTCOME_COLORS = {
@@ -332,6 +338,33 @@ local function DropMenu(drop)
     ScubaSounds:ShowPopupMenu(nil, entries)
 end
 
+StaticPopupDialogs["SCUBASOUNDS_DELETE_RAID"] = {
+    text = "Delete %s, with everything in it? It's removed for the whole guild.",
+    button1 = DELETE or "Delete",
+    button2 = CANCEL or "Cancel",
+    OnAccept = function(_, lockout)
+        Write("delraid", {
+            l = lockout.id
+        })
+    end,
+    timeout = 0,
+    whileDead = true,
+    hideOnEscape = true
+}
+
+-- Right-clicking a lockout's header, for officers
+local function RaidMenu(lockout)
+    ScubaSounds:ShowPopupMenu(nil, {{
+        text = lockout.raid or "Raid"
+    }, {
+        text = "Delete raid",
+        func = function()
+            StaticPopup_Show("SCUBASOUNDS_DELETE_RAID", (lockout.raid or "this raid") .. " · " ..
+                DateText(lockout.firstKill), nil, lockout)
+        end
+    }})
+end
+
 -- Right-clicking the attendance line, for officers
 local function AttendanceMenu(lockout)
     ScubaSounds:ShowPopupMenu(nil, {{
@@ -400,8 +433,6 @@ local function CreateLockoutHeader()
         edgeFile = WHITE,
         edgeSize = 1
     })
-    header:SetBackdropColor(0.23, 0.2, 0.15, 1)
-    header:SetBackdropBorderColor(0.56, 0.48, 0.29, 1)
     header.Toggle = header:CreateTexture(nil, "ARTWORK")
     header.Toggle:SetSize(14, 14)
     header.Toggle:SetPoint("LEFT", 6, 0)
@@ -436,7 +467,14 @@ local function CreateLockoutHeader()
         GameTooltip:Show()
     end)
     header.Sync:SetScript("OnLeave", GameTooltip_Hide)
-    header:SetScript("OnClick", function(self)
+    header:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+    header:SetScript("OnClick", function(self, button)
+        if button == "RightButton" then
+            if Raids:IsOfficer() then
+                RaidMenu(self.Lockout)
+            end
+            return
+        end
         local open = ScubaSounds_Options.RaidsOpen
         open[self.Lockout.id] = not open[self.Lockout.id] or nil
         ScubaSounds:RefreshRaids()
@@ -521,6 +559,13 @@ local function CreateItemRow()
     row.Border = row:CreateTexture(nil, "OVERLAY")
     row.Border:SetTexture("Interface\\Common\\WhiteIconFrame")
     row.Border:SetAllPoints(row.Icon)
+    -- Lit up for a few seconds when the drop has just arrived (see RefreshRaids)
+    row.Glow = row:CreateTexture(nil, "BACKGROUND")
+    row.Glow:SetAllPoints()
+    row.Glow:SetTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight")
+    row.Glow:SetBlendMode("ADD")
+    row.Glow:SetVertexColor(1, 0.82, 0, 0.7)
+    row.Glow:Hide()
     row.Name = row:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
     row.Name:SetPoint("LEFT", row.Icon, "RIGHT", 6, 0)
     row.Name:SetWidth(RAID_NAME_WIDTH)
@@ -733,7 +778,8 @@ function ScubaSounds:CreateRaidsPage(frame)
     page:Hide()
     ui = {
         page = page,
-        asked = {} -- lockout ID -> GetTime() its Sync button was clicked
+        asked = {}, -- lockout ID -> GetTime() its Sync button was clicked
+        newUntil = {} -- drop -> GetTime() it stops being lit up as just arrived
     }
     ScubaSounds.UI.Raids = ui
 
@@ -749,7 +795,7 @@ function ScubaSounds:CreateRaidsPage(frame)
             ScubaSounds_Options.RaidRecentOnly = checked
             ScubaSounds:RefreshRaids()
         end)
-    ScubaSounds:CreateLabel(page, recent, "Last 3 months only")
+    ScubaSounds:CreateLabel(page, recent, "Last 4 months only")
 
     ui.syncOlder = CreateFrame("Button", nil, page, "UIPanelButtonTemplate")
     ui.syncOlder:SetSize(130, 22)
@@ -804,6 +850,7 @@ function ScubaSounds:CreateRaidsPage(frame)
     ui.addForm = CreateAddForm()
 
     page:SetScript("OnShow", function()
+        ui.knownDrops = nil -- only drops arriving while the tab is open light up
         ScubaSounds:RefreshRaids()
     end)
     Raids:OnChange(function()
@@ -901,6 +948,8 @@ local function LayOutBody(lockout, y)
             for _, drop in ipairs(group.drops) do
                 local row = ui.items:Get()
                 row.Drop = drop
+                local newUntil = ui.newUntil[drop.uid]
+                row.Glow:SetShown(newUntil ~= nil and GetTime() < newUntil)
                 row:SetPoint("TOPLEFT", indent * 2, -y)
                 row:SetWidth(ui.width - indent * 2)
                 ShowItemName(row)
@@ -970,7 +1019,23 @@ function ScubaSounds:RefreshRaids()
     ui.empty:SetText(#Shown:GuildRaids() == 0 and "No raids recorded yet. Raids show here after their first boss kill." or
                          "No raids match these filters.")
 
+    -- Drops that weren't there the last time the tab drew have just arrived: lit up for NEW_GLOW seconds. The first
+    -- draw (and switching between the sample and the guild's raids) is the baseline, so nothing lights up then
+    local baseline = ui.knownDrops == nil or ui.knownSample ~= Raids:IsSample()
+    local known, glowing = {}, false
+    for _, lockout in ipairs(Shown:GuildRaids()) do
+        for _, drop in ipairs(lockout.drops) do
+            known[drop.uid] = true
+            if not baseline and not ui.knownDrops[drop.uid] then
+                ui.newUntil[drop.uid] = GetTime() + NEW_GLOW
+            end
+            glowing = glowing or (ui.newUntil[drop.uid] or 0) > GetTime()
+        end
+    end
+    ui.knownDrops, ui.knownSample = known, Raids:IsSample()
+
     local open = ScubaSounds_Options.RaidsOpen
+    local anyLive = false
     local y = 0
     for _, lockout in ipairs(lockouts) do
         local header = ui.headers:Get()
@@ -980,9 +1045,17 @@ function ScubaSounds:RefreshRaids()
         local isOpen = open[lockout.id]
         header.Toggle:SetTexture(isOpen and MINUS or PLUS)
         header.Title:SetText((lockout.raid or "Unknown raid") .. " · " .. NightsText(lockout))
+        local now = GetServerTime()
+        local inside = #Members(Replay.InsideAt(lockout, now))
+        local live = inside > 0 or now - Replay.LastActivity(lockout) <= LIVE_FOR
+        anyLive = anyLive or live
+        local bg, border = live and LIVE_BG or HEADER_BG, live and LIVE_BORDER or HEADER_BORDER
+        header:SetBackdropColor(bg[1], bg[2], bg[3], 1)
+        header:SetBackdropBorderColor(border[1], border[2], border[3], 1)
         local bosses = #lockout.kills .. (lockout.bossTotal and ("/" .. lockout.bossTotal) or "") ..
                            (lockout.bossTotal == 1 and " boss" or " bosses")
-        header.Summary:SetText(bosses .. " · " .. #Members(lockout.attended) .. " present")
+        header.Summary:SetText((live and (GREEN .. "Live|r · ") or "") .. bosses .. " · " .. #Members(lockout.attended) ..
+                                   " present" .. (inside > 0 and (" · " .. inside .. " inside now") or ""))
         local asked = ui.asked[lockout.id]
         local recentlyAsked = asked and GetTime() - asked < ASKED_SECONDS
         header.Sync:SetText(recentlyAsked and "Asked" or "Sync")
@@ -993,6 +1066,19 @@ function ScubaSounds:RefreshRaids()
         end
     end
     ui.content:SetHeight(math.max(y, 1))
+
+    -- Redrawn on its own while something's changing: a Live lockout's "inside now" (and it going quiet), and the lit
+    -- up drops going dark
+    local delay = (glowing and NEW_GLOW + 0.1) or (anyLive and LIVE_REFRESH) or nil
+    if delay and not ui.redrawScheduled then
+        ui.redrawScheduled = true
+        C_Timer.After(delay, function()
+            ui.redrawScheduled = false
+            if ui.page:IsVisible() then
+                ScubaSounds:RefreshRaids()
+            end
+        end)
+    end
 end
 
 -- For the Officer tab, which shows the same names and items

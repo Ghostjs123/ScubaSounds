@@ -17,9 +17,10 @@ import time
 TESTS = os.path.dirname(os.path.abspath(__file__))
 ADDON_TESTS = os.path.join(TESTS, "addon")
 EXPECTED = os.path.join(ADDON_TESTS, "expected")
-SUITES = [os.path.join(TESTS, "ledger", name) for name in ["test_units.py", "test_glue.py", "test_sync.py"]] + \
-         [os.path.join(TESTS, "raids", name) for name in ["test_replay.py", "test_recorder.py", "test_raids_tab.py", "test_sample.py", "test_officer_tab.py"]]
-SLOW_SUITES = ["test_sync.py"]
+SUITES = [os.path.join(TESTS, "ledger", name) for name in ["test_units.py", "test_glue.py", "test_sync.py", "test_raid_night.py"]] + \
+         [os.path.join(TESTS, "raids", name) for name in ["test_replay.py", "test_recorder.py", "test_raids_tab.py", "test_sample.py", "test_officer_tab.py",
+                                                               "test_liveraid.py"]]
+SLOW_SUITES = ["test_sync.py", "test_raid_night.py"]
 
 
 def run_script(path, deterministic=False):

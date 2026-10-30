@@ -76,8 +76,15 @@ local function Now()
     return GetServerTime()
 end
 
+-- Presence and binds go out last: after a boss encounter's message lockdown, kills, drops and loot come first
+local LOW_PRIORITY = {
+    pin = true,
+    pout = true,
+    bind = true
+}
+
 local function Write(kind, data, eventTime)
-    return ScubaSounds.Ledger:Write(kind, data, eventTime)
+    return ScubaSounds.Ledger:Write(kind, data, eventTime, LOW_PRIORITY[kind] and "BULK" or nil)
 end
 
 local function ItemIdOf(link)

@@ -98,7 +98,7 @@ function ScubaSounds:InitOptions()
     ScubaSounds:SeedEarliest()
     options.StatsView = options.StatsView or "guild" -- Stats tab: "guild" or "myself"
     -- Raids tab: lockouts open (lockout ID -> true), bosses closed ("lockout|boss" -> true), the raid filter (a raid's
-    -- name, or "all") and the "Last 3 months only" checkbox
+    -- name, or "all") and the "Last 4 months only" checkbox
     options.RaidsOpen = options.RaidsOpen or {}
     options.RaidBossesClosed = options.RaidBossesClosed or {}
     options.RaidFilter = options.RaidFilter or "all"
@@ -106,7 +106,7 @@ function ScubaSounds:InitOptions()
         options.RaidRecentOnly = true
     end
     -- The officers' tab: Characters or People, the sorted column, raids that don't count (raid name -> true) and its own
-    -- "Last 3 months only"
+    -- "Last 4 months only"
     options.OfficerView = options.OfficerView or "characters"
     options.OfficerSort = options.OfficerSort or {
         column = "name",

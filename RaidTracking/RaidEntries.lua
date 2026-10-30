@@ -1,7 +1,7 @@
 -- ScubaSounds: raid tracking's entry kinds and their data (docs\RAID_TRACKING_DESIGN.md, "Data model"). Every entry in the
 -- event log is one of these, its data in one-letter keys to keep messages small:
---   kill  {l, r, e, b, m?, n?}      a boss kill: lockout, raid, encounter ID, boss name, who was in the instance, and
---                                   how many bosses the raid has
+--   kill  {l, r, e, b, m?, n?, z?}  a boss kill: lockout, raid, encounter ID, boss name, who was in the instance, and
+--                                   how many bosses the raid has; z = part of a test raid (/ss debug liveraid)
 --   pin   {r, l?}                   the author's character entered the raid instance
 --   pout  {r, l?}                   ...and left it (left the instance or the raid group, or logged out)
 --   bind  {r, l}                    the author's entries in raid r without a lockout (written before the first kill)
@@ -20,6 +20,7 @@
 --   fix   {l, s, x?, p, c?}         an officer correction: s = "won" (drop x won by p), "de" (drop x disenchanted by
 --                                   p), "in" / "out" (p attended / didn't attend the lockout)
 --   del   {l, x}                    an officer deleted drop x
+--   delraid {l}                     an officer deleted the whole lockout (and everything in it)
 -- No WoW calls, so this runs the same in tests
 ScubaSounds = ScubaSounds or {}
 local Entries = {}
@@ -39,7 +40,8 @@ Entries.RAID_KINDS = {
     step = true,
     role = true,
     fix = true,
-    del = true
+    del = true,
+    delraid = true
 }
 
 Entries.VIA = {
@@ -151,7 +153,8 @@ local SCHEMAS = {
         e = IsWhole,
         b = IsText,
         m = optionalNames,
-        n = optionalWhole
+        n = optionalWhole,
+        z = optionalBoolean
     },
     pin = {
         r = IsText,
@@ -209,6 +212,9 @@ local SCHEMAS = {
     del = {
         l = IsWhole,
         x = IsText
+    },
+    delraid = {
+        l = IsWhole
     }
 }
 

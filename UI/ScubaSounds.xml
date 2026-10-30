@@ -33,7 +33,7 @@
             <Layer level="ARTWORK">
                 <Texture name="ScubaSoundsOptionsFrameTitle" file="Interface\DialogFrame\UI-DialogBox-Header">
                     <Size>
-                        <AbsDimension x="310" y="64" />
+                        <AbsDimension x="240" y="64" />
                     </Size>
                     <Anchors>
                         <Anchor point="TOP">
@@ -44,7 +44,7 @@
                     </Anchors>
                 </Texture>
 
-                <FontString name="ScubaSoundsOptionsFrameTitleText" inherits="GameFontNormal" text="ScubaSounds Options">
+                <FontString name="ScubaSoundsOptionsFrameTitleText" inherits="GameFontNormal" text="ScubaSounds">
                     <Anchors>
                         <Anchor point="TOP" relativeTo="ScubaSoundsOptionsFrame">
                             <Offset>

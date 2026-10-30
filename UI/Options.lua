@@ -1,4 +1,4 @@
--- ScubaSounds: the options window (/ss options), its tabs and the sound tabs. The Notable Loot, Stats and Options
+-- ScubaSounds: the ScubaSounds window (/ss), its tabs and the sound tabs. The Notable Loot, Stats and Options
 -- tabs are in their own files in UI. Everything here runs once the addon has loaded
 local _G = _G
 local CreateFrame = _G.CreateFrame

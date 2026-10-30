@@ -94,6 +94,44 @@ def digest_merge_equals_digest_of_union():
 
 
 @test
+def removing_from_a_digest_undoes_adding():
+    remove = L.eval("""function(all, gone)
+        local S = ScubaSounds.LedgerStore
+        local d = S.EmptyDigest()
+        for i = 1, #all do S.AddToDigest(d, all[i]) end
+        for i = 1, #gone do S.RemoveFromDigest(d, gone[i]) end
+        return d.n, d.s, d.x
+    end""")
+    rng = random.Random(6)
+    for _ in range(100):
+        ids = sorted({"r|%d|%d" % (START_TIME + rng.randrange(10 ** 6), rng.randrange(3)) for _ in range(rng.randrange(1, 50))})
+        gone = rng.sample(ids, rng.randrange(0, len(ids) + 1))
+        kept = [i for i in ids if i not in gone]
+        check(remove(L.table_from(ids), L.table_from(gone)) == digest_of(L.table_from(kept)), "remove != without")
+
+
+@test
+def written_since_lists_only_the_last_hour():
+    store = L.eval("""function(now)
+        local clock = {t = now}
+        local s = ScubaSounds.LedgerStore.New({}, function() return clock.t end)
+        for i, age in ipairs({7200, 3000, 400, 100, 0}) do
+            s:Add({t = now - age, w = now - age, c = 0, a = "x" .. i, k = "k"})
+        end
+        local names = {}
+        for _, e in ipairs(s:WrittenSince(now - 500)) do table.insert(names, e.a) end
+        table.sort(names)
+        local all = {}
+        for _, e in ipairs(s:WrittenSince(0)) do table.insert(all, e.a) end
+        table.sort(all)
+        return table.concat(names, ","), table.concat(all, ",")
+    end""")
+    recent, all = store(START_TIME + 30 * 86400)
+    check(recent == "x3,x4,x5", "since 500s ago: %s" % recent)
+    check(all == "x2,x3,x4,x5", "the 2-hour-old entry is past what the store remembers: %s" % all)
+
+
+@test
 def digest_detects_any_single_difference():
     rng = random.Random(5)
     for _ in range(300):

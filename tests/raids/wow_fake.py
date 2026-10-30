@@ -13,7 +13,7 @@ from ledger_env import ADDON, LIB_FILES, LEDGER_FILES, START_TIME, addon_file  #
 
 RAID_FILES = ["Data/DropSources.lua", "RaidTracking/RaidEntries.lua", "RaidTracking/RaidReplay.lua",
               "RaidTracking/RaidSample.lua", "RaidTracking/RaidEquip.lua",
-              "RaidTracking/Raids.lua", "RaidTracking/RaidRecorder.lua"]
+              "RaidTracking/Raids.lua", "RaidTracking/RaidRecorder.lua", "RaidTracking/RaidLiveTest.lua"]
 
 FAKE_WOW = r"""
 FRAMES = {}

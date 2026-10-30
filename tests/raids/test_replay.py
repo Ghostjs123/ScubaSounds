@@ -282,6 +282,33 @@ def deleted_drops_are_gone_for_good():
 
 
 @test
+def a_deleted_raid_is_gone_with_everything_in_it():
+    log = Log()
+    master_loot_night(log)
+    kill(log, "Kay Mon", T0 + 7 * DAY, "Lucifron", 663, lockout=L2)
+    recv(log, "Kay Mon", T0 + 60, SULF, "ml", x="m:abc:1", p="Loot Bank")
+    log.write("Officer Guy", "delraid", T0 + HOUR, l=L1)
+    # Entries about it that sync in later change nothing: no lockout, no drops, nothing held
+    drop(log, "Scuba Fish", T0 + 50, "m:late:1", SULF, written=T0 + 2 * HOUR)
+    log.write("Officer Guy", "fix", T0 + 2 * HOUR, l=L1, s="won", x="m:abc:1", p="Bob Bobson")
+    state = log.state()
+    ids = [state.list[i].id for i in range(1, len(state.list) + 1)]
+    check(ids == [L2], "lockouts %r" % ids)
+    check(state.lockouts[L1] is None, "the lockout is still there")
+    check(state.dropsByItem[SULF] is None, "its drops are still counted")
+    pending = log.lua.globals().ScubaSounds.RaidReplay.Pending(state, "loot bank")
+    check(len(pending) == 0, "the collector still holds its items")
+
+
+@test
+def a_test_raid_is_marked():
+    log = Log()
+    log.write("Kay Mon", "kill", T0, l=L1, r=MC, e=663, b="Lucifron", z=True)
+    kill(log, "Kay Mon", T0, "Lucifron", 663, lockout=L2)
+    check(log.lockout(L1).test is True and not log.lockout(L2).test, "test flag")
+
+
+@test
 def an_added_drop_and_a_recorded_one_are_flagged_until_one_is_deleted():
     log = Log()
     kill(log, "Kay Mon", T0, "Lucifron", 663)

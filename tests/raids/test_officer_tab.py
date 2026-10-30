@@ -81,7 +81,7 @@ def every_guild_member_gets_a_row_sorted_by_name():
     check(not any(n in ("Random Pugsworth", "Lfm Andy", "Some Rogue") for n in names), "a pug has a row")
     bear = [r for r in rows if r.startswith("R Bear Mon |")][0]
     raids, won, big, seen = numbers(bear)
-    check(raids == 12 and big == 0 and seen > 100, bear)  # the regulars attend every raid of the last 3 months
+    check(raids == 12 and big == 0 and seen > 100, bear)  # the regulars attend every raid of the last 4 months
     print("    " + bear)
 
 

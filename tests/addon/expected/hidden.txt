@@ -1,4 +1,4 @@
-msg: Open the options window first (/ss o)
+msg: Open the ScubaSounds window first (/ss)
 msg: Hidden options shown until the window closes
 flag true
 after close flag false

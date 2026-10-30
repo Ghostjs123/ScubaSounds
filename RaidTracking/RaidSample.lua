@@ -46,12 +46,14 @@ local RAIDS = {{
               {"Chromaggus", {19347, 19349, 19361}}, {"Nefarian", {19003, 19364, 19363, 19360, 19356}}},
     trash = {19362}
 }}
+Sample.Raids = RAIDS -- also used by /ss debug liveraid (RaidLiveTest.lua)
 
 -- Lockouts: raid, weeks ago, bosses killed (nil: all), and the nights it took as days after its first (nil: one night).
 -- In the last few weeks, Molten Core over two nights in a row and over two with a day between, and Blackwing Lair
 -- over three
-local LOCKOUTS = {{1, 0}, {2, 0}, {3, 0, 5}, {1, 1, nil, {0, 1}}, {2, 1}, {3, 1, nil, {0, 1, 3}}, {1, 2, nil, {0, 2}},
-                  {2, 2}, {1, 3}, {2, 3}, {1, 4}, {1, 5}, {1, 14}}
+-- A fifth value marks the raid in progress right now (Live in the Raids tab: everyone still inside)
+local LOCKOUTS = {{1, 0}, {2, 0}, {3, 0, 5, nil, true}, {1, 1, nil, {0, 1}}, {2, 1}, {3, 1, nil, {0, 1, 3}}, {1, 2, nil, {0, 2}},
+                  {2, 2}, {1, 3}, {2, 3}, {1, 4}, {1, 5}, {1, 19}}
 
 -- A small fixed-seed random generator (the same raids every time)
 local function Random(seed)
@@ -170,6 +172,10 @@ function Sample.Build(now)
         local raid = RAIDS[spec[1]]
         local lockout = 7000 + index
         local start = lastNight - spec[2] * 7 * DAY - (spec[1] - 1) * DAY -- each raid on its own night of the week
+        local live = spec[5] == true
+        if live then
+            start = now - 160 * MINUTE
+        end
         local killed = spec[3] or #raid.bosses
         local nights = spec[4] or {0}
 
@@ -202,6 +208,21 @@ function Sample.Build(now)
         end
 
         local t = start
+        -- The raid in progress: everyone zoned in and hasn't left (a couple stepped out)
+        if live then
+            for i, name in ipairs(roster) do
+                Add(name, "pin", start - random(5, 15) * MINUTE, {
+                    r = raid.name,
+                    l = lockout
+                })
+                if i % 15 == 0 then
+                    Add(name, "pout", start + random(20, 60) * MINUTE, {
+                        r = raid.name,
+                        l = lockout
+                    })
+                end
+            end
+        end
         -- Loot roles, set before the first kill
         if raid.masterLoot then
             Add(MASTER_LOOTER, "role", t - 10 * MINUTE, {

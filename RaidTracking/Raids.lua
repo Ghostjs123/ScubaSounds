@@ -86,7 +86,8 @@ local function TurnOffSampleForRealRaids()
     local knowsRoster = saved ~= nil and saved.classes ~= nil and next(saved.classes) ~= nil
     local guildRaid = false
     for _, lockout in ipairs(current and current.list or {}) do
-        guildRaid = guildRaid or IsGuildRaid(lockout, function(key)
+        -- A test raid (/ss debug liveraid) isn't a real one
+        guildRaid = guildRaid or not lockout.test and IsGuildRaid(lockout, function(key)
             return Raids:IsGuildMember(key)
         end, knowsRoster)
     end

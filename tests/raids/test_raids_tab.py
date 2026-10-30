@@ -23,7 +23,8 @@ def a_lockout_opens_to_attendance_roles_bosses_and_outcomes():
     tab = Tab()
     a_night(tab)
     shown = tab.shown()
-    check(shown.startswith("H Molten Core · ") and "2 bosses · 9 present | Sync" in shown, shown)
+    # Live: we're still inside (our own presence span is open)
+    check(shown.startswith("H Molten Core · ") and "| Live · 2 bosses · 9 present · 1 inside now | Sync" in shown, shown)
     tab.click_header()
     shown = tab.shown()
     lines = shown.split("\n")
@@ -52,10 +53,10 @@ def bosses_collapse_and_show_their_count():
 def the_filters():
     tab = Tab()
     a_night(tab)
-    old = tab.c.eval("NOW") - 120 * 86400
+    old = tab.c.eval("NOW") - 150 * 86400
     tab.c.run('ScubaSounds.Ledger:Write("kill", {r = "Onyxia\'s Lair", l = 999, e = 1084, b = "Onyxia"}, %d)' % old)
     tab.c.step(1)
-    check("Onyxia" not in tab.shown(), "an old raid shows with Last 3 months only")
+    check("Onyxia" not in tab.shown(), "an old raid shows with Last 4 months only")
     tab.c.run("RECENT_BOX.onToggle(false)")
     check("Onyxia's Lair" in tab.shown(), "the old raid didn't show")
     tab.c.run("ScubaSounds.UI.Raids.filter.scripts.OnClick(ScubaSounds.UI.Raids.filter)")
@@ -172,6 +173,68 @@ def the_lockout_sync_button_asks_the_guild():
     check(tab.c.eval("#SENT") > 0, "nothing sent")
     tab.c.step(16)
     check("| Sync" in tab.shown(), tab.shown())
+
+
+@test
+def a_raid_goes_quiet_once_everyone_leaves_and_15_minutes_pass():
+    tab = Tab()
+    a_night(tab)
+    check("Live" in tab.shown().split("\n")[0], "not live while inside")
+    tab.c.run('INSTANCE = {name = "Orgrimmar", type = "none"}')
+    tab.c.fire("ZONE_CHANGED_NEW_AREA")
+    tab.c.step(1)
+    header = tab.shown().split("\n")[0]
+    check("Live" in header and "inside now" not in header, "just left: still Live, nobody inside: " + header)
+    tab.c.step(16 * 60)
+    check("Live" not in tab.shown().split("\n")[0], "still Live after going quiet")
+
+
+@test
+def a_drop_arriving_while_the_tab_is_open_lights_up_for_a_few_seconds():
+    tab = Tab()
+    a_night(tab)
+    tab.c.run("OFFICER_PAGE = nil; PAGE.shown = true")
+    tab.click_header()
+    tab.refresh()
+    glowing = "(function() local n = 0 for _, r in ipairs(ScubaSounds.UI.Raids.items.used) do if r.Glow.shown then n = n + 1 end end return n end)()"
+    check(tab.c.eval(glowing) == 0, "something lit up on opening")
+    tab.c.run('ScubaSounds.Ledger:Write("drop", {r = "Molten Core", l = 424242, x = "r99:19019", i = 19019})')
+    tab.c.step(1)
+    tab.refresh()
+    check(tab.c.eval(glowing) == 1, "the new drop didn't light up")
+    tab.c.step(9)
+    tab.refresh()
+    check(tab.c.eval(glowing) == 0, "still lit after 8 seconds")
+    # Opening the tab again doesn't light up what came in while it was closed
+    tab.c.run('PAGE.shown = false; ScubaSounds.Ledger:Write("drop", {r = "Molten Core", l = 424242, x = "r98:19020", i = 19020})')
+    tab.c.step(1)
+    tab.c.run("PAGE.shown = true; PAGE.scripts.OnShow(PAGE)")
+    check(tab.c.eval(glowing) == 0, "lit up what arrived while closed")
+
+
+@test
+def officers_delete_a_whole_raid_from_its_header():
+    tab = Tab()
+    a_night(tab)
+    tab.refresh()
+    tab.c.run("local h = ScubaSounds.UI.Raids.headers.used[1]; h.scripts.OnClick(h, 'RightButton')")
+    tab.choose("Delete raid")
+    popup = tab.c.eval("POPUPS[1]")
+    check(popup.which == "SCUBASOUNDS_DELETE_RAID", "no confirmation")
+    tab.c.eval('function(p) StaticPopupDialogs[p.which].OnAccept(nil, p.data) end')(popup)
+    tab.c.step(1)
+    check(tab.shown().startswith("E No raids recorded yet"), tab.shown())
+    check(len(tab.c.entries("delraid")) == 1, "no delraid entry")
+
+
+@test
+def non_officers_get_no_raid_menu():
+    tab = Tab(rank=3)
+    a_night(tab)
+    tab.refresh()
+    tab.c.run("local h = ScubaSounds.UI.Raids.headers.used[1]; h.scripts.OnClick(h, 'RightButton')")
+    check(tab.menu() == "", "a menu opened for a non-officer")
+    check("Molten Core" in tab.shown(), "the right-click toggled or removed it")
 
 
 def other_raid(tab, lockout, guild, pugs, raid="Onyxia's Lair"):

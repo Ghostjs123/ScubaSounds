@@ -122,6 +122,7 @@ class Client:
         self.sent_messages = 0
         self.received_texts = 0
         self.node = None
+        self.lockdown_until = 0.0  # this client's own lockdown (a raider in a boss fight)
         if online:
             self.login()
 
@@ -130,7 +131,8 @@ class Client:
         self.generation += 1
         gen = self.generation
         self.online = True
-        self.node = node or "%s%d" % (self.name[:6].lower(), gen)
+        # Unique per client and session, as the addon's random IDs are ("Raider 01" -> "raider01" + session)
+        self.node = node or "%s%d" % ("".join(ch for ch in self.name.lower() if ch.isalnum())[:13], gen)
         net = self.net
 
         def now():
@@ -199,9 +201,11 @@ class Client:
         self.tokens = min(net.burst, self.tokens + (net.time - self.last_refill) * net.rate)
         self.last_refill = net.time
         while self.outgoing:
-            if net.time < net.lockdown_until:
-                # An encounter's lockdown: nothing leaves; the addon keeps resending, so it goes out afterwards
-                net.at(net.lockdown_until, lambda: self._drain(gen))
+            # An encounter's lockdown (everyone's, or just this client's, as for raiders in a boss fight): nothing
+            # leaves; the addon keeps resending, so it goes out afterwards
+            locked_until = max(net.lockdown_until, self.lockdown_until)
+            if net.time < locked_until:
+                net.at(locked_until, lambda: self._drain(gen))
                 return
             text = self.outgoing[0][2]
             cost = len(text) + 40  # ChatThrottleLib counts header overhead too
@@ -232,10 +236,10 @@ class Client:
     def count(self):
         return self.lua.eval("STORE:Count()")
 
-    def write(self, kind="test", data=None, event_time=None):
+    def write(self, kind="test", data=None, event_time=None, priority=None):
         g = self.lua.globals()
         d = self.lua.table_from(data, recursive=True) if isinstance(data, dict) else data
-        return g.SYNC.Write(g.SYNC, kind, d, event_time)
+        return g.SYNC.Write(g.SYNC, kind, d, event_time, priority)
 
     def write_local_only(self, kind="test", written=None, event_time=None, author=None):
         """An entry put straight into the saved log (as if written in a past session), not sent. Works before the

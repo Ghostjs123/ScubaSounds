@@ -32,7 +32,9 @@ function SlashCmdList.SCUBASOUNDS(args)
         words[i] = strlower(words[i])
     end
 
-    if words[1] == "debug" or words[1] == "d" then
+    if not words[1] then
+        ScubaSounds:ShowOptions()
+    elseif words[1] == "debug" or words[1] == "d" then
         ScubaSounds:DebugCommand(words)
     elseif words[1] == "recent" then
         ScubaSounds:PrintRecentPlays()
@@ -41,16 +43,17 @@ function SlashCmdList.SCUBASOUNDS(args)
     elseif words[1] == "raids" or words[1] == "r" then
         ScubaSounds:ShowOptionsTab("Raids")
     elseif words[1] == "o" or ScubaSounds:HasValue(words, "options") or ScubaSounds:HasValue(words, "option") then
-        ScubaSounds:ShowOptions()
+        ScubaSounds:ShowOptionsTab("Options")
     elseif ScubaSounds:HasValue(words, "on") then
         ScubaSounds:SetSoundsDisabled(false)
     elseif ScubaSounds:HasValue(words, "off") then
         ScubaSounds:SetSoundsDisabled(true)
     else
         ScubaSounds:PrintCommands("Commands:", {
-            {"/ss options (or /ss o)", "open the options window"},
-            {"/ss stats", "open the options window on the Stats tab"},
-            {"/ss raids (or /ss r)", "open the options window on the Raids tab"},
+            {"/ss", "open the ScubaSounds window"},
+            {"/ss options (or /ss o)", "open the window on the Options tab"},
+            {"/ss stats", "open the window on the Stats tab"},
+            {"/ss raids (or /ss r)", "open the window on the Raids tab"},
             {"/ss on", "turn sounds on"},
             {"/ss off", "turn sounds off"},
             {"/ss recent", "the last 10 sounds played"},
@@ -277,7 +280,7 @@ function ScubaSounds:DebugCommand(words)
         -- /ss debug hidden: shows options normally hidden from this character (Bobmoney's tartattack checkbox), or hides
         -- them again. Only while the options window is open; closing it puts everything back
         if not (ScubaSoundsOptionsFrame and ScubaSoundsOptionsFrame:IsShown()) then
-            ScubaSounds:SendMessage("Open the options window first (/ss o)")
+            ScubaSounds:SendMessage("Open the ScubaSounds window first (/ss)")
             return
         end
         local state = ScubaSounds.State
@@ -297,6 +300,11 @@ function ScubaSounds:DebugCommand(words)
             state.TracePet and "on" or "off", tostring(state.PetLevel), state.PetGuid and "" or " (no pet remembered)",
             (issecretvalue(guid) or issecretvalue(level)) and "secret" or
                 (guid and ("level " .. tostring(level)) or "no pet out")))
+    elseif words[2] == "liveraid" and ScubaSounds.Raids:IsOfficer() then
+        -- /ss debug liveraid (officers): a Blackwing Lair clear played into the guild's raids over a minute, seen Live
+        -- by everyone online, then deleted a minute after (see RaidTracking\RaidLiveTest.lua). Anyone else gets the
+        -- usual list, as for any unknown command
+        ScubaSounds:StartLiveRaidTest()
     elseif words[2] == "raidlog" then
         -- /ss debug raidlog [clear]: turns the raid tracking diagnostic on or off (it stays on across sessions), or
         -- deletes what it recorded (see RaidTracking\RaidLog.lua)
@@ -306,14 +314,22 @@ function ScubaSounds:DebugCommand(words)
             ScubaSounds:ToggleRaidLog()
         end
     else
-        ScubaSounds:PrintCommands("Debug commands (only print here, nothing is sent or unlocked):", {
-            {"/ss debug chatlink <sound>", "the sound's link for each of its tabs"},
-            {"/ss debug discovery <sound>", "the guild message posted when it's first unlocked"},
-            {"/ss debug awaydiscoveries (or ao) [count]", "the login summary, for count random sounds (default 12)"},
-            {"/ss debug levelup (or lo)", "play the next level-up jingle of a pretend round"},
-            {"/ss debug hidden", "show or hide options other characters get, while the options window is open"},
-            {"/ss debug pet", "print every pet level check, to see why a pet level up did or didn't play"},
-            {"/ss debug raidlog [clear]", "record raid, loot, trade and vendor events for raid tracking (or delete them)"}
-        })
+        local commands = {{"/ss debug chatlink <sound>", "the sound's link for each of its tabs"},
+                          {"/ss debug discovery <sound>", "the guild message posted when it's first unlocked"},
+                          {"/ss debug awaydiscoveries (or ao) [count]",
+                           "the login summary, for count random sounds (default 12)"},
+                          {"/ss debug levelup (or lo)", "play the next level-up jingle of a pretend round"},
+                          {"/ss debug hidden", "show or hide options other characters get, while the ScubaSounds window is open"},
+                          {"/ss debug pet", "print every pet level check, to see why a pet level up did or didn't play"},
+                          {"/ss debug raidlog [clear]",
+                           "record raid, loot, trade and vendor events for raid tracking (or delete them)"}}
+        -- Only officers know it exists, heading included
+        local heading = "Debug commands (only print here, nothing is sent or unlocked):"
+        if ScubaSounds.Raids:IsOfficer() then
+            heading = "Debug commands (only print here, nothing is sent or unlocked, unless it says so):"
+            table.insert(commands, {"/ss debug liveraid",
+                                    "send a test Blackwing Lair clear to the whole guild over a minute (deletes itself)"})
+        end
+        ScubaSounds:PrintCommands(heading, commands)
     end
 end

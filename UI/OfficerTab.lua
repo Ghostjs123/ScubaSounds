@@ -27,7 +27,7 @@ local Shown = Raids.Shown
 local Shared = ScubaSounds.RaidsTabShared
 
 local DAY = 86400
-local RECENT_DAYS = 90
+local RECENT_DAYS = 120
 local GREY = "|cffa8a8a8"
 local DARK_GREY = "|cff808080"
 local ORANGE = {1, 0.5, 0}
@@ -660,7 +660,7 @@ function ScubaSounds:CreateOfficerPage(frame)
             ScubaSounds_Options.OfficerRecentOnly = checked
             ScubaSounds:RefreshOfficer()
         end)
-    ScubaSounds:CreateLabel(page, recent, "Last 3 months only")
+    ScubaSounds:CreateLabel(page, recent, "Last 4 months only")
     ui.older = page:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
     ui.older:SetPoint("TOPRIGHT", -GRID_LEFT - 4, -58)
     ui.older:SetTextColor(1, 0.5, 0.25)

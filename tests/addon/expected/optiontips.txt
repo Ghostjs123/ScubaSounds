@@ -1,5 +1,5 @@
 Play outside of raid: Off | Off, sounds only play inside raid instances. On, they play everywhere: the open world, dungeons and battlegrounds (each tab can also turn battlegrounds off).
-Show minimap button: Off | The ScubaSounds button on the edge of the minimap. Left-click opens this window, right-click opens the Stats tab, and dragging moves it around the edge. /ss options opens this window either way.
+Show minimap button: Off | The ScubaSounds button on the edge of the minimap. Left-click opens this window, right-click opens the Stats tab, and dragging moves it around the edge. /ss opens this window either way.
 Disable Sounds: Off | Mutes every ScubaSounds sound for you, and greys out the sound settings. A sound you would have heard doesn't count as heard (or get announced). The play buttons still preview. /ss off and /ss on do the same.
 Replay one-time sounds every time: Off | Can be spammy. Only you hear the replays; nothing goes to guild chat or your group. | More show up here as they're found
 Send messages in guild: Off | Lets the addon type in chat for you: announcing sounds the guild discovers, and a few short celebration lines. Off, it never posts in chat. The hidden addon messages that let guildmates hear your sounds still go out, so they hear them either way.

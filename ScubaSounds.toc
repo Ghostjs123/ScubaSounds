@@ -33,6 +33,7 @@ RaidTracking\RaidSample.lua
 RaidTracking\RaidEquip.lua
 RaidTracking\Raids.lua
 RaidTracking\RaidRecorder.lua
+RaidTracking\RaidLiveTest.lua
 SlashCommands.lua
 UI\MinimapButton.lua
 UI\Style.lua

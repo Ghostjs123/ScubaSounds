@@ -25,6 +25,7 @@ local MAX_COUNTER = 100000
 local MAX_STRING = 512
 local MAX_DATA_DEPTH = 4
 local MAX_DATA_KEYS = 64
+local FRESH_FOR = 3600 -- seconds the store remembers which entries were just written (more than any settling time)
 
 Store.DAY = DAY
 Store.HOUR = HOUR
@@ -90,6 +91,21 @@ function Store.AddToDigest(digest, id)
     digest.n = digest.n + 1
     digest.s = (digest.s + Fnv1a(id, HASH_BASIS)) % TWO_32
     digest.x = Xor32(digest.x, Fnv1a(id, HASH_BASIS_2))
+end
+
+-- Takes one ID back out (the inverse of AddToDigest)
+function Store.RemoveFromDigest(digest, id)
+    digest.n = digest.n - 1
+    digest.s = (digest.s - Fnv1a(id, HASH_BASIS)) % TWO_32
+    digest.x = Xor32(digest.x, Fnv1a(id, HASH_BASIS_2))
+end
+
+function Store.CopyDigest(digest)
+    return {
+        n = digest.n,
+        s = digest.s,
+        x = digest.x
+    }
 end
 
 function Store.MergeDigest(into, other)
@@ -220,7 +236,8 @@ function Store.New(saved, now)
         listeners = {},
         lastWritten = nil,
         lastCounter = -1,
-        oldestDay = nil
+        oldestDay = nil,
+        fresh = {} -- entries written in the last FRESH_FOR seconds (see WrittenSince)
     }, Store)
     local sorted = {}
     for _, entry in ipairs(saved.entries or {}) do
@@ -252,6 +269,25 @@ function Store:Index(entry)
     if not self.oldestDay or day < self.oldestDay then
         self.oldestDay = day
     end
+    if entry.w >= self.now() - FRESH_FOR then
+        table.insert(self.fresh, entry)
+    end
+end
+
+-- Entries written after since (by their written time), from the last FRESH_FOR seconds only
+function Store:WrittenSince(since)
+    local cutoff = self.now() - FRESH_FOR
+    local kept, found = {}, {}
+    for _, entry in ipairs(self.fresh) do
+        if entry.w >= cutoff then
+            table.insert(kept, entry)
+            if entry.w > since then
+                table.insert(found, entry)
+            end
+        end
+    end
+    self.fresh = kept
+    return found
 end
 
 -- Adds an entry if it's valid and new. Returns true when added. Listeners hear about it with whether it went at the

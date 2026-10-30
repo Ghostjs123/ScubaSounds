@@ -97,9 +97,10 @@ function Ledger:OnReady(listener)
     end
 end
 
--- Writes one of our entries and sends it to the guild. Returns it, or nil when there's no guild or it's invalid
-function Ledger:Write(kind, data, eventTime)
-    return self.sync and self.sync:Write(kind, data, eventTime)
+-- Writes one of our entries and sends it to the guild. Returns it, or nil when there's no guild or it's invalid.
+-- priority: see LedgerSync's Write
+function Ledger:Write(kind, data, eventTime, priority)
+    return self.sync and self.sync:Write(kind, data, eventTime, priority)
 end
 
 frame:SetScript("OnEvent", function(self, event, ...)

@@ -57,8 +57,8 @@ function ScubaSounds:CreateGlobalOptionsPage(frame)
         end)
     ScubaSounds:CreateLabel(page, minimapButton, "Show minimap button")
     describe(minimapButton, "Show minimap button", "The ScubaSounds button on the edge of the minimap. Left-click " ..
-        "opens this window, right-click opens the Stats tab, and dragging moves it around the edge. /ss options " ..
-        "opens this window either way.")
+        "opens this window, right-click opens the Stats tab, and dragging moves it around the edge. /ss opens " ..
+        "this window either way.")
 
     local disableSounds = ScubaSounds:CreateCheckbox(page, GRID_LEFT, -31 - ROW_HEIGHT - 4,
         ScubaSounds_Options[ScubaSounds_DisableSounds], function(checked)

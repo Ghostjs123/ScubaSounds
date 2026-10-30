@@ -34,6 +34,9 @@ local MAX_RANGE_DAYS = 3660 -- ten years: a day query covering more is refused
 local MAX_HOURS = MAX_RANGE_DAYS * 24
 local PEER_MEMORY = 300 -- seconds a peer's advertisement counts for the "older raids not synced" note
 local MAX_NODE = 16
+local SETTLE = 300 -- seconds an entry is left to its live push before advertisements count it (see Digests)
+local EXCHANGE_GAP = 30 -- seconds between exchanges we start because of a differing advertisement, at least
+local DIFFERING_MEMORY = AD_INTERVAL + AD_JITTER -- a differing advertisement waits this long for a round, at most
 
 Sync.WINDOW_DAYS = WINDOW_DAYS
 Sync.VERSION = VERSION
@@ -138,6 +141,9 @@ function Sync.New(opts)
         heardAds = {}, -- digest key -> when we last heard it advertised
         peers = {}, -- node -> {seen, old (digest), oldest (day)}
         exchanges = {}, -- node -> when we last started an exchange with it
+        differing = {}, -- node -> when we last heard it advertise a log different from ours
+        lastExchange = -math.huge, -- when we last started an exchange over a differing advertisement
+        othersExchanging = {}, -- node -> when we last heard another client start an exchange with it
         answering = {}, -- node -> when it last started an exchange with us
         incomingIds = {}, -- node .. hours -> an ID list arriving in several parts
         listeners = {}
@@ -162,14 +168,15 @@ end
 -- =================================================================
 -- Writing and sending entries
 -- =================================================================
--- Writes one of our entries and sends it to the guild. Returns the entry, or nil when it's invalid
-function Sync:Write(kind, data, eventTime)
+-- Writes one of our entries and sends it to the guild. Returns the entry, or nil when it's invalid. priority:
+-- ChatThrottleLib's ("ALERT", "NORMAL" by default, "BULK"), so what matters most goes first after a boss encounter
+function Sync:Write(kind, data, eventTime, priority)
     local entry = self.store:Write(kind, data, eventTime, self.author)
     if entry then
         self:Send({
             o = "en",
             e = {WireEntry(entry)}
-        })
+        }, priority)
     end
     return entry
 end
@@ -192,14 +199,41 @@ end
 -- =================================================================
 -- Advertising
 -- =================================================================
-function Sync:Digests()
-    local windowStart = self:WindowStart()
-    return self.store:RangeDigest(windowStart, self:Today()), self.store:RangeDigest(-math.huge, windowStart - 1)
+-- The digests an advertisement carries: the recent window, and everything older. The window leaves out entries
+-- written in the last SETTLE seconds: those are still arriving by live push (a raid writes them every few seconds, and
+-- a boss encounter holds them back until it ends), so two clients only start an exchange over what should have
+-- settled. Anything a live push missed is caught once it's that old.
+-- cutoff: count only entries written by then (nil: everything). An advertisement carries the cutoff it used, rounded to
+-- the minute so clients advertising together agree on it, and the receiver compares its own log at that same cutoff
+function Sync:Digests(cutoff)
+    local windowStart, today = self:WindowStart(), self:Today()
+    local recent = self.store:RangeDigest(windowStart, today)
+    for _, entry in ipairs(cutoff and self.store:WrittenSince(cutoff) or {}) do
+        local day = Store.DayOf(entry.w)
+        if day >= windowStart and day <= today then
+            Store.RemoveFromDigest(recent, entry.id)
+        end
+    end
+    return recent, self.store:RangeDigest(-math.huge, windowStart - 1)
+end
+
+-- The cutoff our advertisements use: SETTLE seconds ago, to the minute. A client that just started (logged in, maybe
+-- mid-raid) missed the live pushes, so for its first SETTLE seconds it counts everything and catches up straight away
+function Sync:Cutoff()
+    if not self.startedAt or self.now() - self.startedAt < SETTLE then
+        return nil
+    end
+    return math.floor((self.now() - SETTLE) / 60) * 60
+end
+
+local function AdKey(recent, old, cutoff)
+    return DigestKey(recent) .. "/" .. DigestKey(old) .. "/" .. (cutoff or "")
 end
 
 function Sync:Advertise()
-    local recent, old = self:Digests()
-    local key = DigestKey(recent) .. "/" .. DigestKey(old)
+    local cutoff = self:Cutoff()
+    local recent, old = self:Digests(cutoff)
+    local key = AdKey(recent, old, cutoff)
     local heard = self.heardAds[key]
     if heard and self.now() - heard < AD_QUIET then
         return false
@@ -209,10 +243,33 @@ function Sync:Advertise()
         o = "ad",
         r = recent,
         old = old,
+        sc = cutoff,
         od = self.store:OldestDay(),
         d = self:Today()
     })
     return true
+end
+
+-- One round, every AD_INTERVAL or so: advertise, and (if we haven't started one lately) one exchange with a random one
+-- of the peers whose log differed from ours since the last round. Entries from any exchange are broadcast, so one
+-- exchange repairs many clients
+function Sync:Round()
+    self:Advertise()
+    local now, candidates = self.now(), {}
+    for node, heard in pairs(self.differing) do
+        if now - heard > DIFFERING_MEMORY then
+            self.differing[node] = nil
+        else
+            table.insert(candidates, node)
+        end
+    end
+    if #candidates > 0 and now - self.lastExchange >= EXCHANGE_GAP then
+        self.lastExchange = now
+        table.sort(candidates)
+        local node = candidates[math.floor(self.random() * #candidates) + 1]
+        self.differing[node] = nil
+        self:StartExchange(node)
+    end
 end
 
 function Sync:ScheduleAdvertise(delay)
@@ -220,7 +277,7 @@ function Sync:ScheduleAdvertise(delay)
         if not self.running then
             return
         end
-        self:Advertise()
+        self:Round()
         self:ScheduleAdvertise(AD_INTERVAL + self.random() * AD_JITTER)
     end)
 end
@@ -230,6 +287,7 @@ function Sync:Start()
         return
     end
     self.running = true
+    self.startedAt = self.now()
     self:ScheduleAdvertise(FIRST_AD_DELAY + self.random() * AD_JITTER)
 end
 
@@ -270,14 +328,17 @@ function Sync:StartExchange(node)
         if not self.running then
             return
         end
-        local recent = self:Digests()
         local peer = self.peers[node]
-        if peer and peer.recentKey == DigestKey(recent) then
+        if peer and peer.recentKey == DigestKey(self:Digests(peer.cutoff)) then
             return -- caught up meanwhile
         end
         local answering = self.answering[node]
         if answering and self.now() - answering < EXCHANGE_TIMEOUT then
             return -- they started one with us, which settles both sides
+        end
+        local other = self.othersExchanging[node]
+        if other and self.now() - other < EXCHANGE_TIMEOUT then
+            return -- someone else's exchange with them is under way; its entries reach us too
         end
         self:Query(node, self:WindowStart(), self:Today(), true)
     end)
@@ -348,20 +409,31 @@ end
 
 function handlers.ad(self, message)
     if not Store.IsDigest(message.r) or not Store.IsDigest(message.old) or
-        (message.od ~= nil and not IsWholeNumber(message.od)) then
+        (message.od ~= nil and not IsWholeNumber(message.od)) or (message.sc ~= nil and not IsWholeNumber(message.sc)) then
         return
     end
     local now = self.now()
-    self.heardAds[DigestKey(message.r) .. "/" .. DigestKey(message.old)] = now
+    self.heardAds[AdKey(message.r, message.old, message.sc)] = now
     self.peers[message.f] = {
         seen = now,
         old = message.old,
         oldest = message.od,
-        recentKey = DigestKey(message.r)
+        recentKey = DigestKey(message.r),
+        cutoff = message.sc
     }
-    local recent = self:Digests()
-    if not Store.DigestsEqual(message.r, recent) then
+    -- Our log at their cutoff, so entries still in flight don't count as a difference. Every client hears every
+    -- advertisement, and each answering every difference at once would be dozens of exchanges all broadcasting the
+    -- same entries. So a client starts at most one exchange per EXCHANGE_GAP; a difference heard sooner waits for the
+    -- next round (see Round)
+    local recent = self:Digests(message.sc)
+    if Store.DigestsEqual(message.r, recent) then
+        self.differing[message.f] = nil
+    elseif now - self.lastExchange >= EXCHANGE_GAP then
+        self.lastExchange = now
+        self.differing[message.f] = nil
         self:StartExchange(message.f)
+    else
+        self.differing[message.f] = now
     end
 end
 
@@ -542,6 +614,10 @@ function Sync:OnMessage(message)
         return
     end
     local to = message.to
+    -- Someone else starting an exchange with a node: ours with it can wait (see StartExchange)
+    if message.o == "dq" and IsNode(to) and to ~= self.node then
+        self.othersExchanging[to] = self.now()
+    end
     if to ~= nil and to ~= self.node and to ~= "*" and message.o ~= "en" then
         return
     end

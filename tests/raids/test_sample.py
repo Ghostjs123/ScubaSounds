@@ -78,7 +78,9 @@ def it_shows_by_default_with_the_guilds_names():
     tab = sample_tab()
     tab.click_header()
     shown = tab.shown()
-    check(shown.startswith("H Molten Core · "), shown)
+    # The raid in progress tonight comes first, Live
+    check(shown.startswith("H Blackwing Lair · ") and "| Live · 5/8 bosses" in shown.split("\n")[0], shown[:300])
+    check("inside now" in shown.split("\n")[0] and "Live" not in shown.split("\n")[1], shown[:300])
     check(tab.c.eval("ScubaSounds.UI.Raids.status.text") == "Sample raids (see the Options tab)", "status")
     present = shown.split("\n")[1]
     check("Bear Mon" in present and "Scuba Fish" in present, present)
@@ -90,7 +92,7 @@ def it_shows_by_default_with_the_guilds_names():
 
 
 @test
-def the_14_week_old_raid_only_shows_without_the_recent_filter():
+def the_19_week_old_raid_only_shows_without_the_recent_filter():
     tab = sample_tab()
     count = len([l for l in tab.shown().split("\n") if l.startswith("H ")])
     tab.c.run("RECENT_BOX.onToggle(false)")
