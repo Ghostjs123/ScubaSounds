@@ -202,8 +202,8 @@ function ScubaSounds:DebugCommand(words)
             ScubaSounds:SendMessage(ScubaSounds:DiscoveryLink(sound, tabName))
         end
     elseif words[2] == "discovery" and words[3] then
-        -- /ss debug discovery <sound>: the guild message each of its triggers posts when first set off, with the link
-        -- guildmates with the addon see
+        -- /ss debug discovery <sound>: the guild message each of its triggers posts when first set off, as guildmates
+        -- without the addon see it (exactly as sent) and as guildmates with it see it (linked, the download note dropped)
         local sound = ScubaSounds:FindSoundByName(words[3])
         if not sound then
             return
@@ -217,8 +217,9 @@ function ScubaSounds:DebugCommand(words)
                         category.name)
                 if trigger.category == category.id and not seen[text] and ScubaSounds:HasValue(trigger.sounds, sound) then
                     seen[text] = true
-                    local before = text:match(data.DiscoveryLinkPattern)
-                    ScubaSounds:SendMessage(before .. ScubaSounds:DiscoveryLink(sound, category.name))
+                    ScubaSounds:SendMessage("Without the addon: " .. text)
+                    ScubaSounds:SendMessage("With the addon: " ..
+                                                (ScubaSounds:LinkSoundAtEnd(text, data.DiscoveryLinkPattern) or text))
                 end
             end
         end
@@ -317,17 +318,28 @@ function ScubaSounds:DebugCommand(words)
         else
             ScubaSounds:ToggleRaidLog()
         end
+    elseif words[2] == "log" then
+        -- /ss debug log [clear]: turns the sounds diagnostic on or off (it stays on across sessions), or deletes what
+        -- it recorded (see DebugLog.lua)
+        if words[3] == "clear" then
+            ScubaSounds:ClearDebugLog()
+        else
+            ScubaSounds:ToggleDebugLog()
+        end
     else
         local commands = {{"/ss debug chatlink <sound>", "the sound's link for each of its tabs"},
-                          {"/ss debug discovery <sound>", "the guild message posted when it's first unlocked"},
+                          {"/ss debug discovery <sound>", "the guild message posted when it's first unlocked, with and without the addon"},
                           {"/ss debug awaydiscoveries (or ao) [count]",
                            "the login summary, for count random sounds (default 12)"},
                           {"/ss debug levelup (or lo)", "play the next level-up jingle of a pretend round"},
                           {"/ss debug hidden", "show or hide options other characters get, while the ScubaSounds window is open"},
                           {"/ss debug pet", "print every pet level check, to see why a pet level up did or didn't play"},
-                          {"/ss debug lootroles", "preview the raid's loot collector and disenchanters prompt"},
+                          {"/ss debug lootroles", "preview the raid's loot collectors and disenchanters prompt"},
                           {"/ss debug raidlog [clear]",
-                           "record raid, loot, trade and vendor events for raid tracking (or delete them)"}}
+                           "record raid, loot, trade and vendor events for raid tracking (or delete them)"},
+                          {"/ss debug log [clear]",
+                           "record game events and why each sound did or didn't play, to find what's broken " ..
+                               "(or delete them)"}}
         -- Only officers know it exists, heading included
         local heading = "Debug commands (only print here, nothing is sent or unlocked):"
         if ScubaSounds.Raids:IsOfficer() then

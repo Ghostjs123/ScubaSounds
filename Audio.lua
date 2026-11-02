@@ -17,25 +17,30 @@ function ScubaSounds:IsSoundOn(categoryId, sound)
 end
 
 function ScubaSounds:ShouldPlay(sound)
+    return ScubaSounds:WhyNotPlay(sound) == nil
+end
+
+-- Why a sound can't play right now (for the debug log), or nil when it can
+function ScubaSounds:WhyNotPlay(sound)
     -- On timeout
     if ScubaSounds.Audio.Timeouts[sound] then
-        return false
+        return "on timeout"
     end
 
     if ScubaSounds_Options[ScubaSounds_DisableSounds] then
-        return false
+        return "Disable Sounds is on"
     end
 
     if not ScubaSounds:IsInRaidInstance() and ScubaSounds_Options[ScubaSounds_PlayOutsideRaid] == false then
-        return false
+        return "outside a raid with Play outside of raid off"
     end
 
     -- Sound is playing and cannot overlap self
     if ScubaSounds.Audio.CurrentlyPlaying[sound] and not ScubaSounds.Audio.SoundInfo[sound].canOverlapSelf then
-        return false
+        return "already playing"
     end
 
-    return true
+    return nil
 end
 
 -- Wiring up an unused sound means moving its file out of Sounds/Unused
@@ -50,16 +55,33 @@ function ScubaSounds:SoundPath(sound)
 end
 
 function ScubaSounds:PreviewSound(sound)
-    PlaySoundFile(ScubaSounds:SoundPath(sound), "Master")
+    local path = ScubaSounds:SoundPath(sound)
+    ScubaSounds.DebugLog:SoundFile(path, "preview", PlaySoundFile(path, "Master"))
 end
 
 -- Runs an addon event's triggers in order and plays each one whose condition matches (only the first for
 -- exclusive events). Matches on a local event also relay to the group when the trigger asks for it.
+-- With the debug log on, each trigger's outcome is noted, and an error still closes the Fire's log entry
 function ScubaSounds:Fire(event, ctx)
     ctx = ctx or {}
+    local debugEntry = ScubaSounds.DebugLog:FireStart(event, ctx)
+    if not debugEntry then
+        ScubaSounds:RunTriggers(event, ctx)
+        return
+    end
+    local ok, err = pcall(ScubaSounds.RunTriggers, ScubaSounds, event, ctx)
+    ScubaSounds.DebugLog:FireEnd(debugEntry)
+    if not ok then
+        error(err, 0)
+    end
+end
+
+function ScubaSounds:RunTriggers(event, ctx)
     local isLocal = ctx.relayedBy == nil
     for _, trigger in ipairs(ScubaSounds.Data.Listeners[event] or {}) do
-        if not trigger.when or trigger.when(ctx) then
+        if trigger.when and not trigger.when(ctx) then
+            ScubaSounds.DebugLog:Outcome(trigger.id, "no match")
+        else
             local relay = trigger.relay
             local relays = isLocal and (trigger.together or relay == true or (type(relay) == "function" and relay(ctx)))
             -- A relayed trigger with several sounds is picked here, so the whole group plays the same one
@@ -67,6 +89,7 @@ function ScubaSounds:Fire(event, ctx)
                 ctx.sound = ScubaSounds:SelectRandom(trigger.sounds)
             end
             if isLocal and trigger.together then
+                ScubaSounds.DebugLog:Outcome(trigger.id, "waiting to play together with the group")
                 ScubaSounds:RelayToGroupTogether(event, ctx, function()
                     ScubaSounds:PlayTrigger(trigger.id, ctx.sound, ctx)
                 end)
@@ -172,26 +195,43 @@ function ScubaSounds:StartTriggerCooldown(trigger)
     end
 end
 
+-- Why it didn't play goes to the debug log (when it's on)
+local function Skipped(triggerId, reason)
+    ScubaSounds.DebugLog:Outcome(triggerId, reason)
+    return false
+end
+
+-- With the debug log on: why each of a trigger's sounds couldn't be picked
+local function WhyNoSound(trigger)
+    local reasons = {}
+    for _, sound in ipairs(trigger.sounds) do
+        local reason = not ScubaSounds:IsSoundOn(trigger.category, sound) and "off" or ScubaSounds:WhyNotPlay(sound) or
+                           (ScubaSounds:GetChance(trigger, sound) <= 0 and "at 0%") or "played recently"
+        table.insert(reasons, sound .. " " .. reason)
+    end
+    return "no sound to pick (" .. table.concat(reasons, ", ") .. ")"
+end
+
 function ScubaSounds:PlayTrigger(triggerId, pickedSound, ctx)
     local trigger = ScubaSounds.Data.TriggersById[triggerId]
     if not trigger then
-        return false
+        return Skipped(triggerId, "unknown trigger")
     end
     local settings = ScubaSounds_Options.Categories[trigger.category]
     if not settings.enabled then
-        return false
+        return Skipped(triggerId, "tab " .. trigger.category .. " off")
     end
     local _, instanceType = IsInInstance()
     if instanceType == "pvp" and not settings.inBattlegrounds then
-        return false
+        return Skipped(triggerId, "tab " .. trigger.category .. " off in battlegrounds")
     end
     if trigger.cooldown and ScubaSounds:IsTriggerOnCooldown(trigger) then
-        return false
+        return Skipped(triggerId, "on cooldown")
     end
     -- One of a trigger's sounds at a time: another can't start on top while one is still playing
     for _, sound in ipairs(trigger.sounds) do
         if ScubaSounds.Audio.CurrentlyPlaying[sound] then
-            return false
+            return Skipped(triggerId, sound .. " still playing")
         end
     end
     -- Sounds that could play: on, not timed out, and not at 0% (which counts as off)
@@ -240,10 +280,17 @@ function ScubaSounds:PlayTrigger(triggerId, pickedSound, ctx)
     end
     -- One roll per trigger: pick the sound, then roll its chance, so adding sounds doesn't make the trigger play more
     local sound = ScubaSounds:HasValue(playable, pickedSound) and pickedSound or ScubaSounds:SelectRandom(playable)
-    if sound == nil or math.random(1, 100) > ScubaSounds:GetChance(trigger, sound) or
-        not ScubaSounds:PlaySound(sound) then
-        return false
+    if sound == nil then
+        return Skipped(triggerId, ScubaSounds.DebugLog.on and WhyNoSound(trigger) or "no sound to pick")
     end
+    local chance = ScubaSounds:GetChance(trigger, sound)
+    if math.random(1, 100) > chance then
+        return Skipped(triggerId, "chance roll missed (" .. chance .. "%)")
+    end
+    if not ScubaSounds:PlaySound(sound) then
+        return Skipped(triggerId, sound .. " " .. (ScubaSounds:WhyNotPlay(sound) or "refused"))
+    end
+    ScubaSounds.DebugLog:Outcome(triggerId, "played " .. sound)
     ScubaSounds:BroadcastPlayed(sound, trigger.category)
     if recent then
         table.insert(recent, sound)
@@ -285,12 +332,13 @@ function ScubaSounds:PlaySound(sound)
     if ScubaSounds:ShouldPlay(sound) then
         -- Play the sound on Master channel, after the sound's delay if it has one (previews don't wait)
         local delay = ScubaSounds.Audio.SoundInfo[sound].delay or 0
+        local path = ScubaSounds:SoundPath(sound)
         if delay > 0 then
             C_Timer.After(delay, function()
-                PlaySoundFile(ScubaSounds:SoundPath(sound), "Master")
+                ScubaSounds.DebugLog:SoundFile(path, "after a delay", PlaySoundFile(path, "Master"))
             end)
         else
-            PlaySoundFile(ScubaSounds:SoundPath(sound), "Master")
+            ScubaSounds.DebugLog:SoundFile(path, "trigger", PlaySoundFile(path, "Master"))
         end
         -- Mark it as playing, the wait included
         ScubaSounds.Audio.CurrentlyPlaying[sound] = true

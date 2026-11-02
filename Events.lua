@@ -13,32 +13,47 @@ local issecretvalue = _G.issecretvalue
 
 ScubaSounds_EventFrame = CreateFrame("Frame")
 
+-- Each in a pcall: an event missing from this client fails alone (noted in the debug log) instead of stopping the rest
+local function Register(event, unit)
+    local frame = ScubaSounds_EventFrame
+    local ok, err
+    if unit then
+        ok, err = pcall(frame.RegisterUnitEvent, frame, event, unit)
+    else
+        ok, err = pcall(frame.RegisterEvent, frame, event)
+    end
+    if not ok then
+        ScubaSounds.DebugLog:RegisterFailed(event, err)
+    end
+end
+
 for _, event in ipairs(ScubaSounds.Data.WowEvents) do
-    ScubaSounds_EventFrame:RegisterEvent(event)
+    Register(event)
 end
 
 -- Only the player's are used, and these fire constantly for every other unit
-ScubaSounds_EventFrame:RegisterUnitEvent("UNIT_COMBAT", "player")
+Register("UNIT_COMBAT", "player")
 
-ScubaSounds_EventFrame:RegisterUnitEvent("UNIT_AURA", "player")
+Register("UNIT_AURA", "player")
 
 -- Being charmed (mind controlled) changes the player's unit flags
-ScubaSounds_EventFrame:RegisterUnitEvent("UNIT_FLAGS", "player")
+Register("UNIT_FLAGS", "player")
 
-ScubaSounds_EventFrame:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player")
+Register("UNIT_SPELLCAST_SUCCEEDED", "player")
 
-ScubaSounds_EventFrame:RegisterUnitEvent("UNIT_SPELLCAST_START", "player")
+Register("UNIT_SPELLCAST_START", "player")
 
 -- Channelled spells (Arcane Missiles) may only report their channel starting
-ScubaSounds_EventFrame:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START", "player")
+Register("UNIT_SPELLCAST_CHANNEL_START", "player")
 
--- Setting the hearthstone. Registered in a pcall since it may not exist in every client (the chat line is the backup)
-pcall(ScubaSounds_EventFrame.RegisterEvent, ScubaSounds_EventFrame, "HEARTHSTONE_BOUND")
+-- Setting the hearthstone. It may not exist in every client (the chat line is the backup)
+Register("HEARTHSTONE_BOUND")
 
--- Hunter pet XP, a second sign of a pet level up. Registered in a pcall since it may not exist in every client
-pcall(ScubaSounds_EventFrame.RegisterUnitEvent, ScubaSounds_EventFrame, "UNIT_PET_EXPERIENCE", "pet")
+-- Hunter pet XP, a second sign of a pet level up. It may not exist in every client
+Register("UNIT_PET_EXPERIENCE", "pet")
 
 function ScubaSounds_OnEvent(self, event, ...)
+    ScubaSounds.DebugLog:GameEvent(event, ...)
     local handler = ScubaSounds.Events[event]
     if handler then
         handler(ScubaSounds, ...)

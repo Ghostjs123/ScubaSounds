@@ -199,7 +199,7 @@ def in_a_raid_the_list_splits_and_the_roles_show():
     check(shown.startswith("T In your raid ("), shown[:200])
     check("T Everyone else (" in shown, "no second section")
     roles = strip_colors(tab.c.eval("ScubaSounds.UI.Officer.collector.text"))
-    check(roles.startswith("Loot collector: Scuba Fish (set by Bear Mon)"), roles)
+    check(roles.startswith("Loot collectors: Scuba Fish (set by Bear Mon)"), roles)
     de = strip_colors(tab.c.eval("ScubaSounds.UI.Officer.disenchanters.text"))
     check(de == "Disenchanters: Jeraldine Garcia, Vitoli Ravioli (set by Bear Mon)", de)
     check(not tab.c.eval("ScubaSounds.UI.Officer.rolesNote.shown"), "the note shows in a raid")
@@ -209,12 +209,28 @@ def in_a_raid_the_list_splits_and_the_roles_show():
 def change_writes_an_override():
     tab = Officer()
     tab.shown()
+    # Collectors: tick a second one, untick the first, then the last one can't be unticked
     tab.c.run("ScubaSounds.UI.Officer.changeCollector.scripts.OnClick(ScubaSounds.UI.Officer.changeCollector)")
     tab.choose("Bear Mon")
     tab.c.step(1)
     tab.shown()
     roles = strip_colors(tab.c.eval("ScubaSounds.UI.Officer.collector.text"))
-    check(roles == "Loot collector: Bear Mon (changed by Kay Mon)", roles)
+    check(roles == "Loot collectors: Bear Mon, Scuba Fish (changed by Kay Mon)", roles)
+    menu = strip_colors(tab.menu())
+    check("None" not in menu, "collectors offer None: " + menu)
+    tab.choose("Scuba Fish")
+    tab.c.step(1)
+    tab.shown()
+    roles = strip_colors(tab.c.eval("ScubaSounds.UI.Officer.collector.text"))
+    check(roles == "Loot collectors: Bear Mon (changed by Kay Mon)", roles)
+    before = tab.c.eval("ScubaSounds.Ledger.store:Count()")
+    tab.choose("Bear Mon")
+    tab.c.step(1)
+    tab.shown()
+    roles = strip_colors(tab.c.eval("ScubaSounds.UI.Officer.collector.text"))
+    check(roles == "Loot collectors: Bear Mon (changed by Kay Mon)", "unticked the last collector: " + roles)
+    check(tab.c.eval("ScubaSounds.Ledger.store:Count()") == before, "unticking the last collector wrote a role")
+    tab.c.run("ScubaSounds:HidePopupMenu()")
     # Disenchanters: untick one, then pick None
     button = "ScubaSounds.UI.Officer.changeDisenchanters"
     tab.c.run("%s.scripts.OnClick(%s)" % (button, button))
@@ -255,7 +271,7 @@ def real_raids_before_the_first_kill_show_their_unattached_roles():
     tab.c.step(1)
     tab.shown()
     roles = strip_colors(tab.c.eval("ScubaSounds.UI.Officer.collector.text"))
-    check(roles == "Loot collector: Loot Bank (set by Kay Mon)", roles)
+    check(roles == "Loot collectors: Loot Bank (set by Kay Mon)", roles)
 
 
 @test

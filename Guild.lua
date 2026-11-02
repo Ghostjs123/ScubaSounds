@@ -828,7 +828,8 @@ function ScubaSounds:PrintAwayDiscoveries(links, heading)
     end
 end
 
--- A message ending "<sound> (<tab> tab)" (pattern: before, sound, tab) with that part as a link; nil if it doesn't match
+-- A message matching pattern (captures: before, sound, tab) as the part before followed by the sound's link, so
+-- anything else the pattern matches after the sound is dropped; nil if it doesn't match
 function ScubaSounds:LinkSoundAtEnd(message, pattern)
     local before, sound, tabName = message:match(pattern)
     if not sound or not ScubaSounds.Audio.SoundInfo[sound] then

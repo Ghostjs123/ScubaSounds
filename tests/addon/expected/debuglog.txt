@@ -1,0 +1,15 @@
+loaded off: enabled=false entries=0
+on: SESSION_START missing=C_Timer.After C_ChatInfo.SendAddonMessage C_ChatInfo.RegisterAddonMessagePrefix C_ChatInfo.SendChatMessage C_Spell.GetSpellName C_UnitAuras.GetAuraDataByIndex C_Item.GetItemInfo C_Item.GetItemInfoInstant C_Container.GetContainerItemLink C_GuildInfo.GuildRoster UnitGUID UnitIsDeadOrGhost UnitPowerType UnitIsCharmed GetShapeshiftForm GetInventoryItemID GetLootRollItemInfo GetLootRollItemLink IsInRaid IsInGroup UnitAffectingCombat debugstack playOutsideRaid=true | Debug log on (1 entries). It records what the game and the addon do until you turn it off. /reload or log out to save it to disk
+PLAYER_MONEY counted=25 kept=20 | secret arg: <secret>
+campfire: Campfire: played LookLook | others no match: true
+file: PLAY_SOUND_FILE trigger willPlay=true handle=77
+sounds disabled: Campfire: no sound to pick (LookLook Disable Sounds is on, LambSauce Disable Sounds is on, BeforeWar Disable Sounds is on)
+tab off: Campfire: tab Misc off
+nobody listens: FIRE NoSuchEvent: <no triggers listen to it>
+preview: willPlay=false path=Interface/Addons/ScubaSounds/Sounds/Sheesh.ogg
+errors: last=LUA_ERROR Interface/AddOns/ScubaSounds/Audio.lua:10: boom | passed on 2
+broken condition: raised=true entry=FIRE closed=true
+after 5200 more: count=4730 trimmed=500
+off: last=SESSION_END | Debug log off (4731 entries kept). /ss debug log clear to delete them
+nothing while off: true
+cleared: 0 Debug log cleared

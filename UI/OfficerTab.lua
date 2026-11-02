@@ -445,43 +445,46 @@ local function SortedKeys(set)
     return keys
 end
 
-local function ChangeCollector()
-    local current = Shown:CurrentRaid()
-    if current then
-        Shared.PeopleMenu("Loot collector", SortedKeys(current.roster), function(key)
-            WriteRole(current, "col", {key})
-        end)
-    end
-end
+local ROLE_LABELS = {
+    col = "Loot collectors",
+    de = "Disenchanters"
+}
 
--- Ticking and unticking people, one at a time; the menu reopens after each so several can change
-local function ChangeDisenchanters(anchor, chosen)
+-- Ticking and unticking people, one at a time; the menu reopens after each so several can change. Disenchanters can
+-- be None; the last collector can't be unticked (master loot needs someone)
+local function ChangePeople(anchor, role, chosen)
     local current = Shown:CurrentRaid()
     if not current then
         return
     end
     local set = {}
-    for _, key in ipairs(chosen or (current.roles.de and current.roles.de.names) or {}) do
+    for _, key in ipairs(chosen or (current.roles[role] and current.roles[role].names) or {}) do
         set[key] = true
     end
     local entries = {{
-        text = "Disenchanters"
-    }, {
-        text = "None",
-        checked = next(set) == nil,
-        func = function()
-            WriteRole(current, "de", {})
-        end
+        text = ROLE_LABELS[role]
     }}
+    if role == "de" then
+        table.insert(entries, {
+            text = "None",
+            checked = next(set) == nil,
+            func = function()
+                WriteRole(current, "de", {})
+            end
+        })
+    end
     for _, key in ipairs(SortedKeys(current.roster)) do
         table.insert(entries, {
             text = Shown:ColoredName(key),
             checked = set[key] == true,
             func = function()
+                if role == "col" and set[key] and #SortedKeys(set) == 1 then
+                    return
+                end
                 set[key] = not set[key] or nil
                 local names = SortedKeys(set)
-                WriteRole(current, "de", names)
-                ChangeDisenchanters(anchor, names)
+                WriteRole(current, role, names)
+                ChangePeople(anchor, role, names)
             end
         })
     end
@@ -622,7 +625,9 @@ function ScubaSounds:CreateOfficerPage(frame)
     ui.changeCollector:SetSize(56, 18)
     ui.changeCollector:SetPoint("LEFT", ui.collector, "RIGHT", 6, 0)
     ui.changeCollector:SetText("Change")
-    ui.changeCollector:SetScript("OnClick", ChangeCollector)
+    ui.changeCollector:SetScript("OnClick", function(self)
+        ChangePeople(self, "col")
+    end)
     ui.disenchanters = ui.roles:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
     ui.disenchanters:SetPoint("LEFT", ui.changeCollector, "RIGHT", 14, 0)
     ui.changeDisenchanters = CreateFrame("Button", nil, ui.roles, "UIPanelButtonTemplate")
@@ -630,11 +635,11 @@ function ScubaSounds:CreateOfficerPage(frame)
     ui.changeDisenchanters:SetPoint("LEFT", ui.disenchanters, "RIGHT", 6, 0)
     ui.changeDisenchanters:SetText("Change")
     ui.changeDisenchanters:SetScript("OnClick", function(self)
-        ChangeDisenchanters(self)
+        ChangePeople(self, "de")
     end)
     ui.rolesNote = page:CreateFontString(nil, "ARTWORK", "GameFontDisableSmall")
     ui.rolesNote:SetPoint("TOPLEFT", GRID_LEFT + 2, -35)
-    ui.rolesNote:SetText("The current raid's loot collector and disenchanters show here while you're in a raid.")
+    ui.rolesNote:SetText("The current raid's loot collectors and disenchanters show here while you're in a raid.")
 
     -- Characters / People, which raids count, and the recent filter
     ui.viewButtons = {}
@@ -772,7 +777,7 @@ function ScubaSounds:RefreshOfficer()
     ui.rolesNote:SetShown(current == nil)
     if current then
         local showCollector = current.masterLoot
-        ui.collector:SetText(showCollector and RoleText(current.roles.col, "Loot collector") or "")
+        ui.collector:SetText(showCollector and RoleText(current.roles.col, ROLE_LABELS.col) or "")
         ui.changeCollector:SetShown(showCollector)
         ui.disenchanters:ClearAllPoints()
         if showCollector then
@@ -780,7 +785,7 @@ function ScubaSounds:RefreshOfficer()
         else
             ui.disenchanters:SetPoint("LEFT", 0, 0)
         end
-        ui.disenchanters:SetText(RoleText(current.roles.de, "Disenchanters"))
+        ui.disenchanters:SetText(RoleText(current.roles.de, ROLE_LABELS.de))
     end
     local sync = ScubaSounds.Ledger.sync
     ui.older:SetText(not Raids:IsSample() and sync and sync:OlderDiffers() and "Older raids not synced" or "")

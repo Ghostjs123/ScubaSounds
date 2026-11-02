@@ -14,7 +14,7 @@
 --                                   recipient can't use it, f = who traded it to them
 --   step  {s, i, p?, c?}            the author did something with an item they hold: s = "trade" (to p, of class c),
 --                                   "de" (disenchanted), "sell", "buyback", "equip", "window" (raid trade window ended)
---   role  {r, l?, s, n, q?, o?}     loot role s ("col" collector, "de" disenchanters) set to the names n (none: empty).
+--   role  {r, l?, s, n, q?, o?}     loot role s ("col" collectors, "de" disenchanters) set to the names n (none: empty).
 --                                   q: the role entry it replaces (a prompt answer only counts if it replaces the
 --                                   current one); o: an officer override, which always counts
 --   fix   {l, s, x?, p, c?}         an officer correction: s = "won" (drop x won by p), "de" (drop x disenchanted by

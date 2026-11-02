@@ -1,7 +1,7 @@
 -- ScubaSounds: the loot roles prompt (docs\RAID_TRACKING_DESIGN.md, "Loot roles prompt"). In a raid with no loot
--- collector (while master loot is on) or no disenchanters, the master looter, the raid leader and officers are asked
--- who they are. Each answer is a role entry in the guild's log; the first answer per role wins (RaidReplay), and every
--- open prompt shows who set it. Closing it without answering keeps it closed until that role changes or someone
+-- collectors (while master loot is on) or no disenchanters, the master looter, the raid leader and officers are asked
+-- who they are. Each answer is a role entry in the guild's log, and every open prompt shows who set it. A role can be
+-- answered again to change it; of two answers sent at once, the first in the log counts (RaidReplay). Closing it without answering keeps it closed until that role changes or someone
 -- named leaves. /ss debug lootroles shows a preview anywhere, which writes nothing
 local _G = _G
 local CreateFrame = _G.CreateFrame
@@ -22,7 +22,7 @@ local GREY = "|cffa8a8a8"
 local DARK_GREY = "|cff808080"
 local ROLES = {"col", "de"}
 local LABELS = {
-    col = "Loot collector",
+    col = "Loot collectors",
     de = "Disenchanters"
 }
 
@@ -33,7 +33,6 @@ local frame -- built the first time it shows
 local preview -- the debug preview's made-up raid, or nil
 local shownRoles = {} -- role -> true for each row the open prompt has
 local picked = {} -- role -> name keys chosen and not submitted yet
-local submitted = {} -- role -> true once answered here, until the answer arrives
 local dismissed = {} -- DismissKey -> true: closed without answering
 local hidingQuietly = false
 local checkScheduled = false
@@ -41,7 +40,7 @@ local checkScheduled = false
 -- =================================================================
 -- Who and what it asks
 -- =================================================================
--- A role still needs someone: the collector while master loot is on, and disenchanters, when never set or when
+-- A role still needs someone: collectors while master loot is on, and disenchanters, when never set or when
 -- everyone named has left the raid. Disenchanters set to None stay settled
 function Prompt.Missing(current, role)
     if role == "col" and not current.masterLoot then
@@ -127,12 +126,7 @@ local function Answer(role, keys)
     if not current then
         return
     end
-    submitted[role] = true
     picked[role] = nil
-    if not Prompt.Missing(current, role) then
-        Prompt.Refresh() -- someone answered first: theirs shows instead
-        return
-    end
     if current.preview then
         current.roles[role] = {
             id = "preview" .. role,
@@ -157,35 +151,18 @@ local function Answer(role, keys)
     Prompt.Refresh()
 end
 
-local function ChooseCollector(row)
+-- Ticking and unticking people, one at a time; the menu reopens after each so several can be picked. Disenchanters
+-- can be None; collectors can't (master loot needs someone), so with none ticked there's nothing to submit
+local function ChoosePeople(row, role)
     local current = Current()
     if not current then
         return
     end
-    local entries = {{
-        text = LABELS.col
-    }}
-    for _, key in ipairs(SortedRoster(current)) do
-        table.insert(entries, {
-            text = ColoredName(current, key),
-            checked = picked.col ~= nil and picked.col[1] == key,
-            func = function()
-                picked.col = {key}
-                Prompt.Refresh()
-            end
-        })
-    end
-    ScubaSounds:ShowPopupMenu(row.Choose, entries)
-end
-
--- Ticking and unticking people, one at a time; the menu reopens after each so several can be picked
-local function ChooseDisenchanters(row)
-    local current = Current()
-    if not current then
-        return
-    end
+    -- Starts from what's picked, else from who has the role now
+    local value = current.roles[role]
+    local start = picked[role] or (value and value.names)
     local set = {}
-    for _, key in ipairs(picked.de or {}) do
+    for _, key in ipairs(start or {}) do
         set[key] = true
     end
     local function Picked()
@@ -198,24 +175,27 @@ local function ChooseDisenchanters(row)
         return keys
     end
     local entries = {{
-        text = LABELS.de
-    }, {
-        text = "None",
-        checked = picked.de ~= nil and #picked.de == 0,
-        func = function()
-            picked.de = {}
-            Prompt.Refresh()
-        end
+        text = LABELS[role]
     }}
+    if role == "de" then
+        table.insert(entries, {
+            text = "None",
+            checked = start ~= nil and #start == 0,
+            func = function()
+                picked.de = {}
+                Prompt.Refresh()
+            end
+        })
+    end
     for _, key in ipairs(SortedRoster(current)) do
         table.insert(entries, {
             text = ColoredName(current, key),
             checked = set[key] == true,
             func = function()
                 set[key] = not set[key] or nil
-                picked.de = Picked()
+                picked[role] = Picked()
                 Prompt.Refresh()
-                ChooseDisenchanters(row)
+                ChoosePeople(row, role)
             end
         })
     end
@@ -249,11 +229,7 @@ local function CreateRow(role)
     row.Choose:SetPoint("RIGHT", row.Submit, "LEFT", -6, 0)
     row.Choose:SetText("Choose")
     row.Choose:SetScript("OnClick", function()
-        if role == "col" then
-            ChooseCollector(row)
-        else
-            ChooseDisenchanters(row)
-        end
+        ChoosePeople(row, role)
     end)
     return row
 end
@@ -314,7 +290,6 @@ local function Build()
         preview = nil
         wipe(shownRoles)
         wipe(picked)
-        wipe(submitted)
     end)
     if UISpecialFrames then
         table.insert(UISpecialFrames, FRAME_NAME) -- Escape closes it
@@ -341,20 +316,24 @@ function Prompt.Refresh()
             row:SetPoint("TOPLEFT", 20, y)
             y = y - ROW_HEIGHT
             local value = current.roles[role]
-            local open = Prompt.Missing(current, role)
-            if not open and value then
+            local pick = picked[role]
+            local canSubmit = pick ~= nil and (#pick > 0 or role == "de")
+            if pick and canSubmit then
+                row.Value:SetText(NameList(current, pick))
+            elseif pick then
+                row.Value:SetText(GREY .. "Nobody picked|r")
+            elseif value and not Prompt.Missing(current, role) then
                 local by = value.by and (DARK_GREY .. " (" .. (value.override and "changed" or "set") .. " by " ..
                                              DisplayName(current, value.by) .. ")|r") or ""
                 row.Value:SetText(NameList(current, value.names) .. by)
-            elseif picked[role] then
-                row.Value:SetText(NameList(current, picked[role]))
             elseif value and #value.names > 0 then
                 row.Value:SetText(GREY .. NameList(current, value.names) .. " left the raid|r")
             else
                 row.Value:SetText(GREY .. "Not set|r")
             end
-            row.Choose:SetEnabled(open and not submitted[role])
-            row.Submit:SetEnabled(open and not submitted[role] and picked[role] ~= nil)
+            -- Answers can always change a role: each names the one it replaces, and of two sent at once the first
+            -- in the log counts (RaidReplay)
+            row.Submit:SetEnabled(canSubmit)
         end
     end
     frame:SetHeight(-y + BOTTOM)
@@ -389,11 +368,6 @@ function Prompt.Check()
     if not current or not Prompt.Asks(current) then
         HideQuietly()
         return
-    end
-    for role in pairs(submitted) do
-        if not Prompt.Missing(current, role) then
-            submitted[role] = nil
-        end
     end
     local roles = {}
     for _, role in ipairs(ROLES) do

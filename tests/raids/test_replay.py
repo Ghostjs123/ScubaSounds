@@ -425,6 +425,20 @@ def master_loot_to_the_collector_waits_with_them():
 
 
 @test
+def with_two_collectors_each_holds_what_they_were_given():
+    log = Log()
+    master_loot_night(log)
+    role(log, "Kay Mon", T0 - 300, "col", ["Loot Bank", "Bear Mon"], override=True)
+    recv(log, "Kay Mon", T0 + 60, SULF, "ml", x="m:abc:1", p="Loot Bank")
+    recv(log, "Kay Mon", T0 + 61, TALIS, "ml", x="m:abc:2", p="Bear Mon")
+    check(log.status(L1, "m:abc:1") == "with:loot bank", log.status(L1, "m:abc:1"))
+    check(log.status(L1, "m:abc:2") == "with:bear mon", log.status(L1, "m:abc:2"))
+    step(log, "Bear Mon", T0 + HOUR, "trade", TALIS, p="Dee Chanter")
+    check(log.status(L1, "m:abc:2") == "await:dee chanter", log.status(L1, "m:abc:2"))
+    check(log.status(L1, "m:abc:1") == "with:loot bank", "the other collector's item moved")
+
+
+@test
 def a_master_loot_assignment_matches_by_drop_key():
     log = Log()
     master_loot_night(log)

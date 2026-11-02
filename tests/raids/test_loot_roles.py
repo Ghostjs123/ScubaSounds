@@ -1,5 +1,5 @@
 """The loot roles prompt (UI/LootRolesPrompt.lua) on stand-in frames over the fake game's real raid stack: who's
-asked, which roles, answering through the popup menu, the first answer winning, closing it, people leaving, combat,
+asked, which roles, answering through the popup menu, answering again to change a role, closing it, people leaving, combat,
 and /ss debug lootroles' preview outside a group."""
 import os
 import sys
@@ -20,7 +20,7 @@ class Prompt(Tab):
         self.c.run("ScubaSounds.LootRolesPrompt.Check()")
 
     def shown(self):
-        """Whether the prompt is open, and each shown row as "role: value [choose] [submit]"."""
+        """Whether the prompt is open, and each shown row as "role: value [submit]"."""
         return strip_colors(self.c.eval("""function()
             local f = _G.ScubaSoundsLootRolesPrompt
             if not (f and f.shown) then return "closed" end
@@ -28,7 +28,7 @@ class Prompt(Tab):
             for _, role in ipairs({"col", "de"}) do
                 local row = f.Rows[role]
                 if row.shown then
-                    table.insert(out, role .. ": " .. row.Value.text .. (row.Choose.enabled and " [choose]" or "") ..
+                    table.insert(out, role .. ": " .. row.Value.text .. (row.Choose.enabled and "" or " [no choose]") ..
                         (row.Submit.enabled and " [submit]" or ""))
                 end
             end
@@ -64,7 +64,7 @@ class Prompt(Tab):
 def an_officer_in_a_raid_is_asked_for_disenchanters():
     p = Prompt()
     p.check_now()
-    check(p.shown() == "de: Not set [choose]", p.shown())
+    check(p.shown() == "de: Not set", p.shown())
 
 
 @test
@@ -72,7 +72,7 @@ def master_loot_adds_the_collector():
     p = Prompt()
     p.c.run('LOOT_METHOD = "master"; MASTER_LOOTER_RAID_INDEX = 4')
     p.check_now()
-    check(p.shown() == "col: Not set [choose]\nde: Not set [choose]", p.shown())
+    check(p.shown() == "col: Not set\nde: Not set", p.shown())
 
 
 @test
@@ -83,12 +83,43 @@ def answering_writes_the_role_and_shows_who_set_it():
     p.click("col", "Choose")
     p.choose("Loot Bank")
     p.c.run("ScubaSounds:HidePopupMenu()")
-    check("col: Loot Bank [choose] [submit]" in p.shown(), p.shown())
+    check("col: Loot Bank [submit]" in p.shown(), p.shown())
     p.click("col", "Submit")
     p.c.step(2)
     p.answer("de", "Dee Chanter", "Raider Ten")
     check(p.roles() == {"col": ["loot bank"], "de": ["dee chanter", "raider ten"]}, p.roles())
     check(p.shown() == "col: Loot Bank (set by Kay Mon)\nde: Dee Chanter, Raider Ten (set by Kay Mon)", p.shown())
+
+
+@test
+def several_collectors_but_never_none():
+    p = Prompt()
+    p.c.run('LOOT_METHOD = "master"; MASTER_LOOTER_RAID_INDEX = 4')
+    p.check_now()
+    p.click("col", "Choose")
+    menu = strip_colors(p.menu())
+    check("None" not in menu, "collectors offer None: " + menu)
+    p.choose("Loot Bank")
+    p.choose("Bear Mon")
+    check("col: Bear Mon, Loot Bank [submit]" in p.shown(), p.shown())
+    # Unticking both leaves nothing to submit
+    p.choose("Loot Bank")
+    p.choose("Bear Mon")
+    check("col: Nobody picked\n" in p.shown() + "\n", p.shown())
+    p.choose("Loot Bank")
+    p.choose("Bear Mon")
+    p.c.run("ScubaSounds:HidePopupMenu()")
+    p.click("col", "Submit")
+    p.c.step(2)
+    check(p.roles() == {"col": ["bear mon", "loot bank"]}, p.roles())
+    # Asked again only once both have left
+    p.close()
+    p.c.run('for i = #GROUP, 1, -1 do if GROUP[i].name == "Loot Bank" then table.remove(GROUP, i) end end')
+    p.check_now()
+    check(p.shown() == "closed", "asked again with a collector still there: " + p.shown())
+    p.c.run('for i = #GROUP, 1, -1 do if GROUP[i].name == "Bear Mon" then table.remove(GROUP, i) end end')
+    p.check_now()
+    check(p.shown() == "col: Bear Mon, Loot Bank left the raid", p.shown())
 
 
 @test
@@ -103,21 +134,24 @@ def disenchanters_can_be_none_and_that_settles_it():
 
 
 @test
-def the_first_answer_wins():
+def answering_again_changes_it():
     p = Prompt()
     p.check_now()
     p.click("de", "Choose")
     p.choose("Raider Nine")
     p.c.run("ScubaSounds:HidePopupMenu()")
-    # Someone else's answer lands before Submit: ours isn't written, theirs shows
+    # Someone else's answer lands first: ours, submitted after seeing it, replaces it
     p.c.run('ScubaSounds.Ledger:Write("role", {r = "%s", l = %d, s = "de", n = {"Dee Chanter"}})' % (
         rec.MC, rec.LOCKOUT))
-    before = p.c.eval("ScubaSounds.Ledger.store:Count()")
+    p.c.step(2)
+    check(p.shown() == "de: Raider Nine [submit]", "the pick in progress was lost: " + p.shown())
     p.click("de", "Submit")
     p.c.step(2)
-    check(p.c.eval("ScubaSounds.Ledger.store:Count()") == before, "a second answer was written")
-    check(p.roles() == {"de": ["dee chanter"]}, p.roles())
-    check(p.shown() == "de: Dee Chanter (set by Kay Mon)", p.shown())
+    check(p.roles() == {"de": ["raider nine"]}, p.roles())
+    check(p.shown() == "de: Raider Nine (set by Kay Mon)", p.shown())
+    # Choose starts from who has it now: ticking one more adds them
+    p.answer("de", "Dee Chanter")
+    check(p.roles() == {"de": ["dee chanter", "raider nine"]}, p.roles())
     # Two answers written at once (neither had seen the other): the first in log order counts
     p.c.run('ScubaSounds.Ledger:Write("role", {r = "%s", l = %d, s = "col", n = {"Loot Bank"}}); '
             'ScubaSounds.Ledger:Write("role", {r = "%s", l = %d, s = "col", n = {"Bear Mon"}})' % (
@@ -163,7 +197,7 @@ def closing_it_holds_until_someone_named_leaves():
     p.c.run('for i = #GROUP, 1, -1 do if GROUP[i].name == "Loot Bank" then table.remove(GROUP, i) end end')
     p.check_now()
     # Only the collector: the disenchanters were left unanswered when it was closed
-    check(p.shown() == "col: Loot Bank left the raid [choose]", p.shown())
+    check(p.shown() == "col: Loot Bank left the raid", p.shown())
     p.close()
     p.check_now()
     check(p.shown() == "closed", "reopened after being closed: " + p.shown())
@@ -206,7 +240,7 @@ def the_preview_works_outside_a_group_and_writes_nothing():
     p.c.run('GROUP = {}; INSTANCE = {name = "Orgrimmar", type = "none"}')
     before = p.c.eval("ScubaSounds.Ledger.store:Count()")
     p.c.run("ScubaSounds.LootRolesPrompt.ShowPreview()")
-    check(p.shown() == "col: Not set [choose]\nde: Not set [choose]", p.shown())
+    check(p.shown() == "col: Not set\nde: Not set", p.shown())
     intro = p.c.eval("_G.ScubaSoundsLootRolesPrompt.Intro.text")
     check("Preview" in intro, intro)
     p.click("col", "Choose")

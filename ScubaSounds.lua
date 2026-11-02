@@ -489,11 +489,12 @@ ScubaSounds_CThunCombatCommand = "CTHUNCOMBATSTARTED"
 ScubaSounds_RelayCommand = "RELAY"
 ScubaSounds_SitSpamCommand = "TBAG" -- whispered to the dead player
 -- First discoveries, posted in guild chat. Group-wide ones (wipes, boss kills) come from the group leader alone, unnamed
-ScubaSounds.Data.DiscoveryMessage = "%s discovered a sound: %s (%s tab)" -- name, sound, options tab
-ScubaSounds.Data.GroupDiscoveryMessage = "The %s discovered a sound: %s (%s tab)" -- "raid" or "group"
--- Receivers with the addon turn "<sound> (<tab> tab)" at the end of either message into a clickable link: click
--- previews the sound, shift-click opens that options tab. Links can't be sent in chat, so this happens on arrival
-ScubaSounds.Data.DiscoveryLinkPattern = "^(.- discovered a sound: )(%w+) %((.-) tab%)$"
+ScubaSounds.Data.DiscoveryMessage = "%s discovered a sound: [%s (%s tab)] (Download ScubaSounds)" -- name, sound, tab
+ScubaSounds.Data.GroupDiscoveryMessage = "The %s discovered a sound: [%s (%s tab)] (Download ScubaSounds)" -- "raid" or "group"
+-- Receivers with the addon turn "[<sound> (<tab> tab)]" at the end of either message into a clickable link (click
+-- previews the sound, shift-click opens that options tab) and drop the "(Download ScubaSounds)" after it, which is only
+-- for guildmates without the addon. Links can't be sent in chat, so this happens on arrival
+ScubaSounds.Data.DiscoveryLinkPattern = "^(.- discovered a sound: )%[(%w+) %((.-) tab%)%] %(Download ScubaSounds%)$"
 -- /ss whisper <player> <sound>, linked the same way (on both ends of the whisper)
 ScubaSounds.Data.WhisperSoundMessage = "Have a listen: %s (%s tab)" -- sound, options tab
 -- A guild chat line shown only to us, because we're not in a guild yet: "SS - <line> (Only you see this)", with

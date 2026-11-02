@@ -71,7 +71,7 @@ C_Item = { GetItemInfo = function(link) return "Fang", link, 4 end }
 
 -- the addon's own frame comes first; RaidLog's frame is the one registered for ADDON_LOADED with its script
 local frame
-for _, f in ipairs(FRAMES) do if not frame and f.Events["ADDON_LOADED"] and f:GetScript("OnEvent") and f ~= ScubaSounds_EventFrame then frame = f end end
+for _, f in ipairs(FRAMES) do if not frame and f.Events["ADDON_LOADED"] and f:GetScript("OnEvent") and f ~= ScubaSounds_EventFrame and f ~= ScubaSounds.DebugLog.frame then frame = f end end
 local fire = function(e, ...) frame:GetScript("OnEvent")(frame, e, ...) end
 fire("ADDON_LOADED", "ScubaSounds")
 table.insert(out, "after load: enabled=" .. tostring(ScubaSounds_RaidLog.enabled) .. " events=" .. #ScubaSounds_RaidLog.events .. " listening=" .. tostring(frame.Events["LOOT_OPENED"] or false))

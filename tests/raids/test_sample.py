@@ -84,7 +84,7 @@ def it_shows_by_default_with_the_guilds_names():
     check(tab.c.eval("ScubaSounds.UI.Raids.status.text") == "Sample raids (see the Options tab)", "status")
     present = shown.split("\n")[1]
     check("Bear Mon" in present and "Scuba Fish" in present, present)
-    check("L Loot collector: Scuba Fish · Disenchanters: Jeraldine Garcia, Vitoli Ravioli" in shown, shown)
+    check("L Loot collectors: Scuba Fish · Disenchanters: Jeraldine Garcia, Vitoli Ravioli" in shown, shown)
     # Class colored
     raw = tab.c.eval("ScubaSounds.UI.Raids.lines.used[1].Text.text")
     check("|c" in raw, "names not class colored")

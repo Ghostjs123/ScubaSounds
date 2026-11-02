@@ -925,7 +925,7 @@ local function LayOutBody(lockout, y)
     if collector or disenchanters then
         local parts = {}
         if collector then
-            table.insert(parts, GREY .. "Loot collector:|r " .. NameList(collector))
+            table.insert(parts, GREY .. "Loot collectors:|r " .. NameList(collector))
         end
         if disenchanters then
             table.insert(parts, GREY .. "Disenchanters:|r " .. NameList(disenchanters))

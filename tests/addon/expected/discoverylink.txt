@@ -1,0 +1,11 @@
+sent: Me-X discovered a sound: [Mario1Up (Level Ups tab)] (Download ScubaSounds)
+a guildmate's, with the addon: Kay-X discovered a sound: !cff71d5ff!Hscubasounds:Mario1Up:Level Ups!h!TInterface\Buttons\UI-SpellbookIcon-NextPage-Up:0!t[Mario1Up (Level Ups tab)]!h!r
+our own: Discovered a sound: !cff71d5ff!Hscubasounds:Mario1Up:Level Ups!h!TInterface\Buttons\UI-SpellbookIcon-NextPage-Up:0!t[Mario1Up (Level Ups tab)]!h!r
+group sent: The raid discovered a sound: [Mario1Up (Level Ups tab)] (Download ScubaSounds)
+group with the addon: The raid discovered a sound: !cff71d5ff!Hscubasounds:Mario1Up:Level Ups!h!TInterface\Buttons\UI-SpellbookIcon-NextPage-Up:0!t[Mario1Up (Level Ups tab)]!h!r
+unknown sound: Kay-X discovered a sound: [NotASound (Misc tab)] (Download ScubaSounds)
+other guild chat: Kay-X discovered a sound: Mario1Up (Level Ups tab)
+debug discovery:
+Without the addon: Me-X discovered a sound: [Mario1Up (Level Ups tab)] (Download ScubaSounds)
+With the addon: Me-X discovered a sound: !cff71d5ff!Hscubasounds:Mario1Up:Level Ups!h!TInterface\Buttons\UI-SpellbookIcon-NextPage-Up:0!t[Mario1Up (Level Ups tab)]!h!r
+guildless: !c00f7f26cSS - Discovered: !cff71d5ff!Hscubasounds:Mario1Up:Level Ups!h!TInterface\Buttons\UI-SpellbookIcon-NextPage-Up:0!t[Mario1Up (Level Ups tab)]!h!r!r !cffa8a8a8(Only you see this)!r
