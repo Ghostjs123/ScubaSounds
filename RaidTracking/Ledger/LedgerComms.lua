@@ -59,22 +59,28 @@ function Comms.New(opts)
     }, Comms)
 end
 
--- The wire form of a message, or nil when it can't be encoded
+-- The wire form of a message, or nil when it can't be encoded. The serialized message goes in after its Adler-32, so a
+-- message damaged into something that still decompresses and deserializes is dropped instead of believed
 function Comms:Encode(message)
     local ok, serialized = pcall(self.serializer.Serialize, self.serializer, message)
     if not ok or type(serialized) ~= "string" then
         return nil
     end
-    local compressed = self.deflate:CompressDeflate(serialized, COMPRESSION)
+    local checked = string.format("%08x", self.deflate:Adler32(serialized)) .. serialized
+    local compressed = self.deflate:CompressDeflate(checked, COMPRESSION)
     return compressed and self.deflate:EncodeForWoWAddonChannel(compressed)
 end
 
--- The message a wire form came from, or nil when it doesn't decode to a table
+-- The message a wire form came from, or nil when it doesn't decode to a table or fails its checksum
 function Comms:Decode(encoded)
     local ok, message = pcall(function()
         local compressed = self.deflate:DecodeForWoWAddonChannel(encoded)
-        local serialized = compressed and self.deflate:DecompressDeflate(compressed)
-        if type(serialized) ~= "string" then
+        local checked = compressed and self.deflate:DecompressDeflate(compressed)
+        if type(checked) ~= "string" then
+            return nil
+        end
+        local serialized = checked:sub(9)
+        if checked:sub(1, 8) ~= string.format("%08x", self.deflate:Adler32(serialized)) then
             return nil
         end
         local success, value = self.serializer:Deserialize(serialized)

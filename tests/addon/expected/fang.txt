@@ -1,0 +1,33 @@
+login already in a form: silent
+back to caster: silent
+into bear, full set: Snake
+into cat 30s later (cooldown): silent
+straight from cat to travel after the cooldown: Snake
+missing the gloves: silent
+another belt: silent
+rogue stealthing in the set: silent
+secret chest item: silent
+secret form: silent
+Blind plays 9.6% (still secret)
+Blind by name, other ID: PocketSand
+someone else's Blind: silent
+Gouge: silent
+Sprint and Dash play 5.0% (still secret)
+Sprint 2983: GetOutTheWay
+Dash 1850: GetOutTheWay
+Sprint 99999: GetOutTheWay
+Dash 99998: GetOutTheWay
+someone else's Sprint: silent
+Evasion: silent
+Frost Shock plays 9.9% (still secret)
+Frost Shock rank 1: FrostShock
+Frost Shock by name, other ID: FrostShock
+someone else's Frost Shock: silent
+Earth Shock: silent
+Blinded plays 2.0% (still secret)
+rogue's Blind among other debuffs: StrokenMyShit
+still blinded: silent
+a player's "Blind" with another ID: StrokenMyShit
+an NPC's "Blind": silent
+a "Blind" with no known caster: silent
+secret debuff: silent

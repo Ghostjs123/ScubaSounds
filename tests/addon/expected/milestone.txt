@@ -1,3 +1,4 @@
+plays LearnedDoctors
 GUILD: Maxed Mining
 event ProfessionMaxed Mining
 GUILD: Maxed Fishing

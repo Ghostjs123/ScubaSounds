@@ -4,3 +4,6 @@ own message echoed: silent
 PlayerDied Kay Mon-X trueName=x own=false
 seen here too: silent
 option off: silent
+live raid option, inside a guild raid: PlayerDied Kay Mon-X trueName=Kay Mon-X own=false
+live raid option, not inside one: silent
+both options off, inside a guild raid: silent

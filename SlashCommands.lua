@@ -305,6 +305,10 @@ function ScubaSounds:DebugCommand(words)
         -- by everyone online, then deleted a minute after (see RaidTracking\RaidLiveTest.lua). Anyone else gets the
         -- usual list, as for any unknown command
         ScubaSounds:StartLiveRaidTest()
+    elseif words[2] == "lootroles" then
+        -- /ss debug lootroles: the loot roles prompt with both roles, even outside a group, for a look at it. Answers
+        -- only change the preview (see UI\LootRolesPrompt.lua)
+        ScubaSounds.LootRolesPrompt.ShowPreview()
     elseif words[2] == "raidlog" then
         -- /ss debug raidlog [clear]: turns the raid tracking diagnostic on or off (it stays on across sessions), or
         -- deletes what it recorded (see RaidTracking\RaidLog.lua)
@@ -321,6 +325,7 @@ function ScubaSounds:DebugCommand(words)
                           {"/ss debug levelup (or lo)", "play the next level-up jingle of a pretend round"},
                           {"/ss debug hidden", "show or hide options other characters get, while the ScubaSounds window is open"},
                           {"/ss debug pet", "print every pet level check, to see why a pet level up did or didn't play"},
+                          {"/ss debug lootroles", "preview the raid's loot collector and disenchanters prompt"},
                           {"/ss debug raidlog [clear]",
                            "record raid, loot, trade and vendor events for raid tracking (or delete them)"}}
         -- Only officers know it exists, heading included

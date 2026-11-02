@@ -19,7 +19,21 @@ S.FullName = function() return "Me-X" end
 S.IsOwnName = function(_, n) return n == "Me-X" end
 S.SendChatWhenAllowed = function(_, msg, ch) table.insert(out, ch .. ": " .. msg) end
 local fire = S.Fire
-S.Fire = function(self, event, ctx) if event == "ProfessionMaxed" or event == "ReputationExalted" then table.insert(out, "event " .. event .. " " .. ctx.name) end return fire(self, event, ctx) end
+S.Fire = function(self, event, ctx)
+  if event == "ProfessionMaxed" or event == "ReputationExalted" then table.insert(out, "event " .. event .. " " .. ctx.name) end
+  return fire(self, event, ctx)
+end
+-- First Aid: its own sound at 300, no guild message
+local saved = {S.PlaySound, S.RecordSoundHeard, S.AnnounceDiscovery, S.BroadcastPlayed, S.ShouldPlay}
+S.PlaySound = function(_, s) table.insert(out, "plays " .. s) return true end
+S.RecordSoundHeard = function() end
+S.AnnounceDiscovery = function() end
+S.BroadcastPlayed = function() end
+S.ShouldPlay = function() return true end
+IsInInstance = function() return false, "none" end
+S.Events:CHAT_MSG_SKILL("Your skill in First Aid has increased to 299.")
+S.Events:CHAT_MSG_SKILL("Your skill in First Aid has increased to 300.")
+S.PlaySound, S.RecordSoundHeard, S.AnnounceDiscovery, S.BroadcastPlayed, S.ShouldPlay = unpack(saved)
 S.Events:CHAT_MSG_SKILL("Your skill in Mining has increased to 299.")
 S.Events:CHAT_MSG_SKILL("Your skill in Mining has increased to 300.")
 S.Events:CHAT_MSG_SKILL("Your skill in Mining has increased to 300.")

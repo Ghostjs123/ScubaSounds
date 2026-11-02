@@ -277,6 +277,13 @@ ScubaSounds.Audio.SoundInfo = {
         canOverlapSelf = false,
         timeout = 1
     },
+    ["FrostShock"] = {
+        extension = "ogg",
+        duration = 2,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Shib"
+    },
     ["FuckMeHard"] = {
         extension = "ogg",
         duration = 15,
@@ -319,6 +326,13 @@ ScubaSounds.Audio.SoundInfo = {
         timeout = 1,
         credit = "Shib"
     },
+    ["GetOutTheWay"] = {
+        extension = "ogg",
+        duration = 7,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Shib"
+    },
     ["GetThisShitOffMe"] = {
         extension = "ogg",
         duration = 5,
@@ -350,6 +364,13 @@ ScubaSounds.Audio.SoundInfo = {
         duration = 1,
         canOverlapSelf = false,
         timeout = 1
+    },
+    ["Horn"] = {
+        extension = "ogg",
+        duration = 4,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Nigel"
     },
     ["Horse1"] = {
         extension = "ogg",
@@ -450,6 +471,13 @@ ScubaSounds.Audio.SoundInfo = {
         timeout = 1
     },
     ["LambSauce"] = {
+        extension = "ogg",
+        duration = 3,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Shib"
+    },
+    ["LearnedDoctors"] = {
         extension = "ogg",
         duration = 3,
         canOverlapSelf = false,
@@ -740,6 +768,13 @@ ScubaSounds.Audio.SoundInfo = {
         canOverlapSelf = false,
         timeout = 1
     },
+    ["PocketSand"] = {
+        extension = "ogg",
+        duration = 2,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Shib"
+    },
     ["PodRacing"] = {
         extension = "ogg",
         duration = 2,
@@ -839,9 +874,23 @@ ScubaSounds.Audio.SoundInfo = {
         timeout = 300,
         formerUse = "Used to play for the whole raid when it pulled C'Thun"
     },
+    ["Snake"] = {
+        extension = "ogg",
+        duration = 4,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Shib"
+    },
     ["StoleThatShit"] = {
         extension = "ogg",
         duration = 7,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Shib"
+    },
+    ["StrokenMyShit"] = {
+        extension = "ogg",
+        duration = 10,
         canOverlapSelf = false,
         timeout = 1,
         credit = "Shib"
@@ -966,6 +1015,13 @@ ScubaSounds.Audio.SoundInfo = {
         canOverlapSelf = false,
         timeout = 1,
         credit = "Shib"
+    },
+    ["Wululu"] = {
+        extension = "ogg",
+        duration = 2,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Nigel"
     },
     ["XPShutdown"] = {
         extension = "ogg",

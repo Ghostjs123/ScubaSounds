@@ -190,6 +190,27 @@ def a_raid_goes_quiet_once_everyone_leaves_and_15_minutes_pass():
 
 
 @test
+def inside_a_live_raid_is_whoever_the_tab_counts_inside_now():
+    tab = Tab()
+    a_night(tab)
+
+    def inside(name):
+        return tab.c.eval('ScubaSounds.Raids:IsInsideLiveRaid("%s")' % name)
+
+    # Only our own client wrote presence here, so only we're inside
+    check(inside("Kay Mon") and inside("Kay-Mon"), "not inside while the tab says 1 inside now")
+    check(not inside("Bear Mon"), "present tonight, but no open span, counted as inside")
+    # The sample never stands in for the guild's raids
+    tab.c.run("ScubaSounds.Raids:SetSample(true)")
+    check(inside("Kay Mon") and not inside("Raider Seven"), "the sample changed who's inside")
+    tab.c.run("ScubaSounds.Raids:SetSample(false)")
+    tab.c.run('INSTANCE = {name = "Orgrimmar", type = "none"}')
+    tab.c.fire("ZONE_CHANGED_NEW_AREA")
+    tab.c.step(1)
+    check(not inside("Kay Mon"), "still inside after leaving")
+
+
+@test
 def a_drop_arriving_while_the_tab_is_open_lights_up_for_a_few_seconds():
     tab = Tab()
     a_night(tab)
@@ -260,11 +281,11 @@ def a_raid_mostly_of_pugs_isnt_the_guilds():
 
 
 @test
-def exactly_three_quarters_guild_still_counts():
+def exactly_half_guild_still_counts():
     tab = Tab()
-    other_raid(tab, 992, guild=3, pugs=1)
+    other_raid(tab, 992, guild=4, pugs=4)
     check("H Onyxia's Lair" in tab.shown(), tab.shown())
-    other_raid(tab, 993, guild=5, pugs=2, raid="Zul'Gurub")  # 71%
+    other_raid(tab, 993, guild=3, pugs=4, raid="Zul'Gurub")  # 43%
     check("Zul'Gurub" not in tab.shown(), tab.shown())
 
 

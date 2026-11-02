@@ -129,7 +129,7 @@ function ScubaSounds:StartLiveRaidTest()
             })
         end)
         -- The boss's loot a moment later, each to someone (or not recorded)
-        for slot = 1, math.random(2, 3) do
+        for slot = 1, index == #raid.bosses and 3 or math.random(2, 3) do
             At(index * step + 1 + slot * 0.5, function()
                 local item = items[math.random(#items)]
                 local key = string.format("t%x:%d:%d", lockout, index, slot)

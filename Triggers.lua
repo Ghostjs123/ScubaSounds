@@ -501,9 +501,21 @@ AddTrigger("PetTamed", "Misc", "WW91IHRhbWUgYSBiZWFzdA==", {"GoodBoy", "BomboCla
 -- after their guild message has gone out. A sound for one is just an AddTrigger with on = "ProfessionMaxed" (or
 -- "ReputationExalted"), plus a when(ctx) to limit it to some professions or factions
 
+-- Not a milestone (no guild message): First Aid only reaches its last rank once
+AddTrigger("FirstAidMaxed", "Misc", "WW91IG1heCBvdXQgRmlyc3QgQWlk", {"LearnedDoctors"}, {
+    on = "FirstAidMaxed",
+    newInForever = true
+})
+
 AddTrigger("MindControlled", "Misc", "WW91IGdldCBtaW5kIGNvbnRyb2xsZWQ=", {"MindOfItsOwn"}, {
     on = "MindControlled",
     defaultChance = 10,
+    newInForever = true
+})
+
+AddTrigger("Blinded", "Misc", "QSByb2d1ZSBibGluZHMgeW91", {"StrokenMyShit"}, {
+    on = "Blinded",
+    defaultChance = 2,
     newInForever = true
 })
 
@@ -638,6 +650,12 @@ AddTrigger("FirstRingEquipped", "Misc", "WW91IGVxdWlwIHlvdXIgZmlyc3QgcmluZyAob25
     newInForever = true
 })
 
+AddTrigger("FangForm", "Misc", "WW91IHNoaWZ0IGludG8gYSBmb3JtIHdlYXJpbmcgYWxsIGZpdmUgcGllY2VzIG9mIHRoZSBGYW5nIHNldCAoYXQgbW9zdCBvbmNlIGEgbWludXRlKQ==", {"Snake"}, {
+    on = "FangFormEntered",
+    cooldown = Data.FangFormCooldown,
+    newInForever = true
+})
+
 AddTrigger("ShirtRemoved", "Misc", "WW91IHRha2Ugb2ZmIHlvdXIgc2hpcnQ=", {"GetThisShitOffMe"}, {
     on = "ShirtRemoved",
     cooldown = Data.ShirtRemovedCooldown,
@@ -681,6 +699,46 @@ AddTrigger("Campfire", "Misc", "WW91IGNhc3QgQmFzaWMgQ2FtcGZpcmU=", {"LookLook", 
         return cast.isPlayer and (cast.spellId == Data.BasicCampfireSpellId or
                    ScubaSounds:EqualsIgnoreCase(cast.spellName, Data.BasicCampfireSpellName))
     end,
+    newInForever = true
+})
+
+AddTrigger("BlindCast", "Misc", "WW91IGNhc3QgQmxpbmQ=", {"PocketSand"}, {
+    on = "SpellCast",
+    when = function(cast)
+        return cast.isPlayer and (cast.spellId == Data.BlindSpellId or
+                   ScubaSounds:EqualsIgnoreCase(cast.spellName, Data.BlindSpellName))
+    end,
+    defaultChance = 10,
+    newInForever = true
+})
+
+AddTrigger("SprintCast", "Misc", "WW91IGNhc3QgU3ByaW50IG9yIERhc2g=", {"GetOutTheWay"}, {
+    on = "SpellCast",
+    when = function(cast)
+        if not cast.isPlayer then
+            return false
+        end
+        if ScubaSounds:HasValue(Data.SprintSpellIds, cast.spellId) then
+            return true
+        end
+        for _, name in ipairs(Data.SprintSpellNames) do
+            if ScubaSounds:EqualsIgnoreCase(cast.spellName, name) then
+                return true
+            end
+        end
+        return false
+    end,
+    defaultChance = 5,
+    newInForever = true
+})
+
+AddTrigger("FrostShockCast", "Misc", "WW91IGNhc3QgRnJvc3QgU2hvY2s=", {"FrostShock"}, {
+    on = "SpellCast",
+    when = function(cast)
+        return cast.isPlayer and (ScubaSounds:HasValue(Data.FrostShockSpellIds, cast.spellId) or
+                   ScubaSounds:EqualsIgnoreCase(cast.spellName, Data.FrostShockSpellName))
+    end,
+    defaultChance = 10,
     newInForever = true
 })
 

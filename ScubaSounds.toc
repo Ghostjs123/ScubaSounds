@@ -42,6 +42,7 @@ UI\NotableLootTab.lua
 UI\PopupMenu.lua
 UI\RaidsTab.lua
 UI\OfficerTab.lua
+UI\LootRolesPrompt.lua
 UI\StatsTab.lua
 UI\OptionsTab.lua
 UI\ScubaSounds.xml

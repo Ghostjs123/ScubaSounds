@@ -42,11 +42,13 @@ function ScubaSounds:CreateGlobalOptionsPage(frame)
         "everywhere: the open world, dungeons and battlegrounds (each tab can also turn battlegrounds off).")
     -- Settings that only matter while sounds play: greyed out while Disable Sounds is on (see RefreshSoundSettings)
     ScubaSounds.UI.SoundSettings = {}
-    local function soundSetting(checkbox, label, underline)
+    -- usable(): an extra condition for it to be enabled
+    local function soundSetting(checkbox, label, underline, usable)
         table.insert(ScubaSounds.UI.SoundSettings, {
             checkbox = checkbox,
             label = label,
-            underline = underline
+            underline = underline,
+            usable = usable
         })
     end
     soundSetting(outsideRaid, ScubaSounds:CreateLabel(page, outsideRaid, ScubaSounds_PlayOutsideRaid))
@@ -115,12 +117,27 @@ function ScubaSounds:CreateGlobalOptionsPage(frame)
     local guildDeaths = ScubaSounds:CreateCheckbox(page, GRID_LEFT, -31 - 3 * (ROW_HEIGHT + 4),
         ScubaSounds_Options[ScubaSounds_GuildDeaths], function(checked)
             ScubaSounds_Options[ScubaSounds_GuildDeaths] = checked
+            ScubaSounds:RefreshSoundSettings() -- greys out the live raid deaths option
         end)
     soundSetting(guildDeaths, ScubaSounds:CreateLabel(page, guildDeaths, ScubaSounds_GuildDeaths))
     describe(guildDeaths, ScubaSounds_GuildDeaths, "Plays a guildmate's death sound when they die anywhere, not " ..
         "just near you. Deaths you can see play either way.")
 
-    local playDiscoveries = ScubaSounds:CreateCheckbox(page, GRID_LEFT, -31 - 4 * (ROW_HEIGHT + 4),
+    -- Greyed out while the guild deaths option is on, which already plays these
+    local liveRaidDeaths = ScubaSounds:CreateCheckbox(page, GRID_LEFT, -31 - 4 * (ROW_HEIGHT + 4),
+        ScubaSounds_Options[ScubaSounds_LiveRaidDeaths], function(checked)
+            ScubaSounds_Options[ScubaSounds_LiveRaidDeaths] = checked
+        end)
+    soundSetting(liveRaidDeaths, ScubaSounds:CreateLabel(page, liveRaidDeaths, ScubaSounds_LiveRaidDeaths), nil,
+        function()
+            return not ScubaSounds_Options[ScubaSounds_GuildDeaths]
+        end)
+    describe(liveRaidDeaths, ScubaSounds_LiveRaidDeaths, "Plays a guildmate's death sound wherever you are, while " ..
+        "they're inside one of the guild's raids (shown Live on the Raids tab). Deaths before the raid's first boss " ..
+        "kill don't count yet. \"" .. ScubaSounds_GuildDeaths .. "\" already plays these, so this is greyed out " ..
+        "while it's on.")
+
+    local playDiscoveries = ScubaSounds:CreateCheckbox(page, GRID_LEFT, -31 - 5 * (ROW_HEIGHT + 4),
         ScubaSounds_Options[ScubaSounds_PlayDiscoveries], function(checked)
             ScubaSounds_Options[ScubaSounds_PlayDiscoveries] = checked
         end)

@@ -17,6 +17,36 @@ LIB_FILES = ["Libs/LibStub/LibStub.lua", "Libs/LibSerialize/LibSerialize.lua", "
 LEDGER_FILES = ["RaidTracking/Ledger/LedgerStore.lua", "RaidTracking/Ledger/LedgerComms.lua",
                 "RaidTracking/Ledger/LedgerSync.lua"]
 START_TIME = 1793000000  # Oct 27 2026
+
+# math.random as a generator written in Lua: the C library's rand() differs between platforms, so the same seed would
+# play out differently on Windows and on CI's Linux
+LUA_RANDOM = r"""
+local seed = 1
+math.randomseed = function(s)
+    seed = math.floor(tonumber(s) or 0) % 2147483646 + 1
+end
+math.random = function(m, n)
+    seed = (seed * 16807) % 2147483647
+    local r = (seed - 1) / 2147483646
+    if m == nil then return r end
+    if n == nil then m, n = 1, m end
+    return m + math.floor(r * (n - m + 1))
+end
+"""
+
+
+runtimes_made = 0
+
+
+def lua_runtime():
+    """A Lua 5.1 runtime with the same math.random on every platform. Each runtime starts from its own seed, as
+    clients sharing one sequence would draw the same random IDs."""
+    global runtimes_made
+    runtimes_made += 1
+    lua = lua51.LuaRuntime(unpack_returned_tuples=True, encoding="latin-1")
+    lua.execute(LUA_RANDOM)
+    lua.execute("math.randomseed(%d)" % (runtimes_made * 7919))
+    return lua
 DAY = 86400
 
 
@@ -27,7 +57,7 @@ def addon_file(name):
 
 def new_lua(seed=1):
     """A Lua 5.1 runtime with the libraries and ledger files loaded."""
-    lua = lua51.LuaRuntime(unpack_returned_tuples=True, encoding="latin-1")
+    lua = lua_runtime()
     lua.execute("_G = _G or getfenv(0)")
     for name in LIB_FILES + LEDGER_FILES:
         with open(addon_file(name), encoding="utf-8") as f:

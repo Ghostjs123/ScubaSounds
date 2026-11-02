@@ -8,8 +8,7 @@ import sys
 
 TESTS = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(TESTS, "ledger"))
-from lupa import lua51  # noqa: E402
-from ledger_env import ADDON, LIB_FILES, LEDGER_FILES, START_TIME, addon_file  # noqa: E402
+from ledger_env import ADDON, LIB_FILES, LEDGER_FILES, START_TIME, addon_file, lua_runtime  # noqa: E402
 
 RAID_FILES = ["Data/DropSources.lua", "RaidTracking/RaidEntries.lua", "RaidTracking/RaidReplay.lua",
               "RaidTracking/RaidSample.lua", "RaidTracking/RaidEquip.lua",
@@ -199,6 +198,10 @@ end
 function GetLootMethod()
     return LOOT_METHOD, nil, MASTER_LOOTER_RAID_INDEX
 end
+LEADER = false
+function UnitIsGroupLeader(unit) return unit == "player" and LEADER end
+COMBAT = false
+function InCombatLockdown() return COMBAT end
 
 -- Items
 C_Item = {
@@ -292,7 +295,7 @@ def lua_string(text):
 class Client:
     def __init__(self, name, start_time=START_TIME):
         self.name = name
-        lua = lua51.LuaRuntime(unpack_returned_tuples=True, encoding="latin-1")
+        lua = lua_runtime()
         lua.execute(FAKE_WOW % (start_time, lua_string(name)))
         lua.execute(format_to_pattern())
         for f in ["Libs/ChatThrottleLib.lua"] + LIB_FILES + LEDGER_FILES + ["RaidTracking/Ledger/Ledger.lua"]:

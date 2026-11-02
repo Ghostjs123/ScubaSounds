@@ -507,7 +507,23 @@ def comms_garbled_part_drops_only_that_message():
     g.CA.Send(g.CA, L.table_from({"n": 2}), "NORMAL")
     deliver(wire())
     got = [L.eval("GOT[%d].message.n" % (i + 1)) for i in range(L.eval("#GOT"))]
-    check(got in ([2], [1, 2]), str(got))  # a flipped byte may or may not survive decoding; nothing else breaks
+    check(got == [2], str(got))
+
+
+@test
+def comms_drops_a_message_that_decodes_but_fails_its_checksum():
+    # A message damaged into one that still decompresses and deserializes (CI's seed 118 had a bit flipped into an
+    # entry's event time, which then never synced right as its ID was unchanged)
+    comms_pair()
+    damaged, intact = L.eval("""(function()
+        local serializer, deflate = LibStub("LibSerialize"), LibStub("LibDeflate")
+        local serialized = serializer:Serialize({t = 1792621748})
+        local checksum = string.format("%08x", deflate:Adler32(serializer:Serialize({t = 1792744628})))
+        return CB:Decode(deflate:EncodeForWoWAddonChannel(deflate:CompressDeflate(checksum .. serialized))),
+            CB:Decode(CA:Encode({t = 1792621748}))
+    end)()""")
+    check(damaged is None, "a message failing its checksum decoded")
+    check(intact is not None and intact.t == 1792621748, "an intact message didn't decode")
 
 
 @test

@@ -1,8 +1,11 @@
 default chance 20
 plays in 20000 epic rolls: 3976
-epic in a party: silent
+epic in a party: ZeldaItem
 blue in a party: silent
-two epics from one drop: silent
+two epics from one drop: ZeldaItem
 epic in a raid: silent
 epic while solo: silent
 secret quality: silent
+womp womp epic: silent
+womp womp epic then a real one: ZeldaItem
+secret link: ZeldaItem

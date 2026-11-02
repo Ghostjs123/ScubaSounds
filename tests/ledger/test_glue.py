@@ -6,8 +6,7 @@ import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from lupa import lua51
-from ledger_env import ADDON, LIB_FILES, LEDGER_FILES, START_TIME, addon_file
+from ledger_env import ADDON, LIB_FILES, LEDGER_FILES, START_TIME, addon_file, lua_runtime
 from testkit import test, check, run
 
 FAKE_WOW = r"""
@@ -89,7 +88,7 @@ def guild_send_function():
 
 
 def new_client(name):
-    lua = lua51.LuaRuntime(unpack_returned_tuples=True, encoding="latin-1")
+    lua = lua_runtime()
     lua.execute(FAKE_WOW % START_TIME)
     lua.execute("function ScubaSounds:FullName() return %r end".replace("%r", '"' + name + '"'))
     for f in ["Libs/ChatThrottleLib.lua"] + LIB_FILES + LEDGER_FILES + ["RaidTracking/Ledger/Ledger.lua"]:

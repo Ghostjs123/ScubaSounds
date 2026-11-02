@@ -863,8 +863,9 @@ function Recorder:CurrentRaid()
     return raid, raid and lockouts[raid]
 end
 
+-- Whether master loot is on, and whether we're the master looter
 function Recorder:IsMasterLoot()
-    return (MasterLoot())
+    return MasterLoot()
 end
 
 -- =================================================================

@@ -36,6 +36,17 @@ end)
 ScubaSounds_Options[ScubaSounds_GuildDeaths] = false
 now = 200
 step("option off", function() died(S, guildmate, {t = server}) end)
+S.Raids = S.Raids or {}
+local inside = {["Kay Mon-X"] = true}
+S.Raids.IsInsideLiveRaid = function(_, n) return inside[n] == true end
+ScubaSounds_Options[ScubaSounds_LiveRaidDeaths] = true
+now = 300
+step("live raid option, inside a guild raid", function() died(S, guildmate, {t = server}) end)
+now = 400
+step("live raid option, not inside one", function() died(S, "Bear Mon-X", {t = server}) end)
+ScubaSounds_Options[ScubaSounds_LiveRaidDeaths] = false
+now = 500
+step("both options off, inside a guild raid", function() died(S, guildmate, {t = server}) end)
 return table.concat(out, "\n")
 ''')
 print(res)

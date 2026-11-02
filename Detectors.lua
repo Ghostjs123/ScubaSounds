@@ -154,6 +154,34 @@ function ScubaSounds:CheckMindControlled()
     end
 end
 
+-- A rogue's Blind newly on us: by its ID, or by its name when a player cast it (some NPCs cast a "Blind" of their own)
+function ScubaSounds:CheckBlinded()
+    local data = ScubaSounds.Data
+    local blinded = false
+    for i = 1, 40 do
+        local aura = C_UnitAuras.GetAuraDataByIndex("player", i, "HARMFUL")
+        if not aura then
+            break
+        end
+        local spellId, name, source = aura.spellId, aura.name, aura.sourceUnit
+        if not issecretvalue(spellId) and spellId == data.BlindSpellId then
+            blinded = true
+        elseif not issecretvalue(name) and ScubaSounds:EqualsIgnoreCase(name, data.BlindSpellName) and
+            not issecretvalue(source) and source then
+            local isPlayer = UnitIsPlayer(source)
+            blinded = not issecretvalue(isPlayer) and isPlayer and true or false
+        end
+        if blinded then
+            break
+        end
+    end
+    local wasBlinded = ScubaSounds.State.Blinded
+    ScubaSounds.State.Blinded = blinded
+    if blinded and not wasBlinded then
+        ScubaSounds:Fire("Blinded")
+    end
+end
+
 -- A grenade or dynamite we threw: the killing blow that follows within ExplosiveKillWindow is taken as its doing (the
 -- game doesn't say which hit landed it)
 function ScubaSounds:NoteExplosiveThrown(spellName)

@@ -87,6 +87,8 @@ ScubaSounds.Data.MaxableProfessions = {
     tailoring = true,
     fishing = true
 }
+-- First Aid has a sound of its own on reaching ProfessionMaxRank instead (no guild message)
+ScubaSounds.Data.FirstAidSkillName = "First Aid"
 ScubaSounds.Data.ExaltedStandingId = 8
 ScubaSounds.Data.ExaltedLabel = FACTION_STANDING_LABEL8 or "Exalted"
 -- Roll chat lines: "%s rolls %d (%d-%d)" from /roll, and "Need Roll - %d for %s by %s" (and Greed) from loot rolls
@@ -246,6 +248,17 @@ ScubaSounds.Data.BearFormDeathWindow = 2 -- seconds; dying drops the form, so le
 -- Matched by ID or by name in case Forever's ID differs
 ScubaSounds.Data.BasicCampfireSpellId = 818
 ScubaSounds.Data.BasicCampfireSpellName = "Basic Campfire"
+ScubaSounds.Data.BlindSpellId = 2094
+ScubaSounds.Data.BlindSpellName = "Blind"
+ScubaSounds.Data.SprintSpellIds = {2983, 8696, 11305, 1850, 9821} -- Sprint, then Dash
+ScubaSounds.Data.SprintSpellNames = {"Sprint", "Dash"}
+ScubaSounds.Data.FrostShockSpellIds = {8056, 8058, 10472, 10473}
+ScubaSounds.Data.FrostShockSpellName = "Frost Shock"
+-- Embrace of the Viper: a druid shifting into any form with all five pieces on
+ScubaSounds.Data.FangSetItemIds = {6473, 10410, 10411, 10412, 10413}
+ScubaSounds.Data.FangSetSlots = {INVSLOT_CHEST or 5, INVSLOT_WAIST or 6, INVSLOT_LEGS or 7, INVSLOT_FEET or 8,
+                                 INVSLOT_HAND or 10}
+ScubaSounds.Data.FangFormCooldown = 60
 -- Taming: a Tame Beast cast, then a pet we haven't seen within the window. Matched by ID or name like the spells above
 ScubaSounds.Data.TameBeastSpellId = 1515
 ScubaSounds.Data.TameBeastSpellName = "Tame Beast"
@@ -584,6 +597,7 @@ ScubaSounds_NumBagSlots = 4
 ScubaSounds_PlayOutsideRaid = "Play outside of raid"
 ScubaSounds_DisableSounds = "Disable Sounds"
 ScubaSounds_GuildDeaths = "Play far-away guildmates' death sounds" -- deaths we can't see, from their DIED message
+ScubaSounds_LiveRaidDeaths = "Play live raid death sounds" -- the same, only for those inside one of the guild's raids
 ScubaSounds_ReplayOneTime = "Replay one-time sounds every time" -- for us only, never in guild chat
 ScubaSounds_PlayEverySound = "Play every sound" -- every guildmate's plays, heard here too (debugging)
 ScubaSounds_SeeAllSounds = "See all sounds in chat" -- every guildmate's plays, with who, in our chat (debugging)
@@ -643,7 +657,7 @@ ScubaSounds.Data.WowEvents = {"ADDON_LOADED", "PLAYER_DEAD", "ENCOUNTER_START", 
                               "GROUP_ROSTER_UPDATE", "PLAYER_UNGHOST", "UNIT_HEALTH", "PLAYER_GUILD_UPDATE",
                               "UI_INFO_MESSAGE", "CHAT_MSG_COMBAT_XP_GAIN",
                               "CHAT_MSG_COMBAT_FACTION_CHANGE", "UPDATE_FACTION", "CHAT_MSG_MONSTER_EMOTE",
-                              "START_LOOT_ROLL", "CHAT_MSG_WHISPER"}
+                              "START_LOOT_ROLL", "CHAT_MSG_WHISPER", "UPDATE_SHAPESHIFT_FORM"}
 -- Unit tokens for you and your group, so the frequent unit events can skip everything else with one lookup
 ScubaSounds.Data.GroupUnitTokens = {
     player = true

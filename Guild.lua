@@ -103,9 +103,18 @@ function ScubaSounds:SendAddonMessage(message, channel, target, onDone, maxRetri
     trySend()
 end
 
+-- Whether a far-away guildmate's death plays: any of them with the guild deaths option on, or with the live raid
+-- deaths option, only those inside one of the guild's raids right now
+local function PlaysFarDeath(playerName)
+    local options = ScubaSounds_Options
+    return options[ScubaSounds_GuildDeaths] or
+               (options[ScubaSounds_LiveRaidDeaths] and ScubaSounds.Raids ~= nil and
+                   ScubaSounds.Raids:IsInsideLiveRaid(playerName))
+end
+
 -- Someone spammed sit on our body: plays only while we're still dead
--- A guildmate died somewhere we can't see (another zone, out of range): their Player Deaths sound, if the option is
--- on. Waits a moment so a death seen here first (UNIT_DIED, which also covers the group) isn't played twice. Only
+-- A guildmate died somewhere we can't see (another zone, out of range): their Player Deaths sound, if PlaysFarDeath
+-- says so. Waits a moment so a death seen here first (UNIT_DIED, which also covers the group) isn't played twice. Only
 -- what's known from the message: no class, one-shot or bear form, so the Other Deaths sounds stay for deaths seen here
 -- A first death (fd=<sound>) is noted straight away, so a death seen here (waiting FirstDeathWait) plays it instead of
 -- the death sound; a first death far away plays it for the whole guild, whatever the guild deaths option says. What
@@ -127,7 +136,7 @@ ScubaSounds.GuildEvents[ScubaSounds_DiedCommand] = function(self, playerName, fi
             name = playerName,
             at = GetTime()
         }
-    elseif not ScubaSounds_Options[ScubaSounds_GuildDeaths] then
+    elseif not PlaysFarDeath(playerName) then
         return
     end
     local heardAt = GetTime()
@@ -137,7 +146,7 @@ ScubaSounds.GuildEvents[ScubaSounds_DiedCommand] = function(self, playerName, fi
             return
         end
         ScubaSounds:TakeEnvironmentalDeath(playerName) -- not used for deaths far away
-        if ScubaSounds:PlayFirstDeath(playerName) or not ScubaSounds_Options[ScubaSounds_GuildDeaths] then
+        if ScubaSounds:PlayFirstDeath(playerName) or not PlaysFarDeath(playerName) then
             return
         end
         ScubaSounds:FireDeath({

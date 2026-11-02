@@ -71,6 +71,13 @@ S:SetSoundsDisabled(true)
 table.insert(out, "sounds off: " .. summary())
 S:SetSoundsDisabled(false)
 table.insert(out, "on again:   " .. summary())
+-- Far-away deaths on greys out live raid deaths (the 5th setting), which it already covers
+ScubaSounds_Options[ScubaSounds_GuildDeaths] = true
+S:RefreshSoundSettings()
+table.insert(out, "far-away deaths on: " .. summary())
+ScubaSounds_Options[ScubaSounds_GuildDeaths] = false
+S:RefreshSoundSettings()
+table.insert(out, "far-away deaths off: " .. summary())
 return table.concat(out, "\n")
 ''')
 print(res)

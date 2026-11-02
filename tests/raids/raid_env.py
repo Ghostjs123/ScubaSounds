@@ -6,8 +6,7 @@ import sys
 
 TESTS = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(TESTS, "ledger"))
-from lupa import lua51
-from ledger_env import addon_file, START_TIME, DAY  # noqa: E402
+from ledger_env import addon_file, lua_runtime, START_TIME, DAY  # noqa: E402
 
 RAID_FILES = ["RaidTracking/Ledger/LedgerStore.lua", "RaidTracking/RaidEntries.lua", "RaidTracking/RaidReplay.lua"]
 HOUR = 3600
@@ -43,7 +42,7 @@ end
 
 
 def new_lua():
-    lua = lua51.LuaRuntime(unpack_returned_tuples=True, encoding="latin-1")
+    lua = lua_runtime()
     for name in RAID_FILES:
         with open(addon_file(name), encoding="utf-8") as f:
             lua.execute(f.read())

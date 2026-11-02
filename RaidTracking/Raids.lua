@@ -57,7 +57,7 @@ end
 
 -- A guild raid: at least GUILD_SHARE of those who attended are guild members (isMember(key)), so a pug raid a
 -- guildmate joined doesn't count. With nobody's attendance known, or the roster not read yet, it counts
-local GUILD_SHARE = 0.75
+local GUILD_SHARE = 0.5
 local function IsGuildRaid(lockout, isMember, knowsRoster)
     if not knowsRoster then
         return true
@@ -82,8 +82,7 @@ local function TurnOffSampleForRealRaids()
         return
     end
     local current = Raids:State()
-    local saved = Raids:Saved()
-    local knowsRoster = saved ~= nil and saved.classes ~= nil and next(saved.classes) ~= nil
+    local knowsRoster = Raids:KnowsRoster()
     local guildRaid = false
     for _, lockout in ipairs(current and current.list or {}) do
         -- A test raid (/ss debug liveraid) isn't a real one
@@ -155,6 +154,32 @@ end
 function Raids:IsGuildMember(key)
     local saved = Raids:Saved()
     return saved ~= nil and saved.classes ~= nil and saved.classes[key] ~= nil
+end
+
+-- Whether guild membership is known at all (the roster read at least once), so pugs can be told apart
+function Raids:KnowsRoster()
+    local saved = Raids:Saved()
+    return saved ~= nil and saved.classes ~= nil and next(saved.classes) ~= nil
+end
+
+-- Whether a character is inside one of the guild's raids right now (an open presence span, the Raids tab's "inside
+-- now"), for "Play live raid death sounds". Always the guild's log, never the sample
+function Raids:IsInsideLiveRaid(name)
+    local key = NameKey(name)
+    local current = key and Raids:State()
+    if not current then
+        return false
+    end
+    local knowsRoster = Raids:KnowsRoster()
+    local now = GetServerTime()
+    for _, lockout in ipairs(current.list) do
+        if ScubaSounds.RaidReplay.InsideAt(lockout, now)[key] and IsGuildRaid(lockout, function(member)
+            return Raids:IsGuildMember(member)
+        end, knowsRoster) then
+            return true
+        end
+    end
+    return false
 end
 
 -- How a name key is shown: as the guild roster spells it, else as the log does
@@ -270,13 +295,11 @@ function Shown:IsGuildMember(key)
     return Raids:IsGuildMember(key)
 end
 
--- Whether guild membership is known at all (the roster read at least once), so pugs can be told apart
 function Shown:KnowsRoster()
     if Raids:IsSample() then
         return true
     end
-    local saved = Raids:Saved()
-    return saved ~= nil and saved.classes ~= nil and next(saved.classes) ~= nil
+    return Raids:KnowsRoster()
 end
 
 -- The lockouts that count as the guild's raids (see IsGuildRaid), newest first
@@ -305,7 +328,6 @@ end
 -- masterLoot, roles = role -> {names, by}}, or nil outside a raid. With the sample showing, its newest lockout
 -- stands in, so every part of the tabs can be seen
 function Shown:CurrentRaid()
-    local Replay = ScubaSounds.RaidReplay
     if Raids:IsSample() then
         local newest = Sample().state.list[1]
         if not newest then
@@ -323,6 +345,13 @@ function Shown:CurrentRaid()
             roles = roles
         }
     end
+    return Raids:CurrentRaid()
+end
+
+-- The raid we're really in (never the sample): Shown:CurrentRaid's fields, plus names = name key -> the roster's
+-- spelling and masterLooter = we're the master looter. Each role is its newest value {id, names, by, override}
+function Raids:CurrentRaid()
+    local Replay = ScubaSounds.RaidReplay
     local inRaid = IsInRaid()
     if issecretvalue(inRaid) or not inRaid then
         return nil
@@ -331,12 +360,14 @@ function Shown:CurrentRaid()
     if not raid then
         return nil
     end
-    local roster = {}
+    local roster, names = {}, {}
     local count = GetNumGroupMembers()
     for i = 1, (not issecretvalue(count) and type(count) == "number") and count or 0 do
-        local key = NameKey(ScubaSounds:FullName("raid" .. i))
+        local name = ScubaSounds:FullName("raid" .. i)
+        local key = NameKey(name)
         if key then
             roster[key] = true
+            names[key] = name
         end
     end
     local roles = {}
@@ -354,11 +385,14 @@ function Shown:CurrentRaid()
             roles[role] = roles[role] or value
         end
     end
+    local masterLoot, masterLooter = ScubaSounds.RaidRecorder:IsMasterLoot()
     return {
         raid = raid,
         lockout = lockoutId,
         roster = roster,
-        masterLoot = ScubaSounds.RaidRecorder:IsMasterLoot(),
+        names = names,
+        masterLoot = masterLoot,
+        masterLooter = masterLooter,
         roles = roles
     }
 end

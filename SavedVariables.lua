@@ -38,6 +38,9 @@ function ScubaSounds:InitOptions()
     if options[ScubaSounds_GuildDeaths] == nil then
         options[ScubaSounds_GuildDeaths] = false
     end
+    if options[ScubaSounds_LiveRaidDeaths] == nil then
+        options[ScubaSounds_LiveRaidDeaths] = false
+    end
     if options[ScubaSounds_PlayDiscoveries] == nil then
         options[ScubaSounds_PlayDiscoveries] = false
     end

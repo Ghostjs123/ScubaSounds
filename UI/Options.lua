@@ -58,8 +58,9 @@ local CreatePlayButton = Style.CreatePlayButton
 function ScubaSounds:RefreshSoundSettings()
     local soundsOn = not ScubaSounds_Options[ScubaSounds_DisableSounds]
     for _, setting in ipairs(ScubaSounds.UI.SoundSettings or {}) do
-        setting.checkbox:SetEnabled(soundsOn)
-        local color = soundsOn and LABEL_COLOR or DISABLED_COLOR
+        local enabled = soundsOn and (not setting.usable or setting.usable())
+        setting.checkbox:SetEnabled(enabled)
+        local color = enabled and LABEL_COLOR or DISABLED_COLOR
         setting.label:SetTextColor(unpack(color))
         if setting.underline then
             setting.underline:SetColorTexture(color[1], color[2], color[3], 0.9)

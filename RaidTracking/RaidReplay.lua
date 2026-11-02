@@ -724,7 +724,7 @@ end
 
 -- The loot roles set for a raid that has no lockout yet (before its first kill): role entries naming only the raid,
 -- from since on, by the same rule as a lockout's (an answer counts if it replaces the current one; overrides always).
--- Returns role -> {names = name keys, by = who set it, override}, or nothing for a role not set
+-- Returns role -> {id, names = name keys, by = who set it, override}, or nothing for a role not set
 function Replay.UnboundRoles(entries, raid, since)
     local roles, currentIds = {}, {
         col = "",
@@ -740,6 +740,7 @@ function Replay.UnboundRoles(entries, raid, since)
                     table.insert(names, NameKey(name))
                 end
                 roles[d.s] = {
+                    id = entry.id,
                     names = names,
                     by = NameKey(entry.a),
                     override = d.o == true

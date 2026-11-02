@@ -255,6 +255,41 @@ function ScubaSounds:UpdateBearForm(unit)
     end
 end
 
+-- A druid shifting into any form (from caster or another form) with the whole Fang set on. The first form seen
+-- (logging in already shifted) only sets the baseline
+function ScubaSounds.Events:UPDATE_SHAPESHIFT_FORM()
+    local form = GetShapeshiftForm()
+    if issecretvalue(form) or type(form) ~= "number" then
+        return
+    end
+    local state = ScubaSounds.State
+    local previous = state.ShapeshiftForm
+    state.ShapeshiftForm = form
+    if previous == nil or form == 0 or form == previous then
+        return
+    end
+    local _, class = UnitClass("player")
+    if not issecretvalue(class) and class == "DRUID" and ScubaSounds:IsWearingFangSet() then
+        ScubaSounds:Fire("FangFormEntered")
+    end
+end
+
+function ScubaSounds:IsWearingFangSet()
+    local worn = {}
+    for _, slot in ipairs(ScubaSounds.Data.FangSetSlots) do
+        local itemId = GetInventoryItemID("player", slot)
+        if itemId and not issecretvalue(itemId) then
+            worn[itemId] = true
+        end
+    end
+    for _, itemId in ipairs(ScubaSounds.Data.FangSetItemIds) do
+        if not worn[itemId] then
+            return false
+        end
+    end
+    return true
+end
+
 function ScubaSounds.Events:ENCOUNTER_START(encounterID)
     ScubaSounds.State.WipeDetected = false
     ScubaSounds.State.CurrentEncounterId = not issecretvalue(encounterID) and encounterID or nil
@@ -548,6 +583,7 @@ function ScubaSounds.Events:UNIT_AURA(unitTarget)
     if unitTarget == "player" then
         ScubaSounds:HandlePlayerAura()
         ScubaSounds:CheckMindControlled()
+        ScubaSounds:CheckBlinded()
     end
 end
 
@@ -608,13 +644,19 @@ function ScubaSounds.Events:CHAT_MSG_WHISPER()
     end
 end
 
--- An epic up for need/greed in a party (not a raid). Epics from one drop open their rolls together and count once
+-- An epic up for need/greed in a party (not a raid), other than a Womp Womp item. Epics from one drop open their rolls
+-- together and count once
 function ScubaSounds.Events:START_LOOT_ROLL(rollId)
     if issecretvalue(rollId) or not IsInGroup() or IsInRaid() then
         return
     end
     local _, _, _, quality = GetLootRollItemInfo(rollId)
     if issecretvalue(quality) or quality ~= ScubaSounds.Data.EpicQuality then
+        return
+    end
+    local link = GetLootRollItemLink(rollId)
+    local itemId = not issecretvalue(link) and type(link) == "string" and link:match("item:(%d+)")
+    if itemId and ScubaSounds.Data.WompWompItemIdsMap[itemId] then
         return
     end
     local last = ScubaSounds.State.LastEpicRollAt
@@ -842,6 +884,10 @@ function ScubaSounds.Events:CHAT_MSG_SKILL(message)
     local skill, rank = message:match(data.SkillRankUpPattern)
     if skill and tonumber(rank) >= data.ProfessionMaxRank and data.MaxableProfessions[strlower(skill)] then
         ScubaSounds:AnnounceMilestone("profession", skill)
+    end
+    if skill and tonumber(rank) >= data.ProfessionMaxRank and
+        ScubaSounds:EqualsIgnoreCase(skill, data.FirstAidSkillName) then
+        ScubaSounds:Fire("FirstAidMaxed")
     end
     local tier = data.RidingRankTiers[tonumber(rank)]
     if not skill then

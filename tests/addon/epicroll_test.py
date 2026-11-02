@@ -22,13 +22,19 @@ S.RecordSoundHeard = function() end
 S.AnnounceDiscovery = function() end
 S.BroadcastPlayed = function() end
 S.FullName = function() return "Me-X" end
-local inGroup, inRaid, qualities = true, false, {}
+local inGroup, inRaid, qualities, items = true, false, {}, {}
 IsInGroup = function() return inGroup end
 IsInRaid = function() return inRaid end
 GetLootRollItemInfo = function(id) return "tex", "Item", 1, qualities[id] end
+GetLootRollItemLink = function(id) if items[id] == SECRET then return SECRET end return items[id] and ("|cffa335ee|Hitem:" .. items[id] .. "::::::::60:::::|h[Item]|h|r") end
+local womp = next(S.Data.WompWompItemIdsMap)
 local function roll(label, ...)
   heard = nil
-  for i, q in ipairs({...}) do qualities[i] = q; S.Events:START_LOOT_ROLL(i) end
+  items = {}
+  for i, q in ipairs({...}) do
+    if type(q) == "table" and q ~= SECRET then items[i] = q[2]; q = q[1] end
+    qualities[i] = q; S.Events:START_LOOT_ROLL(i)
+  end
   table.insert(out, label .. ": " .. (heard or "silent"))
   now = now + 60
 end
@@ -36,12 +42,16 @@ table.insert(out, "default chance " .. S:GetChance(S.Data.TriggersById.EpicRoll,
 local plays = 0
 for i = 1, 20000 do heard = nil; qualities[1] = 4; S.Events:START_LOOT_ROLL(1); if heard then plays = plays + 1 end; now = now + 60 end
 table.insert(out, "plays in 20000 epic rolls: " .. plays)
-ScubaSounds_Options.Chance["Loot/Sheesh"] = 100
+local epicRoll = S.Data.TriggersById.EpicRoll
+ScubaSounds_Options.Chance[S:ChanceKey(epicRoll, "Sheesh")] = 100
 roll("epic in a party", 4)
 roll("blue in a party", 3)
 roll("two epics from one drop", 4, 4)
 inRaid = true; roll("epic in a raid", 4); inRaid = false
 inGroup = false; roll("epic while solo", 4); inGroup = true
 roll("secret quality", SECRET)
+roll("womp womp epic", {4, womp})
+roll("womp womp epic then a real one", {4, womp}, {4, "19019"})
+roll("secret link", {4, SECRET})
 return table.concat(out, "\n")
 '''))
