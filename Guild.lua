@@ -54,13 +54,7 @@ end
 -- Returns whether it was sent (or shown)
 function ScubaSounds:SendChat(text, chatType, target)
     if chatType == "GUILD" and not IsInGuild() then
-        local data = ScubaSounds.Data
-        local linked = ScubaSounds:LinkSoundAtEnd(text, data.DiscoveryLinkPattern) or text
-        -- Shorter than the guild version: "SS - ", no name of ours and "discovered:", so it fits on one line
-        linked = ScubaSounds:DropOwnDiscoveryName(ScubaSounds:LinkBracketedSounds(linked), data.OwnNoGuildDiscoveryWords)
-        linked = linked:gsub(data.DiscoveryWords, data.NoGuildDiscoveryWords)
-        DEFAULT_CHAT_FRAME:AddMessage(string.format(ScubaSounds_PrintFormat, data.NoGuildPrefix .. linked) ..
-                                          data.NoGuildSuffix)
+        ScubaSounds:ShowChatLocally(text, ScubaSounds.Data.NoGuildSuffix)
         return true
     end
     if not ScubaSounds_Options[ScubaSounds_SendGuildMessages] then
@@ -73,9 +67,20 @@ function ScubaSounds:SendChat(text, chatType, target)
     return true
 end
 
--- Retries through throttling and boss encounter lockdown, then calls onDone (sent or gave up)
-function ScubaSounds:SendGuildMessage(message, onDone, prio)
-    ScubaSounds:SendAddonMessage(message, "GUILD", nil, onDone, nil, prio)
+-- A guild chat line shown only in our own chat, then suffix. Shorter than the guild version: "SS - ", no name of ours
+-- and "discovered:", so it fits on one line
+function ScubaSounds:ShowChatLocally(text, suffix)
+    local data = ScubaSounds.Data
+    local linked = ScubaSounds:LinkSoundAtEnd(text, data.DiscoveryLinkPattern) or text
+    linked = ScubaSounds:DropOwnDiscoveryName(ScubaSounds:LinkBracketedSounds(linked), data.OwnNoGuildDiscoveryWords)
+    linked = linked:gsub(data.DiscoveryWords, data.NoGuildDiscoveryWords)
+    DEFAULT_CHAT_FRAME:AddMessage(string.format(ScubaSounds_PrintFormat, data.NoGuildPrefix .. linked) .. suffix)
+end
+
+-- Retries through throttling and boss encounter lockdown (for maxRetries seconds, default MaxRelayRetries), then calls
+-- onDone (sent or gave up)
+function ScubaSounds:SendGuildMessage(message, onDone, prio, maxRetries)
+    ScubaSounds:SendAddonMessage(message, "GUILD", nil, onDone, maxRetries, prio)
 end
 
 -- Every addon message goes through ChatThrottleLib, which paces our traffic together with every other addon that
@@ -242,14 +247,14 @@ function ScubaSounds:ParseFields(payload)
 end
 
 -- Guild-wide info, not tied to sounds. fields is a flat table of strings/numbers/booleans
-function ScubaSounds:BroadcastToGuild(command, fields, prio)
+function ScubaSounds:BroadcastToGuild(command, fields, prio, maxRetries)
     if not IsInGuild() then
         return
     end
     fields.t = GetServerTime() -- messages can be delayed by lockdown
     fields.v = C_AddOns.GetAddOnMetadata("ScubaSounds", "Version")
     local message = command .. ":" .. ScubaSounds:FullName("player") .. ":" .. ScubaSounds:EncodeFields(fields)
-    ScubaSounds:SendGuildMessage(message:sub(1, 255), nil, prio)
+    ScubaSounds:SendGuildMessage(message:sub(1, 255), nil, prio, maxRetries)
 end
 
 -- firstDeathSound: our first death's sound, so the whole guild plays the same one. environment: "lava", "fall" or nil
@@ -733,7 +738,8 @@ function ScubaSounds:IsOwnContext(ctx)
 end
 
 -- One client posts each first discovery: whoever set it off, or for group-wide ones the group leader. Without a guild
--- it only shows in our own chat, so then everyone in the group sees the group-wide one
+-- it only shows in our own chat, so then everyone in the group sees the group-wide one. With "Send messages in guild"
+-- off it's shown in our own chat and sent as a DISCOVERED message, for guildmates with the addon to show in theirs
 function ScubaSounds:AnnounceDiscovery(trigger, sound, ctx)
     local character = ScubaSounds:FullName("player")
     if not character then
@@ -742,14 +748,41 @@ function ScubaSounds:AnnounceDiscovery(trigger, sound, ctx)
     local data = ScubaSounds.Data
     -- The tab of the trigger that played, since a sound can be in more than one
     local tabName = ScubaSounds:CategoryName(trigger.category)
+    local function post(text, group)
+        if IsInGuild() and not ScubaSounds_Options[ScubaSounds_SendGuildMessages] then
+            ScubaSounds:ShowChatLocally(text, data.QuietDiscoverySuffix)
+            -- Waits out lockdown as long as the chat line would have
+            ScubaSounds:BroadcastToGuild(ScubaSounds_QuietDiscoveryCommand, {
+                s = sound,
+                tab = tabName,
+                grp = group
+            }, "ALERT", data.BlockedChatGiveUp)
+        else
+            ScubaSounds:SendChatWhenAllowed(text, "GUILD")
+        end
+    end
     if trigger.groupDiscovery and IsInGroup() then
         if UnitIsGroupLeader("player") or not IsInGuild() then
-            ScubaSounds:SendChatWhenAllowed(data.GroupDiscoveryMessage:format(IsInRaid() and "raid" or "group", sound,
-                tabName), "GUILD")
+            local group = IsInRaid() and "raid" or "group"
+            post(data.GroupDiscoveryMessage:format(group, sound, tabName), group)
         end
     elseif ScubaSounds:IsOwnContext(ctx) then
-        ScubaSounds:SendChatWhenAllowed(data.DiscoveryMessage:format(character, sound, tabName), "GUILD")
+        post(data.DiscoveryMessage:format(character, sound, tabName))
     end
+end
+
+-- A guildmate's discovery that wasn't posted in guild chat, shown as the line it would have been (without the
+-- suffix: our colour already sets it apart). Our own was shown when we sent it
+ScubaSounds.GuildEvents[ScubaSounds_QuietDiscoveryCommand] = function(self, playerName, fields)
+    local sound, tabName, group = fields.s, fields.tab, fields.grp
+    if ScubaSounds:IsOwnName(playerName) or type(sound) ~= "string" or not ScubaSounds.Audio.SoundInfo[sound] or
+        type(tabName) ~= "string" then
+        return
+    end
+    local data = ScubaSounds.Data
+    local text = (group == "raid" or group == "group") and data.GroupDiscoveryMessage:format(group, sound, tabName) or
+                     data.DiscoveryMessage:format(playerName, sound, tabName)
+    ScubaSounds:ShowChatLocally(text, "")
 end
 
 -- (play icon)[Sound (Tab tab)]: click previews the sound, shift-click opens that tab. The icon is part of the link

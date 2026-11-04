@@ -1,6 +1,7 @@
 """Discovery messages in guild chat: what's sent (which guildmates without the addon see as is), what the chat filter
-shows guildmates with it (a link, with "(Download ScubaSounds)" dropped), our own, an unknown sound, and the guildless
-version shown only to us."""
+shows guildmates with it (a link, with "(Download ScubaSounds)" dropped), our own, an unknown sound, the DISCOVERED
+message sent instead with "Send messages in guild" off and how guildmates show it, and the guildless version shown only
+to us."""
 import os, sys, lupa
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from addon_files import addon_lua_files, addon_path
@@ -25,6 +26,7 @@ S:InitOptions()
 local out = {}
 local sent = {}
 S.FullName = function() return "Me-X" end
+UnitName = function() return "Me" end
 S.SendChatWhenAllowed = function(_, msg, chatType) table.insert(sent, msg) end
 IsInGroup = function() return false end
 IsInRaid = function() return true end
@@ -52,10 +54,38 @@ table.insert(out, "group sent: " .. sent[#sent])
 table.insert(out, "group with the addon: " .. shown(sent[#sent]))
 table.insert(out, "unknown sound: " .. shown(S.Data.DiscoveryMessage:format("Kay-X", "NotASound", "Misc")))
 table.insert(out, "other guild chat: " .. shown("Kay-X discovered a sound: Mario1Up (Level Ups tab)"))
--- /ss debug discovery: both versions, for each tab the sound's triggers are on
+-- "Send messages in guild" off: nothing posted, shown in our chat and sent as DISCOVERED for guildmates to show
+IsInGroup = function() return false end
+IsInGuild = function() return true end
+local printedLines = {}
+DEFAULT_CHAT_FRAME = {AddMessage = function(_, m) table.insert(printedLines, (m:gsub("|", "!"))) end}
+local broadcasts = {}
+S.BroadcastToGuild = function(_, command, fields, prio, maxRetries)
+  table.insert(broadcasts, command .. " s=" .. fields.s .. " tab=" .. fields.tab .. " grp=" .. tostring(fields.grp) ..
+    " " .. prio .. " " .. tostring(maxRetries))
+end
+ScubaSounds_Options[ScubaSounds_SendGuildMessages] = false
+local sentBefore = #sent
+S:AnnounceDiscovery(trigger, "Mario1Up", {})
+IsInGroup = function() return true end
+S:AnnounceDiscovery({category = trigger.category, groupDiscovery = true}, "Mario1Up", {})
+table.insert(out, "quiet, posted: " .. (#sent - sentBefore))
+table.insert(out, "quiet, broadcasts:\n" .. table.concat(broadcasts, "\n"))
+table.insert(out, "quiet, our chat:\n" .. table.concat(printedLines, "\n"))
+printedLines = {}
+local receive = S.GuildEvents[ScubaSounds_QuietDiscoveryCommand]
+receive(S, "Kay-X", {s = "Mario1Up", tab = "Level Ups"})
+receive(S, "Kay-X", {s = "Mario1Up", tab = "Level Ups", grp = "raid"})
+receive(S, "Me-X", {s = "Mario1Up", tab = "Level Ups"})
+receive(S, "Kay-X", {s = "NotASound", tab = "Misc"})
+receive(S, "Kay-X", {s = "Mario1Up"})
+table.insert(out, "quiet, a guildmate's chat:\n" .. table.concat(printedLines, "\n"))
+ScubaSounds_Options[ScubaSounds_SendGuildMessages] = true
+-- /ss debug discovery: every version, for each tab the sound's triggers are on
 IsInGroup = function() return false end
 local debugLines = {}
 S.SendMessage = function(_, m) table.insert(debugLines, (m:gsub("|", "!"))) end
+DEFAULT_CHAT_FRAME = {AddMessage = function(_, m) table.insert(debugLines, (m:gsub("|", "!"))) end}
 S:DebugCommand({"debug", "discovery", "mario1up"})
 table.insert(out, "debug discovery:\n" .. table.concat(debugLines, "\n"))
 -- Not in a guild: shown only to us

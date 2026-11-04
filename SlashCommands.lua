@@ -203,7 +203,8 @@ function ScubaSounds:DebugCommand(words)
         end
     elseif words[2] == "discovery" and words[3] then
         -- /ss debug discovery <sound>: the guild message each of its triggers posts when first set off, as guildmates
-        -- without the addon see it (exactly as sent) and as guildmates with it see it (linked, the download note dropped)
+        -- without the addon see it (exactly as sent), as guildmates with it see it (linked, the download note dropped),
+        -- and as it shows in our own chat when "Send messages in guild" is off
         local sound = ScubaSounds:FindSoundByName(words[3])
         if not sound then
             return
@@ -220,6 +221,8 @@ function ScubaSounds:DebugCommand(words)
                     ScubaSounds:SendMessage("Without the addon: " .. text)
                     ScubaSounds:SendMessage("With the addon: " ..
                                                 (ScubaSounds:LinkSoundAtEnd(text, data.DiscoveryLinkPattern) or text))
+                    ScubaSounds:SendMessage("With guild messages off, in your own chat (guildmates with the addon get it without the note):")
+                    ScubaSounds:ShowChatLocally(text, data.QuietDiscoverySuffix)
                 end
             end
         end

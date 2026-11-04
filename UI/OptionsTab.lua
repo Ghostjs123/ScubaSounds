@@ -112,7 +112,8 @@ function ScubaSounds:CreateGlobalOptionsPage(frame)
     ScubaSounds:CreateLabel(page, sendGuildMessages, ScubaSounds_SendGuildMessages)
     describe(sendGuildMessages, ScubaSounds_SendGuildMessages, "Lets the addon type in chat for you: announcing " ..
         "sounds the guild discovers, and a few short celebration lines. Off, it never posts in chat. The hidden " ..
-        "addon messages that let guildmates hear your sounds still go out, so they hear them either way.")
+        "addon messages that let guildmates hear your sounds still go out, so they hear them either way, and your " ..
+        "discoveries still show in the chat of guildmates with the addon (only they see them).")
 
     local guildDeaths = ScubaSounds:CreateCheckbox(page, GRID_LEFT, -31 - 3 * (ROW_HEIGHT + 4),
         ScubaSounds_Options[ScubaSounds_GuildDeaths], function(checked)

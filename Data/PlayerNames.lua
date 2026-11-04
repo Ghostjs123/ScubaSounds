@@ -86,7 +86,7 @@ ScubaSounds.Data.PlayerNames = {
     [Vimy] = {"Vimy"},
     [Vitoli] = {"Vitoli", "Uglyvit", "Vitoli Ravioli"},
     [Shib] = {"Shib", "Shibly Wibbly", "Shibl Wibbil", "Shib Meister"},
-    [Zarix] = {"Yellowfilth"}
+    [Zarix] = {"Yellowfilth", "Zarix Grumble"}
 }
 
 -- Keyed by lowercase name; see ScubaSounds:GetTruePlayerName. A true name can be a character's full Forever name
@@ -104,7 +104,7 @@ ScubaSounds.Data.DeathSoundMap = {
     [Bobmoney] = {"DownTheWell"},
     [Brutezy] = {"RetardAlert"},
     [Chaka] = {"LegoYoda"},
-    [Cousy] = {"BestWarlock"},
+    [Cousy] = {"BestWarlock", "ImNano"},
     [Dahhart] = {"Dahhart", "ThanksDahfart"},
     [Device] = {"Keyboard"},
     [Doppel] = {"Discord"},
@@ -122,6 +122,7 @@ ScubaSounds.Data.DeathSoundMap = {
     [Nacho] = {"Goofy"},
     [Nigel] = {"Mario", "Weeaboo"},
     [Nips] = {"CopCuties"},
+    [Pigglywiggly] = {"PileOfRubbish"},
     [Rizka] = {"Oof"},
     [Scharf] = {"How"},
     [Sevvy] = {"SevvyLove"},
@@ -139,6 +140,7 @@ ScubaSounds.Data.DeviceDeathSoundRotation = {Kaemo, Stavis}
 -- Players whose death sound is new in Forever: their trigger says "New in Forever" (with the credit) until it's found
 ScubaSounds.Data.NewInForeverDeaths = {
     [Bobmoney] = true,
+    [Pigglywiggly] = true,
     [Shib] = true
 }
 

@@ -425,6 +425,13 @@ ScubaSounds.Audio.SoundInfo = {
         timeout = 30,
         formerUse = "Used to play when entering Ahn'Qiraj (picks 1 of 4 with ComeOnYouApes, DisableHisHand and Cavern)"
     },
+    ["ImNano"] = {
+        extension = "ogg",
+        duration = 2,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Nigel"
+    },
     ["ImRetarded"] = {
         extension = "wav",
         duration = 1,
@@ -767,6 +774,13 @@ ScubaSounds.Audio.SoundInfo = {
         duration = 1,
         canOverlapSelf = false,
         timeout = 1
+    },
+    ["PileOfRubbish"] = {
+        extension = "ogg",
+        duration = 3,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Kaymon"
     },
     ["PocketSand"] = {
         extension = "ogg",

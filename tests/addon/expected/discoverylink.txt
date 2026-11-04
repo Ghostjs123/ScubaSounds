@@ -5,7 +5,19 @@ group sent: The raid discovered a sound: [Mario1Up (Level Ups tab)] (Download Sc
 group with the addon: The raid discovered a sound: !cff71d5ff!Hscubasounds:Mario1Up:Level Ups!h!TInterface\Buttons\UI-SpellbookIcon-NextPage-Up:0!t[Mario1Up (Level Ups tab)]!h!r
 unknown sound: Kay-X discovered a sound: [NotASound (Misc tab)] (Download ScubaSounds)
 other guild chat: Kay-X discovered a sound: Mario1Up (Level Ups tab)
+quiet, posted: 0
+quiet, broadcasts:
+DISCOVERED s=Mario1Up tab=Level Ups grp=nil ALERT 3600
+DISCOVERED s=Mario1Up tab=Level Ups grp=raid ALERT 3600
+quiet, our chat:
+!c00f7f26cSS - Discovered: !cff71d5ff!Hscubasounds:Mario1Up:Level Ups!h!TInterface\Buttons\UI-SpellbookIcon-NextPage-Up:0!t[Mario1Up (Level Ups tab)]!h!r!r !cffa8a8a8(Not posted in guild chat)!r
+!c00f7f26cSS - The raid discovered: !cff71d5ff!Hscubasounds:Mario1Up:Level Ups!h!TInterface\Buttons\UI-SpellbookIcon-NextPage-Up:0!t[Mario1Up (Level Ups tab)]!h!r!r !cffa8a8a8(Not posted in guild chat)!r
+quiet, a guildmate's chat:
+!c00f7f26cSS - Kay-X discovered: !cff71d5ff!Hscubasounds:Mario1Up:Level Ups!h!TInterface\Buttons\UI-SpellbookIcon-NextPage-Up:0!t[Mario1Up (Level Ups tab)]!h!r!r
+!c00f7f26cSS - The raid discovered: !cff71d5ff!Hscubasounds:Mario1Up:Level Ups!h!TInterface\Buttons\UI-SpellbookIcon-NextPage-Up:0!t[Mario1Up (Level Ups tab)]!h!r!r
 debug discovery:
 Without the addon: Me-X discovered a sound: [Mario1Up (Level Ups tab)] (Download ScubaSounds)
 With the addon: Me-X discovered a sound: !cff71d5ff!Hscubasounds:Mario1Up:Level Ups!h!TInterface\Buttons\UI-SpellbookIcon-NextPage-Up:0!t[Mario1Up (Level Ups tab)]!h!r
+With guild messages off, in your own chat (guildmates with the addon get it without the note):
+!c00f7f26cSS - Discovered: !cff71d5ff!Hscubasounds:Mario1Up:Level Ups!h!TInterface\Buttons\UI-SpellbookIcon-NextPage-Up:0!t[Mario1Up (Level Ups tab)]!h!r!r !cffa8a8a8(Not posted in guild chat)!r
 guildless: !c00f7f26cSS - Discovered: !cff71d5ff!Hscubasounds:Mario1Up:Level Ups!h!TInterface\Buttons\UI-SpellbookIcon-NextPage-Up:0!t[Mario1Up (Level Ups tab)]!h!r!r !cffa8a8a8(Only you see this)!r

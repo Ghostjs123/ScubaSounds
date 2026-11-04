@@ -503,6 +503,10 @@ ScubaSounds.Data.NoGuildPrefix = "SS - "
 ScubaSounds.Data.NoGuildSuffix = " |cffa8a8a8(Only you see this)|r"
 ScubaSounds.Data.DiscoveryWords = " discovered a sound: "
 ScubaSounds.Data.NoGuildDiscoveryWords = " discovered: "
+-- A first discovery not posted because the discoverer (or the group leader) has "Send messages in guild" off: it's
+-- shown the same way in their own chat, with this suffix, and through the DISCOVERED message in each guildmate's with
+-- the addon, without it
+ScubaSounds.Data.QuietDiscoverySuffix = " |cffa8a8a8(Not posted in guild chat)|r"
 -- Our own discoveries leave out our name (only in our chat; everyone else still sees it)
 ScubaSounds.Data.OwnDiscoveryWords = "Discovered a sound: "
 ScubaSounds.Data.OwnNoGuildDiscoveryWords = "Discovered: "
@@ -533,6 +537,9 @@ ScubaSounds_DiedCommand = "DIED"
 ScubaSounds_PlayedCommand = "PLAYED"
 ScubaSounds_MaxLevelCommand = "LEVEL60" -- every guild member plays the max level sound
 ScubaSounds_GoldMilestoneCommand = "GOLD" -- GOLD:<player>:g=<gold>, every guild member plays that milestone's sound
+-- DISCOVERED:<player>:s=<sound>;tab=<tab name>;grp=<"raid" or "group", for group-wide ones>: a first discovery that
+-- wasn't posted in guild chat (see QuietDiscoverySuffix)
+ScubaSounds_QuietDiscoveryCommand = "DISCOVERED"
 ScubaSounds.GuildEvents = {} -- receive hooks: ScubaSounds.GuildEvents[command] = function(self, playerName, fields)
 -- Sound stats. Every login asks the guild which sounds they've heard; replies are whispered back.
 -- STATS:<character>:v=<version>;<sound>=<first heard>;@<trigger ID>=<first heard>;... (also sent to the guild live,
