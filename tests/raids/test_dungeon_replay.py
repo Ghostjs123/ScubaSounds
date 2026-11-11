@@ -199,16 +199,18 @@ def an_officer_deletes_a_run():
 
 
 @test
-def only_runs_made_up_of_guild_members_count():
+def only_runs_with_at_least_three_guild_members_count():
     log = DungeonLog()
     log.kill("Taco Lips", T0, "Herod", 2)
     run_ = log.runs().list[1]
     replay = log.lua.globals().ScubaSounds.DungeonReplay
     everyone = log.lua.eval("function() return true end")
-    no_pugs = log.lua.eval("function(key) return key ~= 'wet farts' end")
+    two_pugs = log.lua.eval("function(key) return key ~= 'wet farts' and key ~= 'stud alert' end")
+    three_pugs = log.lua.eval("function(key) return key == 'buff check' or key == 'taco lips' end")
     check(replay.IsGuildRun(run_, everyone, True), "a full guild run counts")
-    check(not replay.IsGuildRun(run_, no_pugs, True), "a run with a pug doesn't")
-    check(replay.IsGuildRun(run_, no_pugs, False), "before the roster is read, everything counts")
+    check(replay.IsGuildRun(run_, two_pugs, True), "three guild members and two pugs count")
+    check(not replay.IsGuildRun(run_, three_pugs, True), "two guild members and three pugs don't")
+    check(replay.IsGuildRun(run_, three_pugs, False), "before the roster is read, everything counts")
 
 
 @test

@@ -124,12 +124,29 @@ def hovering_an_item_says_where_it_dropped_and_who_looted_it():
 
 
 @test
+def pugs_are_marked_in_the_group_and_as_looters():
+    tab = DungeonsTab()
+    c = tab.c
+    c.run("QUALITY[%d] = 4" % HELM)
+    c.enter(["Buff Check", "Taco Lips", "Robot Shark", "Random Pug"])
+    c.target()
+    c.kill("Herod", 2)
+    c.step(8)
+    c.loot_line("Random Pug receives loot: %s." % link(HELM))
+    c.step(8)
+    tab.click_header()
+    lines = tab.shown().split("\n")
+    check(lines[1] == "L Group: Buff Check, Random Pug (pug), Robot Shark, Taco Lips", lines[1])
+    check(lines[3] == "I Item %d | Random Pug (pug)" % HELM, lines)
+
+
+@test
 def the_filters():
     tab = DungeonsTab()
     tab.a_run()
     old = tab.c.eval("NOW") - 150 * 86400
     tab.c.run('ScubaSounds.Dungeons:Write("dkill", {r = "Razorfen Downs", e = 3, b = "Tuten\'kash", '
-              'm = {"Buff Check", "Taco Lips"}}, %d)' % old)
+              'm = {"Buff Check", "Taco Lips", "Robot Shark"}}, %d)' % old)
     tab.c.step(1)
     check("Razorfen Downs" not in tab.shown(), "an old run shows with Last 4 months only")
     tab.c.run("RECENT_BOX.onToggle(false)")

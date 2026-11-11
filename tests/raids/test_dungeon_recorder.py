@@ -1,6 +1,6 @@
 """Dungeon tracking on the fake game (wow_fake.py): a party in Scarlet Monastery, game events in, entries out, sent live
 to guildmates and replayed into runs. Covers the copy number from creature GUIDs, kills, loot (ours and an observer's),
-groups with a pug, raid groups, item quality, live-only sending and keeping 4 months."""
+groups with pugs, raid groups, item quality, live-only sending and keeping 4 months."""
 import os
 import sys
 
@@ -76,10 +76,26 @@ def someone_elses_loot_is_written_once_by_an_observer():
 
 
 @test
-def a_group_with_a_pug_writes_nothing():
+def three_guild_members_and_two_pugs_are_recorded_with_the_pugs():
     buff = new_client("Buff Check")
     buff.run("QUALITY[%d] = 4" % HELM)
-    buff.enter(PARTY[:4] + ["Random Pug"])
+    buff.enter(PARTY[:3] + ["Random Pug", "Other Pug"])
+    buff.target()
+    buff.kill()
+    buff.step(8)
+    buff.loot_line("Random Pug receives loot: %s." % link(HELM))
+    buff.step(8)
+    kills, loot = buff.dungeon_entries("dkill"), buff.dungeon_entries("dloot")
+    check(len(kills) == 1 and "Random Pug" in kills[0][2]["m"] and len(kills[0][2]["m"]) == 5, kills)
+    check(len(loot) == 1 and loot[0][2]["p"] == "Random Pug", loot)
+    check(len(buff.runs()) == 1, "the run shows")
+
+
+@test
+def two_guild_members_and_three_pugs_write_nothing():
+    buff = new_client("Buff Check")
+    buff.run("QUALITY[%d] = 4" % HELM)
+    buff.enter(PARTY[:2] + ["Random Pug", "Other Pug", "Third Pug"])
     buff.target()
     buff.kill()
     buff.loot_line("You receive loot: %s." % link(HELM))

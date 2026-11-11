@@ -24,6 +24,7 @@ local MAX_TEXT = 128
 local MAX_GROUP = 5
 local TRASH = "Trash"
 Replay.TRASH = TRASH
+Replay.MIN_GUILD = 3 -- guild members a group needs for its run to be recorded and shown
 
 Replay.KINDS = {
     dkill = true,
@@ -216,15 +217,17 @@ function Replay.Build(entries)
     }
 end
 
--- Whether everyone in the run is a guild member (isMember(key)); with the roster not read yet, every run counts
+-- Whether at least MIN_GUILD of the run's group are guild members (isMember(key)); with the roster not read yet, every
+-- run counts
 function Replay.IsGuildRun(run, isMember, knowsRoster)
     if not knowsRoster then
         return true
     end
+    local members = 0
     for key in pairs(run.members) do
-        if not isMember(key) then
-            return false
+        if isMember(key) then
+            members = members + 1
         end
     end
-    return true
+    return members >= Replay.MIN_GUILD
 end

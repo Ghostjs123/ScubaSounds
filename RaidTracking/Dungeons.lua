@@ -1,5 +1,5 @@
--- ScubaSounds: dungeon tracking's WoW side (docs\DUNGEON_TRACKING_DESIGN.md). Records 5-man runs made up entirely of
--- guild members: boss kills and blue or better loot (see DungeonReplay for the entry kinds). Entries live in their own
+-- ScubaSounds: dungeon tracking's WoW side (docs\DUNGEON_TRACKING_DESIGN.md). Records 5-man runs with at least 3 guild
+-- members in the group: boss kills and blue or better loot (see DungeonReplay for the entry kinds). Entries live in their own
 -- store, apart from the raid log, and are only sent live: each goes to the guild once as it's written, under its own
 -- prefix, and nothing is caught up later. Kept 4 months
 local _G = _G
@@ -171,7 +171,7 @@ function Dungeons:OnChange(listener)
     table.insert(changeListeners, listener)
 end
 
--- The runs made up entirely of guild members, newest first
+-- The runs with at least Replay.MIN_GUILD guild members, newest first
 function Dungeons:GuildRuns()
     local current = Dungeons:State()
     local runs = {}
@@ -208,24 +208,27 @@ local function CurrentDungeon()
     return name, map
 end
 
--- The group's names when everyone in it is a guild member, else nil (nothing is written for a group with a pug)
+-- The group's names when at least Replay.MIN_GUILD of them are guild members, else nil (nothing is written for a group
+-- of mostly pugs). Pugs are in the list too
 local function GuildGroup()
     if not Raids:KnowsRoster() then
         return nil
     end
-    local names = {}
+    local names, members = {}, 0
     for _, unit in ipairs(PARTY_UNITS) do
         local exists = UnitExists(unit)
         if not issecretvalue(exists) and exists then
             local name = ScubaSounds:FullName(unit)
             local key = NameKey(name)
-            if not key or not Raids:IsGuildMember(key) then
-                return nil
+            if key then
+                table.insert(names, name)
+                if Raids:IsGuildMember(key) then
+                    members = members + 1
+                end
             end
-            table.insert(names, name)
         end
     end
-    return #names > 1 and names or nil
+    return members >= Replay.MIN_GUILD and names or nil
 end
 
 -- Entries written before the copy number is known wait for it; leaving the dungeon writes them without one

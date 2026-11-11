@@ -1,5 +1,5 @@
 -- ScubaSounds: the options window's Dungeons tab (docs\DUNGEON_TRACKING_DESIGN.md, "Dungeons tab"). Every 5-man run
--- made up entirely of guild members, newest first: the group, and each blue or better item under the boss killed before
+-- with at least 3 guild members, newest first: the group, and each blue or better item under the boss killed before
 -- it was looted, with who looted it. Officers can delete a run. Laid out like the Raids tab, whose rows it shares; rows
 -- are only made for open runs, and reused between refreshes
 local _G = _G
@@ -45,10 +45,14 @@ local ui -- ScubaSounds.UI.Dungeons once the page is built
 -- =================================================================
 -- Names
 -- =================================================================
+-- Class-colored for guild members; a pug (not in the guild roster, once it's been read) is marked as one
 local function ColoredName(key)
+    local name = Dungeons:DisplayName(key)
+    if Raids:KnowsRoster() and not Raids:IsGuildMember(key) then
+        return name .. GREY .. " (pug)|r"
+    end
     local class = Raids:ClassOf(key)
     local color = class and RAID_CLASS_COLORS and RAID_CLASS_COLORS[class]
-    local name = Dungeons:DisplayName(key)
     if color and color.colorStr then
         return "|c" .. color.colorStr .. name .. "|r"
     end
@@ -440,8 +444,8 @@ function ScubaSounds:RefreshDungeons()
     local runs = VisibleRuns()
     ui.empty:SetShown(#runs == 0)
     ui.empty:SetText(#all == 0 and
-                         "No dungeon runs recorded yet. A run shows here after its first boss kill, when everyone in " ..
-                         "the group is a guild member. Runs are only shared as they happen, so this lists the ones " ..
+                         "No dungeon runs recorded yet. A run shows here after its first boss kill, when at least 3 " ..
+                         "of the group are guild members. Runs are only shared as they happen, so this lists the ones " ..
                          "from while you were online." or "No runs match these filters.")
 
     -- Items that weren't there the last time the tab drew have just arrived: lit up for NEW_GLOW seconds. The first draw
