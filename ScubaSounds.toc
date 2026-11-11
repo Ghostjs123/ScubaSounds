@@ -1,6 +1,6 @@
 ## Interface: 16001
 ## Title: ScubaSounds
-## Version: 2.4
+## Version: 2.5
 ## Notes: Sound board addon for Scuba Cops
 ## Author: Kaymon
 ## SavedVariables: ScubaSounds_Options, ScubaSounds_RaidLog, ScubaSounds_Ledger, ScubaSounds_DebugLog, ScubaSounds_StatsAudit
