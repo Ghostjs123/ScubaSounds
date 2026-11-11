@@ -250,6 +250,7 @@ ScubaSounds.Data.BasicCampfireSpellId = 818
 ScubaSounds.Data.BasicCampfireSpellName = "Basic Campfire"
 ScubaSounds.Data.BlindSpellId = 2094
 ScubaSounds.Data.BlindSpellName = "Blind"
+ScubaSounds.Data.UnrollBagSpellId = 429961 -- using a Cozy Sleeping Bag; Forever only, so matched by ID alone
 ScubaSounds.Data.SprintSpellIds = {2983, 8696, 11305, 1850, 9821} -- Sprint, then Dash
 ScubaSounds.Data.SprintSpellNames = {"Sprint", "Dash"}
 ScubaSounds.Data.FrostShockSpellIds = {8056, 8058, 10472, 10473}
@@ -491,6 +492,9 @@ ScubaSounds_SitSpamCommand = "TBAG" -- whispered to the dead player
 -- First discoveries, posted in guild chat. Group-wide ones (wipes, boss kills) come from the group leader alone, unnamed
 ScubaSounds.Data.DiscoveryMessage = "%s discovered a sound: [%s (%s tab)] (Download ScubaSounds)" -- name, sound, tab
 ScubaSounds.Data.GroupDiscoveryMessage = "The %s discovered a sound: [%s (%s tab)] (Download ScubaSounds)" -- "raid" or "group"
+-- Only in our own chat: a sound or trigger first heard on this account that a guildmate had already discovered. The link's
+-- tooltip shows the trigger
+ScubaSounds.Data.FirstPlayHereMessage = "First time you've heard %s"
 -- Receivers with the addon turn "[<sound> (<tab> tab)]" at the end of either message into a clickable link (click
 -- previews the sound, shift-click opens that options tab) and drop the "(Download ScubaSounds)" after it, which is only
 -- for guildmates without the addon. Links can't be sent in chat, so this happens on arrival
@@ -564,13 +568,11 @@ ScubaSounds.Data.StatsReplyDelay = 30 -- seconds; replies are spread out so the 
 -- The login discoveries summary waits for the whole sync: the request, every reply's random wait, and a few seconds for
 -- the last replies to arrive (they may queue behind other traffic)
 ScubaSounds.Data.NewDiscoveriesDelay = ScubaSounds.Data.StatsRequestDelay + ScubaSounds.Data.StatsReplyDelay + 5
--- Joining (or creating) a guild runs the same sync. Once it's in, our chat lists what the guild had found, and the guild
--- is told which discoveries we brought that nobody there had: a heading, then 2 per line like the login summary.
--- {one, more than one}
+-- Joining (or creating) a guild runs the same sync. Once it's in, our chat lists what the guild had found, 2 per line like
+-- the login summary. {one, more than one}
 ScubaSounds.Data.AwayDiscoveriesHeading = {"1 sound discovered while you were away:",
                                            "%d sounds discovered while you were away:"}
 ScubaSounds.Data.GuildJoinedHeading = {"Your new guild has discovered 1 sound:", "Your new guild has discovered %d sounds:"}
-ScubaSounds.Data.BroughtDiscoveriesMessage = {"%s brought 1 sound discovery:", "%s brought %d sound discoveries:"}
 -- A guildmate logging in while we're online with discoveries new to us (made while we were offline). %%d is the count
 ScubaSounds.Data.SyncedDiscoveriesHeading = {"%s logged in with 1 new sound discovery:",
                                              "%s logged in with %%d new sound discoveries:"}
@@ -583,11 +585,21 @@ ScubaSounds_FirstsCommand = "FIRSTS"
 ScubaSounds.Data.FirstsRepliesWanted = 5
 ScubaSounds.Data.MaxAddonMessageLength = 255
 ScubaSounds.Data.MaxRelayRetries = 120 -- seconds, long enough to outlast a boss encounter
+ScubaSounds.Data.CommsTestWait = 10 -- seconds /ss debug comms waits for its test messages to come back
+ScubaSounds.Data.CommsTestLengths = {50, 80, 100, 128, 150, 200, 255} -- characters, for /ss debug comms
+-- /ss debug comms <name>: the guild-wide request goes out this long after the whispered one, and replies are watched
+-- for this long (guildmates wait up to StatsReplyDelay before replying)
+ScubaSounds.Data.CommsGuildRequestDelay = 5 -- seconds
+ScubaSounds.Data.CommsReplyWait = 45 -- seconds
 ScubaSounds.Data.RetryableSendResults = { -- Enum.SendAddonMessageResult
     [3] = true, -- AddonMessageThrottle
     [8] = true, -- ChannelThrottle
     [11] = true -- AddOnMessageLockdown
 }
+-- "No player named '%s' is currently playing." about someone we whispered an addon message to this recently is hidden,
+-- and nothing more is whispered to them for OfflineWhisperPause
+ScubaSounds.Data.AddonWhisperErrorWindow = 60 -- seconds
+ScubaSounds.Data.OfflineWhisperPause = 60 -- seconds
 ScubaSounds.Data.RelayedFields = { -- context fields sent with a relay, beside the sender's name
     spellId = true,
     sound = true -- the sound the sender picked, so the group hears the same one
@@ -703,6 +715,8 @@ ScubaSounds.State.LastFirstCastAt = {} -- first-cast kind -> GetTime() it last c
 ScubaSounds.State.FirstDeaths = {} -- lowercased full name -> {sound, name, at, replay}: a first death waiting to play
 ScubaSounds.State.SyncedDiscoveries = {} -- guildmate who logged in -> discoveries new to us from their push
 ScubaSounds.State.LocalDeaths = {} -- lowercased full name -> GetTime() of the last death seen here (UNIT_DIED)
+ScubaSounds.State.AddonWhisperTargets = {} -- lowercased whisper target -> GetTime() we last whispered an addon message
+ScubaSounds.State.OfflineWhisperTargets = {} -- lowercased whisper target -> GetTime() the game said they're offline
 -- lowercased full name -> {kind = "lava" or "fall", at}: what killed them, from our own death or their DIED message
 ScubaSounds.State.EnvironmentalDeaths = {}
 ScubaSounds.State.LastFallingAt = nil -- GetTime() the player was last in the air

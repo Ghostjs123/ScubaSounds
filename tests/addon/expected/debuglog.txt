@@ -3,7 +3,7 @@ on: SESSION_START missing=C_Timer.After C_ChatInfo.SendAddonMessage C_ChatInfo.R
 PLAYER_MONEY counted=25 kept=20 | secret arg: <secret>
 campfire: Campfire: played LookLook | others no match: true
 file: PLAY_SOUND_FILE trigger willPlay=true handle=77
-sounds disabled: Campfire: no sound to pick (LookLook Disable Sounds is on, LambSauce Disable Sounds is on, BeforeWar Disable Sounds is on)
+sounds disabled: Campfire: no sound to pick (LookLook Disable Sounds is on, LambSauce Disable Sounds is on, BeforeWar Disable Sounds is on, StayAwhile Disable Sounds is on, CampfireSong Disable Sounds is on)
 tab off: Campfire: tab Misc off
 nobody listens: FIRE NoSuchEvent: <no triggers listen to it>
 preview: willPlay=false path=Interface/Addons/ScubaSounds/Sounds/Sheesh.ogg

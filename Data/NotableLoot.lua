@@ -67,6 +67,7 @@ ScubaSounds.Data.NotableLoot = {{
             23015, -- Rat Cage
             23002, -- Turtle Box
             23022, -- Curmudgeon's Payoff
+            211527, -- Cozy Sleeping Bag
         }
     }, {
         name = "World Drop Epics",

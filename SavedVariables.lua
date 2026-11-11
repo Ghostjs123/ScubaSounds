@@ -133,10 +133,6 @@ function ScubaSounds:InitOptions()
         column = "sound",
         ascending = true
     }
-    -- Trigger IDs first heard on this account while out of a guild, until a guild has been told (account-wide)
-    options.UnsharedTriggers = options.UnsharedTriggers or {}
-    -- "<trigger ID>/<sound>" heard out of a guild, so a new sound of a trigger the guild already found is brought too
-    options.UnsharedSounds = options.UnsharedSounds or {}
     -- The guild this account was last synced with, so rejoining it reads "while you were away", not "new guild"
     -- options.LastGuildName
     -- /ss recent: the last sounds played on this account, newest first. {sound, category, time}
@@ -144,6 +140,8 @@ function ScubaSounds:InitOptions()
     options.VisibleRows = nil -- from the removed /ss rows command
     options.FirstPotionBought = nil -- from when PotionSeller played once per character
     options.PotionBoughtAt = nil -- from before PotionSeller used its trigger cooldown
+    options.UnsharedTriggers = nil -- from the removed "brought" guild chat post
+    options.UnsharedSounds = nil
     -- Trigger cooldowns over SavedCooldownMin: character -> trigger ID -> server time it can play again. Ended ones
     -- are dropped here
     options.TriggerCooldowns = options.TriggerCooldowns or {}
@@ -267,6 +265,18 @@ function ScubaSounds:IsSoundHeard(sound)
         end
     end
     return false
+end
+
+-- Played on one of this account's characters, from this trigger
+function ScubaSounds:IsHeardOnAccount(sound, triggerId)
+    local soundHeard, triggerHeard = false, false
+    for _, entries in pairs(ScubaSounds_Options.SoundsHeard) do
+        soundHeard = soundHeard or entries[sound] ~= nil
+    end
+    for _, triggers in pairs(ScubaSounds_Options.TriggersHeard) do
+        triggerHeard = triggerHeard or triggers[triggerId] ~= nil
+    end
+    return soundHeard and triggerHeard
 end
 
 -- A trigger's text reveals once it has played for anyone (any of its sounds); a sound shared with another trigger

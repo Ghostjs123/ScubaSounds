@@ -84,7 +84,10 @@ def guild_send_function():
     fn = re.search(r"^function ScubaSounds:SendAddonMessage\(.*?^end$", guild, re.S | re.M).group(0)
     main = open(os.path.join(ADDON, "ScubaSounds.lua"), encoding="utf-8").read()
     data = re.search(r"^ScubaSounds\.Data\.MaxRelayRetries.*?^}$", main, re.S | re.M).group(0)
-    return data + "\n" + fn
+    # The debug log's and the stats audit's hooks, off as they are unless /ss debug log is on or Refresh was pressed
+    hooks = ("ScubaSounds.DebugLog = ScubaSounds.DebugLog or {AddonSend = function() end}\n"
+             "ScubaSounds.StatsAudit = ScubaSounds.StatsAudit or {Send = function() end}")
+    return data + "\n" + hooks + "\n" + fn
 
 
 def new_client(name):

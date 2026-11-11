@@ -44,11 +44,5 @@ S.PrintAwayDiscoveries = function(_, links) for _, l in ipairs(links) do table.i
 S.DiscoveryLink = function(_, sound) return sound end
 S:ReportNewDiscoveries()
 table.insert(out, "away: " .. table.concat(printed, ", "))
--- 6) guildless alt hears a new sound of a trigger the guild knows, then joins
-inGuild = false
-play("LevelUp", "Mario1Up")      -- known: not brought
-play("LevelUp", "PokemonLevelUp") -- new sound
-inGuild = true
-S:AnnounceBroughtDiscoveries()
 return table.concat(out, "\n")
 '''))

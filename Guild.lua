@@ -94,9 +94,28 @@ function ScubaSounds:SendAddonMessage(message, channel, target, onDone, maxRetri
     prefix = prefix or ScubaSounds_ADDON_PREFIX
     -- One queue per destination, so a long report to one player doesn't hold up messages to anyone else
     local queueName = prefix .. channel .. (target or "")
+    local whisperKey = channel == "WHISPER" and target and target:lower()
     local function trySend()
+        if whisperKey then
+            local state = ScubaSounds.State
+            local offlineAt = state.OfflineWhisperTargets[whisperKey]
+            if offlineAt and GetTime() - offlineAt < ScubaSounds.Data.OfflineWhisperPause then
+                if onDone then
+                    onDone()
+                end
+                return
+            end
+            state.AddonWhisperTargets[whisperKey] = GetTime()
+        end
+        ScubaSounds.DebugLog:AddonSend("queued", prefix, message, channel, target)
+        ScubaSounds.StatsAudit:Send("queued", prefix, message, channel, target)
         ChatThrottleLib:SendAddonMessage(prio or "NORMAL", prefix, message, channel, target, queueName,
             function(_, didSend, result)
+                ScubaSounds.DebugLog:AddonSend("answered", prefix, message, channel, target, didSend, result)
+                ScubaSounds.StatsAudit:Send("answered", prefix, message, channel, target, didSend, result)
+                if whisperKey then -- a long queue can hold a whisper well past when it was queued
+                    ScubaSounds.State.AddonWhisperTargets[whisperKey] = GetTime()
+                end
                 if not didSend and ScubaSounds.Data.RetryableSendResults[result] and retries < maxRetries then
                     retries = retries + 1
                     C_Timer.After(1, trySend)
@@ -106,6 +125,127 @@ function ScubaSounds:SendAddonMessage(message, channel, target, onDone, maxRetri
             end)
     end
     trySend()
+end
+
+-- /ss debug comms (see SlashCommands.lua). Test messages start with COMMSTEST, which every client ignores
+function ScubaSounds:TestComms()
+    local data, state = ScubaSounds.Data, ScubaSounds.State
+    local name, surname = UnitName("player")
+    if issecretvalue(name) or not name then
+        ScubaSounds:SendMessage("Comms test: can't read your name")
+        return
+    end
+    local sends = {{"GUILD", nil}, {"WHISPER", name}}
+    if not issecretvalue(surname) and surname and surname ~= "" then
+        table.insert(sends, {"WHISPER", name .. " " .. surname})
+        table.insert(sends, {"WHISPER", name .. "-" .. surname})
+    end
+    if IsInGroup() then
+        table.insert(sends, {IsInRaid() and "RAID" or "PARTY", nil})
+    end
+    -- Longer and longer whispers to ourselves, padded with x, to find the longest that still arrives
+    local whisperTarget = sends[3] and sends[3][2] or name
+    for _, length in ipairs(data.CommsTestLengths) do
+        table.insert(sends, {"WHISPER", whisperTarget, length})
+    end
+    state.CommsTestRun = (state.CommsTestRun or 0) + 1
+    local run, arrived = state.CommsTestRun, 0
+    local frame = state.CommsTestFrame or CreateFrame("Frame")
+    state.CommsTestFrame = frame
+    frame:RegisterEvent("CHAT_MSG_ADDON")
+    frame:SetScript("OnEvent", function(_, _, prefix, message, channel, sender)
+        if issecretvalue(prefix) or issecretvalue(message) then
+            ScubaSounds:SendMessage("Comms test: an addon message arrived, but secret")
+        elseif prefix == ScubaSounds_ADDON_PREFIX and message:find("^COMMSTEST") then
+            arrived = arrived + 1
+            ScubaSounds:SendMessage("Comms test: arrived " .. message:match("^[^x]*") .. " (" .. #message ..
+                                        " characters) on " .. tostring(channel) .. " from " ..
+                                        (issecretvalue(sender) and "<secret>" or tostring(sender)))
+        end
+    end)
+    ScubaSounds:SendMessage("Comms test: in a guild " .. tostring(IsInGuild()) .. ", prefix registered " ..
+                                tostring(C_ChatInfo.IsAddonMessagePrefixRegistered(ScubaSounds_ADDON_PREFIX)))
+    -- A second apart, so the game's throttle can't be what drops one
+    for i, send in ipairs(sends) do
+        C_Timer.After(i - 1, function()
+            local channel, target, length = send[1], send[2], send[3]
+            local message = "COMMSTEST" .. i .. ":" .. channel .. (target and (":" .. target) or "") ..
+                                (length and (":len" .. length .. ":") or "")
+            if length then
+                message = message .. string.rep("x", length - #message)
+            end
+            local ok, result = pcall(C_ChatInfo.SendAddonMessage, ScubaSounds_ADDON_PREFIX, message, channel, target)
+            ScubaSounds:SendMessage("Comms test: sent " .. message:match("^[^x]*") .. " (" .. #message ..
+                                        " characters), game answered " ..
+                                        (ok and tostring(result) or ("error " .. tostring(result))))
+        end)
+    end
+    C_Timer.After(#sends + data.CommsTestWait, function()
+        if run ~= state.CommsTestRun then
+            return
+        end
+        frame:UnregisterAllEvents()
+        ScubaSounds:SendMessage(string.format("Comms test done: %d of %d came back", arrived, #sends))
+    end)
+end
+
+-- /ss debug comms <name>: a stats request whispered to that guildmate, then one to the whole guild a few seconds later,
+-- printing every stats reply that arrives (and from whom, on which channel) for CommsReplyWait seconds. A reply to
+-- the whisper but none to the guild request means our guild messages don't reach anyone
+function ScubaSounds:TestStatsReplies(target)
+    local data, state = ScubaSounds.Data, ScubaSounds.State
+    local character = ScubaSounds:FullName("player")
+    if not character then
+        ScubaSounds:SendMessage("Comms test: can't read your name")
+        return
+    end
+    state.CommsTestRun = (state.CommsTestRun or 0) + 1
+    local run, replies = state.CommsTestRun, {}
+    local startedAt = GetTime()
+    local frame = state.CommsTestFrame or CreateFrame("Frame")
+    state.CommsTestFrame = frame
+    frame:RegisterEvent("CHAT_MSG_ADDON")
+    frame:SetScript("OnEvent", function(_, _, prefix, message, channel, sender)
+        if issecretvalue(prefix) or issecretvalue(message) or prefix ~= ScubaSounds_ADDON_PREFIX then
+            return
+        end
+        local command = message:match("^(%w+):")
+        if command ~= ScubaSounds_StatsCommand then
+            return
+        end
+        local from = issecretvalue(sender) and "<secret>" or tostring(sender)
+        local key = from .. " on " .. tostring(channel)
+        replies[key] = (replies[key] or 0) + 1
+        if replies[key] == 1 then
+            ScubaSounds:SendMessage(string.format("Comms test: stats reply from %s, %.0fs in", key,
+                GetTime() - startedAt))
+        end
+    end)
+    local request = ScubaSounds_StatsRequestCommand .. ":" .. character .. ":v=" ..
+                        tostring(C_AddOns.GetAddOnMetadata("ScubaSounds", "Version"))
+    local function send(channel, whisperTo)
+        local ok, result = pcall(C_ChatInfo.SendAddonMessage, ScubaSounds_ADDON_PREFIX, request, channel, whisperTo)
+        ScubaSounds:SendMessage("Comms test: stats request " .. (whisperTo and ("whispered to " .. whisperTo) or
+                                    ("sent on " .. channel)) .. ", game answered " ..
+                                    (ok and tostring(result) or ("error " .. tostring(result))))
+    end
+    send("WHISPER", target)
+    C_Timer.After(data.CommsGuildRequestDelay, function()
+        if run == state.CommsTestRun then
+            send("GUILD")
+        end
+    end)
+    C_Timer.After(data.CommsReplyWait, function()
+        if run ~= state.CommsTestRun then
+            return
+        end
+        frame:UnregisterAllEvents()
+        local count = 0
+        for _ in pairs(replies) do
+            count = count + 1
+        end
+        ScubaSounds:SendMessage(string.format("Comms test done: replies from %d sender/channel pairs", count))
+    end)
 end
 
 -- Whether a far-away guildmate's death plays: any of them with the guild deaths option on, or with the live raid
@@ -320,13 +460,6 @@ function ScubaSounds:RecordSoundHeard(sound, triggerId)
         triggersHeard[character][triggerId] = now
         newTrigger[triggerId] = now
         ScubaSounds:NoteEarliest("triggers", triggerId, character, now)
-        if not IsInGuild() then
-            -- Nobody's told; joining a guild announces it (see AnnounceBroughtDiscoveries)
-            ScubaSounds_Options.UnsharedTriggers[triggerId] = true
-        end
-    end
-    if not IsInGuild() and (newSound[sound] or newTrigger[triggerId]) then
-        ScubaSounds_Options.UnsharedSounds[triggerId .. "/" .. sound] = true
     end
     entry.count = entry.count + 1
     if (next(newSound) or next(newTrigger)) and IsInGuild() then
@@ -400,8 +533,10 @@ end
 ScubaSounds.GuildEvents[ScubaSounds_StatsRequestCommand] = function(self, playerName)
     local character = ScubaSounds:FullName("player")
     if not character or ScubaSounds:EqualsIgnoreCase(playerName, character) then
+        ScubaSounds.StatsAudit:Handled(playerName, "STATSREQ ignored: our own")
         return
     end
+    ScubaSounds.StatsAudit:Handled(playerName, "STATSREQ: whispering our stats back")
     C_Timer.After(math.random() * ScubaSounds.Data.StatsReplyDelay, function()
         local heard = ScubaSounds_Options.SoundsHeard
         for heardBy, entries in pairs(heard) do
@@ -499,7 +634,6 @@ function ScubaSounds:CheckGuildJoined()
                                  guildName == ScubaSounds_Options.LastGuildName
             ScubaSounds:ReportNewDiscoveries(not rejoined and data.GuildJoinedHeading or nil)
             ScubaSounds:RememberGuildName()
-            ScubaSounds:AnnounceBroughtDiscoveries()
         end)
     end
     state.InGuild = inGuild
@@ -512,92 +646,15 @@ function ScubaSounds:RememberGuildName()
     end
 end
 
--- After joining: the sounds this account found while out of a guild that nobody in the guild had, posted in guild chat
--- as "[Sound (Tab tab)]" links. Guildmates' secrets already unlocked from the sync's stats push. Ones found while in
--- the guild were announced then, so rejoining doesn't repeat them
-function ScubaSounds:AnnounceBroughtDiscoveries()
-    local character = ScubaSounds:FullName("player")
-    if not character or not IsInGuild() then
-        return
-    end
-    local options, data = ScubaSounds_Options, ScubaSounds.Data
-    local unshared, unsharedSounds = options.UnsharedTriggers, options.UnsharedSounds
-    options.UnsharedTriggers, options.UnsharedSounds = {}, {} -- the guild has them now, from the stats push
-    local function isOwn(name)
-        return options.SoundsHeard[name] or options.TriggersHeard[name]
-    end
-    local soundsHeard, triggersHeard = {}, {}
-    for _, entries in pairs(options.SoundsHeard) do
-        for sound in pairs(entries) do
-            soundsHeard[sound] = true
-        end
-    end
-    for _, triggers in pairs(options.TriggersHeard) do
-        for triggerId in pairs(triggers) do
-            triggersHeard[triggerId] = true
-        end
-    end
-    local entries, seen = {}, {}
-    for _, trigger in ipairs(data.Triggers) do
-        local earliest = options.GuildEarliest.triggers[trigger.id]
-        local guildHad = next(options.GuildTriggersHeard[trigger.id] or {}) or (earliest and not isOwn(earliest.name))
-        if unshared[trigger.id] and triggersHeard[trigger.id] and not guildHad then
-            local tabName = ScubaSounds:CategoryName(trigger.category)
-            for _, sound in ipairs(trigger.sounds) do
-                local key = sound .. ":" .. tabName
-                if soundsHeard[sound] and not seen[key] then
-                    seen[key] = true
-                    table.insert(entries, data.ChatSoundFormat:format(sound, tabName))
-                end
-            end
-        end
-    end
-    -- Sounds the guild hadn't heard, from triggers it had already found
-    for _, trigger in ipairs(data.Triggers) do
-        local tabName = ScubaSounds:CategoryName(trigger.category)
-        for _, sound in ipairs(trigger.sounds) do
-            local earliest = options.GuildEarliest.sounds[sound]
-            local guildHad = next(options.GuildHeard[sound] or {}) or (earliest and not isOwn(earliest.name))
-            local key = sound .. ":" .. tabName
-            if unsharedSounds[trigger.id .. "/" .. sound] and soundsHeard[sound] and not guildHad and not seen[key] then
-                seen[key] = true
-                table.insert(entries, data.ChatSoundFormat:format(sound, tabName))
-            end
-        end
-    end
-    if #entries == 0 then
-        return
-    end
-    local heading = #entries == 1 and data.BroughtDiscoveriesMessage[1]:format(character) or
-                        data.BroughtDiscoveriesMessage[2]:format(character, #entries)
-    local messages
-    if #entries > data.MaxListedDiscoveries then
-        messages = {heading:gsub(":$", ".") .. " " .. data.TooManyDiscoveriesNote}
-    else
-        messages = {heading}
-        local perLine = data.NewDiscoveriesPerLine
-        for i = 1, #entries, perLine do
-            table.insert(messages, table.concat(entries, ", ", i, math.min(i + perLine - 1, #entries)))
-        end
-    end
-    for i, message in ipairs(messages) do
-        C_Timer.After((i - 1) * data.GuildChatLineGap, function()
-            ScubaSounds:SendChatWhenAllowed(message, "GUILD")
-        end)
-    end
-end
-
 -- Login push: our own plays go to everyone online right away, not only to those who ask
 -- isLogin: tagged with who logged in, so guildmates already online can list what's new to them (see
--- ReportSyncedDiscoveries). A guild join isn't tagged, and neither is a login with discoveries from outside the guild
--- still to share: their "brought" message covers those
+-- ReportSyncedDiscoveries). A guild join isn't tagged
 function ScubaSounds:PushOwnStats(isLogin)
     if not IsInGuild() then
         return
     end
-    local options = ScubaSounds_Options
     local character = ScubaSounds:FullName("player")
-    local tagged = isLogin and character and not next(options.UnsharedTriggers) and not next(options.UnsharedSounds)
+    local tagged = isLogin and character
     local headerFields = tagged and ";login=" .. character:gsub("[:;=]", "") or nil
     for heardBy, entries in pairs(ScubaSounds_Options.SoundsHeard) do
         ScubaSounds:SendStatsReport(heardBy, entries, ScubaSounds_Options.TriggersHeard[heardBy] or {}, "GUILD", nil, nil,
@@ -608,6 +665,7 @@ end
 ScubaSounds.GuildEvents[ScubaSounds_StatsCommand] = function(self, playerName, fields)
     -- This account's own characters are read straight from SoundsHeard
     if ScubaSounds_Options.SoundsHeard[playerName] then
+        ScubaSounds.StatsAudit:Handled(playerName, "STATS ignored: one of this account's characters")
         return
     end
     local function remember(heardBy, key, first)
@@ -642,6 +700,11 @@ ScubaSounds.GuildEvents[ScubaSounds_StatsCommand] = function(self, playerName, f
             end
         end
     end
+    local stored = {
+        sounds = 0,
+        triggers = 0,
+        unknown = 0
+    }
     for key, first in pairs(fields) do
         if type(first) == "number" then
             local triggerId = key:match("^@(.+)$")
@@ -649,13 +712,20 @@ ScubaSounds.GuildEvents[ScubaSounds_StatsCommand] = function(self, playerName, f
                 if ScubaSounds.Data.TriggersById[triggerId] then
                     remember(ScubaSounds_Options.GuildTriggersHeard, triggerId, first)
                     ScubaSounds:NoteEarliest("triggers", triggerId, playerName, first)
+                    stored.triggers = stored.triggers + 1
+                else
+                    stored.unknown = stored.unknown + 1
                 end
             elseif ScubaSounds.Audio.SoundInfo[key] then
                 remember(ScubaSounds_Options.GuildHeard, key, first)
                 ScubaSounds:NoteEarliest("sounds", key, playerName, first)
+                stored.sounds = stored.sounds + 1
+            elseif key ~= "t" and key ~= "v" then
+                stored.unknown = stored.unknown + 1
             end
         end
     end
+    ScubaSounds.StatsAudit:Handled(playerName, "STATS stored", stored)
     ScubaSounds_Options.GuildReporters[playerName] = GetServerTime()
     ScubaSounds:RefreshStatsPage()
     ScubaSounds:RefreshShownCategoryPage()
@@ -894,6 +964,27 @@ function ScubaSounds:LinkBracketedSounds(message)
     end))
 end
 
+-- The game's "No player named '%s' is currently playing." about someone we whispered an addon message to recently. Each
+-- whisper still queued to them would print it again, so they're paused too
+function ScubaSounds:IsAddonWhisperError(message)
+    if issecretvalue(message) or type(message) ~= "string" or not ERR_CHAT_PLAYER_NOT_FOUND_S then
+        return false
+    end
+    local pattern = "^" .. ERR_CHAT_PLAYER_NOT_FOUND_S:gsub("[%^%$%(%)%%%.%[%]%*%+%-%?]", "%%%0"):gsub("%%%%s", "(.+)") ..
+                        "$"
+    local name = message:match(pattern)
+    if not name then
+        return false
+    end
+    local key, state = name:lower(), ScubaSounds.State
+    local whisperedAt = state.AddonWhisperTargets[key]
+    if not whisperedAt or GetTime() - whisperedAt > ScubaSounds.Data.AddonWhisperErrorWindow then
+        return false
+    end
+    state.OfflineWhisperTargets[key] = GetTime()
+    return true
+end
+
 function ScubaSounds:SetUpDiscoveryLinks()
     local data = ScubaSounds.Data
     local function linkFilter(pattern)
@@ -922,6 +1013,9 @@ function ScubaSounds:SetUpDiscoveryLinks()
     for _, event in ipairs(data.ChatSoundEvents) do
         ChatFrame_AddMessageEventFilter(event, bracketFilter)
     end
+    ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", function(_, _, message)
+        return ScubaSounds:IsAddonWhisperError(message)
+    end)
     -- Our links never reach the game's own handling, which doesn't know them
     local setItemRef = SetItemRef
     SetItemRef = function(link, ...)

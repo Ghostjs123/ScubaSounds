@@ -6,3 +6,5 @@ Secret price: silent
 Horse (big loot from Me-X): TakeMyMoney
 guildmate's big loot, nothing bought here: HelloThere
 we buy a horse while a guildmate loots big: TakeMyMoney, OhBabyATriple
+Horse: TakeMyMoney
+Arrows x200: silent

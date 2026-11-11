@@ -59,6 +59,13 @@ function ScubaSounds:IsItemLinkEnchanted(itemLink)
     return false
 end
 
+-- C_UnitAuras.GetAuraDataByIndex, or nil past the last aura. While auras are secret (combat, encounters) the call
+-- throws instead of returning a secret, so that ends the list too
+function ScubaSounds:AuraByIndex(unit, index, filter)
+    local ok, aura = pcall(C_UnitAuras.GetAuraDataByIndex, unit, index, filter)
+    return ok and aura or nil
+end
+
 function ScubaSounds:FindAura(unit, spellId, filter)
     if unit == "player" then
         -- In encounters this may come back secret, which can't even be tested; treat it as not found
@@ -69,7 +76,7 @@ function ScubaSounds:FindAura(unit, spellId, filter)
         return aura
     end
     for i = 1, 40 do
-        local aura = C_UnitAuras.GetAuraDataByIndex(unit, i, filter)
+        local aura = ScubaSounds:AuraByIndex(unit, i, filter)
         if not aura then
             return nil
         end

@@ -5,7 +5,3 @@ chat: Me-X discovered a sound: [SunshineShineGet (Level Ups tab)] (Download Scub
 chat: Me-X discovered a sound: [GoodBoy (Misc tab)] (Download ScubaSounds)
 chat: Me-X discovered a sound: [PapaMeat (Misc tab)] (Download ScubaSounds)
 away: ZeldaItemGet
-chat: Me-X discovered a sound: [BigJobHuh (Level Ups tab)] (Download ScubaSounds)
-chat: Me-X discovered a sound: [PokemonLevelUp (Level Ups tab)] (Download ScubaSounds)
-chat: Me-X brought 2 sound discoveries:
-chat: [BigJobHuh (Level Ups tab)], [PokemonLevelUp (Level Ups tab)]

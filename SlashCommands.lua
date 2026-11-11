@@ -329,6 +329,16 @@ function ScubaSounds:DebugCommand(words)
         else
             ScubaSounds:ToggleDebugLog()
         end
+    elseif words[2] == "comms" then
+        -- /ss debug comms: hidden test messages to ourselves, on the guild channel (which comes back to the sender) and
+        -- whispered to each way our name could be written, sent straight to the game. Prints what the game answered
+        -- for each, then what arrives on a listener of its own for CommsTestWait seconds
+        -- /ss debug comms <name>: a stats request to that guildmate and then the guild, printing who replies
+        if words[3] then
+            ScubaSounds:TestStatsReplies(table.concat(words, " ", 3))
+        else
+            ScubaSounds:TestComms()
+        end
     else
         local commands = {{"/ss debug chatlink <sound>", "the sound's link for each of its tabs"},
                           {"/ss debug discovery <sound>", "the guild message posted when it's first unlocked, with and without the addon"},
@@ -342,11 +352,15 @@ function ScubaSounds:DebugCommand(words)
                            "record raid, loot, trade and vendor events for raid tracking (or delete them)"},
                           {"/ss debug log [clear]",
                            "record game events and why each sound did or didn't play, to find what's broken " ..
-                               "(or delete them)"}}
-        -- Only officers know it exists, heading included
-        local heading = "Debug commands (only print here, nothing is sent or unlocked):"
+                               "(or delete them)"},
+                          {"/ss debug comms",
+                           "send a few hidden test messages to yourself and print which come back, to see if " ..
+                               "guildmates' addons can reach you"},
+                          {"/ss debug comms <name>",
+                           "ask that guildmate, then the guild, for their sound stats and print who answers"}}
+        local heading = "Debug commands (only print here, nothing is unlocked or sent unless it says so):"
+        -- Only officers know it exists
         if ScubaSounds.Raids:IsOfficer() then
-            heading = "Debug commands (only print here, nothing is sent or unlocked, unless it says so):"
             table.insert(commands, {"/ss debug liveraid",
                                     "send a test Blackwing Lair clear to the whole guild over a minute (deletes itself)"})
         end

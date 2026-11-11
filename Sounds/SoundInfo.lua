@@ -147,6 +147,13 @@ ScubaSounds.Audio.SoundInfo = {
         canOverlapSelf = false,
         timeout = 1
     },
+    ["CampfireSong"] = {
+        extension = "ogg",
+        duration = 5,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Kaymon"
+    },
     ["Cavern"] = {
         extension = "wav",
         duration = 1,
@@ -340,6 +347,13 @@ ScubaSounds.Audio.SoundInfo = {
         timeout = 1,
         credit = "Shib"
     },
+    ["GoodnightEverybody"] = {
+        extension = "ogg",
+        duration = 1,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Kaymon"
+    },
     ["Goofy"] = {
         extension = "wav",
         duration = 2,
@@ -437,6 +451,13 @@ ScubaSounds.Audio.SoundInfo = {
         duration = 1,
         canOverlapSelf = false,
         timeout = 1
+    },
+    ["ImTired"] = {
+        extension = "ogg",
+        duration = 4,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Kaymon"
     },
     ["Irrelevant"] = {
         extension = "ogg",
@@ -888,12 +909,33 @@ ScubaSounds.Audio.SoundInfo = {
         timeout = 300,
         formerUse = "Used to play for the whole raid when it pulled C'Thun"
     },
+    ["Sleep"] = {
+        extension = "ogg",
+        duration = 4,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Kaymon"
+    },
     ["Snake"] = {
         extension = "ogg",
         duration = 4,
         canOverlapSelf = false,
         timeout = 1,
         credit = "Shib"
+    },
+    ["Snore"] = {
+        extension = "ogg",
+        duration = 5,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Kaymon"
+    },
+    ["StayAwhile"] = {
+        extension = "ogg",
+        duration = 6,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Keyteor"
     },
     ["StoleThatShit"] = {
         extension = "ogg",
@@ -919,6 +961,13 @@ ScubaSounds.Audio.SoundInfo = {
     ["SurpriseMotherfucker"] = {
         extension = "ogg",
         duration = 2,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Kaymon"
+    },
+    ["SweetDreams"] = {
+        extension = "ogg",
+        duration = 8,
         canOverlapSelf = false,
         timeout = 1,
         credit = "Kaymon"

@@ -1,0 +1,6 @@
+-- guild found it, first time here: linked
+our chat: First time you've heard !cff71d5ff!Hscubasounds:Mario1Up:Level Ups!h!TInterface\Buttons\UI-SpellbookIcon-NextPage-Up:0!t[Mario1Up (Level Ups tab)]!h!r
+-- second time: nothing
+-- nobody heard it: the discovery line instead
+guild chat: Me-X discovered a sound: [FF7Victory (Level Ups tab)] (Download ScubaSounds)
+-- heard on an alt: nothing

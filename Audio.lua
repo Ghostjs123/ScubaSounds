@@ -307,7 +307,13 @@ function ScubaSounds:PlayTrigger(triggerId, pickedSound, ctx)
     end
     -- A trigger nobody has set off yet, or a sound nobody has heard yet (a found trigger can still hold new sounds)
     local isFirstDiscovery = ScubaSounds:IsHiddenSecret(trigger) or not ScubaSounds:IsSoundHeard(sound)
+    -- New to this account but found before by a guildmate: no discovery line, so our chat gets a link to read it from
+    local isFirstPlayHere = not isFirstDiscovery and not ScubaSounds:IsHeardOnAccount(sound, trigger.id)
     ScubaSounds:RecordSoundHeard(sound, trigger.id)
+    if isFirstPlayHere then
+        local link = ScubaSounds:DiscoveryLink(sound, ScubaSounds:CategoryName(trigger.category))
+        ScubaSounds:SendMessage(ScubaSounds.Data.FirstPlayHereMessage:format(link))
+    end
     local recentPlays = ScubaSounds_Options.RecentPlays
     table.insert(recentPlays, 1, {
         sound = sound,

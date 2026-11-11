@@ -159,7 +159,7 @@ function ScubaSounds:CheckBlinded()
     local data = ScubaSounds.Data
     local blinded = false
     for i = 1, 40 do
-        local aura = C_UnitAuras.GetAuraDataByIndex("player", i, "HARMFUL")
+        local aura = ScubaSounds:AuraByIndex("player", i, "HARMFUL")
         if not aura then
             break
         end
@@ -499,7 +499,7 @@ function ScubaSounds:HasCampfireNearby()
         return true
     end
     for i = 1, 40 do
-        local aura = C_UnitAuras.GetAuraDataByIndex("player", i, "HELPFUL")
+        local aura = ScubaSounds:AuraByIndex("player", i, "HELPFUL")
         if not aura then
             return false
         end
@@ -528,7 +528,7 @@ function ScubaSounds:HandlePlayerAura()
     local gained = {}
     local gainedNames = {}
     for i = 1, 40 do
-        local aura = C_UnitAuras.GetAuraDataByIndex("player", i, "HELPFUL")
+        local aura = ScubaSounds:AuraByIndex("player", i, "HELPFUL")
         if not aura then
             break
         end
@@ -1066,7 +1066,8 @@ function ScubaSounds:HandleLoot(lootMessage)
                             itemLink:find("|cffff8000") ~= nil
     if (isLegendary or ScubaSounds:Contains(ScubaSounds.Data.BigItemIdsMap, tostring(itemId))) and
         not ScubaSounds:IsItemLinkEnchanted(itemLink) then
-        if IsInGuild() then
+        -- Guildmates would hear it with nothing in chat to explain it, so it stays quiet with guild messages off
+        if IsInGuild() and ScubaSounds_Options[ScubaSounds_SendGuildMessages] then
             ScubaSounds:SendGuildMessage(ScubaSounds_LegendaryReceivedCommand .. ":" .. ScubaSounds:FullName("player") ..
                                              ":" .. itemLink, nil, "ALERT")
         end
@@ -1233,7 +1234,7 @@ function ScubaSounds:HookMerchantBuys()
     end
     hooksecurefunc("BuyMerchantItem", function(index)
         ScubaSounds:CheckExpensivePurchase(index)
-        local link = GetMerchantItemLink(index)
+        local link = GetMerchantItemLink and GetMerchantItemLink(index)
         if issecretvalue(link) or not link then
             return
         end
@@ -1247,7 +1248,17 @@ end
 -- A vendor item costing over ExpensiveItemMinPrice each (the price shown is for its stack). Remembered so the big-loot
 -- sound for the same item stays quiet here (see the BigLoot trigger); the rest of the guild still hears it
 function ScubaSounds:CheckExpensivePurchase(index)
-    local _, _, price, stackCount = GetMerchantItemInfo(index)
+    local price, stackCount
+    -- Forever's client has only the C_MerchantFrame version, which returns a table
+    if C_MerchantFrame and C_MerchantFrame.GetItemInfo then
+        local info = C_MerchantFrame.GetItemInfo(index)
+        if issecretvalue(info) or type(info) ~= "table" then
+            return
+        end
+        price, stackCount = info.price, info.stackCount
+    elseif GetMerchantItemInfo then
+        price, stackCount = select(3, GetMerchantItemInfo(index))
+    end
     if issecretvalue(price) or issecretvalue(stackCount) or type(price) ~= "number" then
         return
     end

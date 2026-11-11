@@ -22,12 +22,6 @@ S:PushOwnStats(true)
 local tagged = 0
 for _, m in ipairs(sent) do if m:find(";login=Kay Mon%-X", 1) then tagged = tagged + 1 end end
 local out = {"login push: " .. #sent .. " messages, " .. tagged .. " tagged, longest " .. (function() local n = 0 for _, m in ipairs(sent) do n = math.max(n, #m) end return n end)()}
-sent = {}
-ScubaSounds_Options.UnsharedSounds = {["LevelUp/Mario1Up"] = true}
-S:PushOwnStats(true)
-tagged = 0
-for _, m in ipairs(sent) do if m:find("login=", 1, true) then tagged = tagged + 1 end end
-table.insert(out, "with unshared discoveries: " .. tagged .. " tagged")
 local fields = S:ParseFields(("STATS:Kay Mon-X:v=1.0;login=Kay Mon-X;Brando=5"):match("^%w+:[^:]+:(.*)$"))
 table.insert(out, "parsed login=" .. tostring(fields.login) .. " Brando=" .. tostring(fields.Brando))
 return table.concat(out, "\n")

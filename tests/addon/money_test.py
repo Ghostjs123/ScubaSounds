@@ -26,6 +26,7 @@ S.SendMessage = function() end
 S.FullName = function() return me end
 S.IsOwnName = function(_, n) return n == me end
 local hooks, items = {}, {}
+C_MerchantFrame = {} -- the classic client's GetMerchantItemInfo first; Forever's is below
 BuyMerchantItem = function() end
 hooksecurefunc = function(name, f) hooks[name] = f end
 GetMerchantItemInfo = function(i) local it = items[i]; return it.name, 0, it.price, it.stack end
@@ -56,5 +57,10 @@ now = now + 30; heard = {}
 hooks.BuyMerchantItem(1, 1)
 S:HandleAddonMessage(ScubaSounds_ADDON_PREFIX, ScubaSounds_LegendaryReceivedCommand .. ":Mate-X:[item]")
 table.insert(out, "we buy a horse while a guildmate loots big: " .. table.concat(heard, ", "))
+-- Forever: only C_MerchantFrame.GetItemInfo, which returns a table, and no GetMerchantItemLink
+GetMerchantItemInfo, GetMerchantItemLink = nil, nil
+C_MerchantFrame = {GetItemInfo = function(i) local it = items[i]; return {name = it.name, price = it.price, stackCount = it.stack} end}
+now = now + 30; buy(1)
+buy(2)
 return table.concat(out, "\n")
 '''))

@@ -137,6 +137,12 @@ local function sessionStart()
     if exists("IsInInstance") then
         inInstance, instanceType = IsInInstance()
     end
+    local prefixes = {}
+    if exists("C_ChatInfo.IsAddonMessagePrefixRegistered") then
+        for _, prefix in ipairs({ScubaSounds_ADDON_PREFIX, "SSLedger"}) do
+            prefixes[prefix] = clean(C_ChatInfo.IsAddonMessagePrefixRegistered(prefix))
+        end
+    end
     wipe(detailed)
     record("SESSION_START", {
         build = exists("GetBuildInfo") and pack(GetBuildInfo()) or "<missing>",
@@ -148,7 +154,12 @@ local function sessionStart()
         playOutsideRaid = clean(ScubaSounds_PlayOutsideRaid and options[ScubaSounds_PlayOutsideRaid]),
         tabsOff = tabsOff,
         soundsOff = clean(options.SoundsOff),
-        instance = pack(inInstance, instanceType)
+        instance = pack(inInstance, instanceType),
+        unitName = exists("UnitName") and pack(UnitName("player")) or nil,
+        inGuild = exists("IsInGuild") and clean(IsInGuild()) or nil,
+        guild = exists("GetGuildInfo") and pack(GetGuildInfo("player")) or nil,
+        guildMembers = exists("GetNumGuildMembers") and pack(GetNumGuildMembers()) or nil,
+        prefixesRegistered = prefixes
     })
 end
 
@@ -233,6 +244,36 @@ function DebugLog:SoundFile(path, kind, ...)
         path = path,
         kind = kind,
         result = pack(...)
+    })
+end
+
+-- An addon message we're sending: once when it's queued, then again with what the game answered (result is an
+-- Enum.SendAddonMessageResult; 0 is success). A queued message with no answer never left ChatThrottleLib
+function DebugLog:AddonSend(stage, prefix, message, channel, target, didSend, result)
+    if not self.on then
+        return
+    end
+    safely(record, "ADDON_SEND", {
+        stage = stage,
+        prefix = prefix,
+        channel = channel,
+        target = clean(target),
+        message = clean(message),
+        didSend = clean(didSend),
+        result = clean(result)
+    })
+end
+
+-- An addon message arriving with one of our prefixes, every one of them (the game event log keeps only the first few)
+function DebugLog:AddonReceive(prefix, message, channel, sender)
+    if not self.on then
+        return
+    end
+    safely(record, "ADDON_RECEIVE", {
+        prefix = clean(prefix),
+        channel = clean(channel),
+        sender = clean(sender),
+        message = clean(message)
     })
 end
 

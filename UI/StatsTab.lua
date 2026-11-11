@@ -61,6 +61,7 @@ function ScubaSounds:CreateStatsPage(frame)
     -- Once per opening of the window, so it can't be spammed
     ui.AskButton:SetScript("OnClick", function(self)
         self:Disable()
+        ScubaSounds.StatsAudit:Start()
         ScubaSounds:RequestStats()
     end)
     frame:HookScript("OnHide", function()

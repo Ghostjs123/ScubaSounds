@@ -693,11 +693,19 @@ AddTrigger("MissingItem", "Misc", "WW91IHRyeSB0byB1c2Ugc29tZXRoaW5nIHdpdGhvdXQgd
     newInForever = true
 })
 
-AddTrigger("Campfire", "Misc", "WW91IGNhc3QgQmFzaWMgQ2FtcGZpcmU=", {"LookLook", "LambSauce", "BeforeWar"}, {
+AddTrigger("Campfire", "Misc", "WW91IGNhc3QgQmFzaWMgQ2FtcGZpcmU=", {"LookLook", "LambSauce", "BeforeWar", "StayAwhile", "CampfireSong"}, {
     on = "SpellCast",
     when = function(cast)
         return cast.isPlayer and (cast.spellId == Data.BasicCampfireSpellId or
                    ScubaSounds:EqualsIgnoreCase(cast.spellName, Data.BasicCampfireSpellName))
+    end,
+    newInForever = true
+})
+
+AddTrigger("SleepingBag", "Misc", "WW91IHVucm9sbCBhIHNsZWVwaW5nIGJhZw==", {"SweetDreams", "GoodnightEverybody", "ImTired", "Sleep", "Snore"}, {
+    on = "SpellCast",
+    when = function(cast)
+        return cast.isPlayer and cast.spellId == Data.UnrollBagSpellId
     end,
     newInForever = true
 })

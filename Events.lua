@@ -729,6 +729,9 @@ function ScubaSounds:HandleRollMessage(message)
 end
 
 function ScubaSounds.Events:CHAT_MSG_ADDON(prefix, message, channel, sender)
+    if prefix == ScubaSounds_ADDON_PREFIX or prefix == "SSLedger" then
+        ScubaSounds.DebugLog:AddonReceive(prefix, message, channel, sender)
+    end
     ScubaSounds:HandleAddonMessage(prefix, message)
 end
 
@@ -763,8 +766,6 @@ function ScubaSounds.Events:PLAYER_ENTERING_WORLD(isInitialLogin, isReloadingUI)
         C_Timer.After(ScubaSounds.Data.NewDiscoveriesDelay, function()
             ScubaSounds:ReportNewDiscoveries()
             ScubaSounds:RememberGuildName()
-            -- e.g. an alt played outside the guild since; nothing if everything's been shared
-            ScubaSounds:AnnounceBroughtDiscoveries()
         end)
     end
     ScubaSounds.Events:GROUP_ROSTER_UPDATE()
