@@ -665,8 +665,10 @@ function ScubaSounds:BuildOptionsFrame()
         table.insert(tabNames, category.name)
         newTabRows[#tabNames] = category.newTabRow
         maxContentHeight = math.max(maxContentHeight, contentHeight)
-        -- Raids comes right after Notable Loot, then the officers' tab (which only officers have)
+        -- Dungeons and Raids come right after Notable Loot, then the officers' tab (which only officers have)
         if category.notableLoot then
+            table.insert(ScubaSounds.UI.Pages, ScubaSounds:CreateDungeonsPage(frame))
+            table.insert(tabNames, "Dungeons")
             table.insert(ScubaSounds.UI.Pages, ScubaSounds:CreateRaidsPage(frame))
             table.insert(tabNames, "Raids")
             table.insert(ScubaSounds.UI.Pages, ScubaSounds:CreateOfficerPage(frame))

@@ -5,7 +5,7 @@ import sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 OPTIONS_FILES = ["UI\\Options.lua", "UI\\NotableLootTab.lua", "UI\\PopupMenu.lua", "UI\\RaidsTab.lua",
-                 "UI\\OfficerTab.lua", "UI\\StatsTab.lua", "UI\\OptionsTab.lua"]
+                 "UI\\DungeonsTab.lua", "UI\\OfficerTab.lua", "UI\\StatsTab.lua", "UI\\OptionsTab.lua"]
 
 
 def addon_path():

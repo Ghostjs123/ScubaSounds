@@ -31,10 +31,12 @@ RaidTracking\Ledger\LedgerSync.lua
 RaidTracking\Ledger\Ledger.lua
 RaidTracking\RaidEntries.lua
 RaidTracking\RaidReplay.lua
+RaidTracking\DungeonReplay.lua
 RaidTracking\RaidSample.lua
 RaidTracking\RaidEquip.lua
 RaidTracking\Raids.lua
 RaidTracking\RaidRecorder.lua
+RaidTracking\Dungeons.lua
 RaidTracking\RaidLiveTest.lua
 SlashCommands.lua
 UI\MinimapButton.lua
@@ -43,6 +45,7 @@ UI\Options.lua
 UI\NotableLootTab.lua
 UI\PopupMenu.lua
 UI\RaidsTab.lua
+UI\DungeonsTab.lua
 UI\OfficerTab.lua
 UI\LootRolesPrompt.lua
 UI\StatsTab.lua

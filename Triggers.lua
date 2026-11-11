@@ -702,6 +702,11 @@ AddTrigger("Campfire", "Misc", "WW91IGNhc3QgQmFzaWMgQ2FtcGZpcmU=", {"LookLook", 
     newInForever = true
 })
 
+AddTrigger("WellFedExpired", "Misc", "WW91ciBXZWxsIEZlZCBidWZmIHJ1bnMgb3V0", {"FeedMeCowboy", "Donut", "Snickers", "MyTummy", "ImHungry"}, {
+    on = "WellFedExpired",
+    newInForever = true
+})
+
 AddTrigger("SleepingBag", "Misc", "WW91IHVucm9sbCBhIHNsZWVwaW5nIGJhZw==", {"SweetDreams", "GoodnightEverybody", "ImTired", "Sleep", "Snore"}, {
     on = "SpellCast",
     when = function(cast)

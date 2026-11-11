@@ -395,6 +395,7 @@ function ScubaSounds.Events:PLAYER_DEAD()
     ScubaSounds.State.ResurrectRequested = false
     ScubaSounds.State.DeadOnCorpse = true
     ScubaSounds.State.KillStreak = 0
+    ScubaSounds.State.WellFedExpires = nil -- dying took it, so it didn't run out
     ScubaSounds:HandlePlayerDeath()
 end
 
@@ -440,6 +441,7 @@ end
 
 function ScubaSounds.Events:PLAYER_REGEN_ENABLED()
     ScubaSounds:HandleCombatEnded()
+    ScubaSounds:CheckWellFed() -- it may have run out while combat hid our buffs
     if ScubaSounds.State.PetLevelChangedAt then
         ScubaSounds:CheckPetLevelUp("combat ended")
     end

@@ -108,6 +108,14 @@ function ScubaSounds:InitOptions()
     if options.RaidRecentOnly == nil then
         options.RaidRecentOnly = true
     end
+    -- Dungeons tab: runs open (run ID -> true), bosses closed ("run|boss" -> true), the dungeon filter (a dungeon's
+    -- name, or "all") and its "Last 4 months only" checkbox
+    options.DungeonsOpen = options.DungeonsOpen or {}
+    options.DungeonBossesClosed = options.DungeonBossesClosed or {}
+    options.DungeonFilter = options.DungeonFilter or "all"
+    if options.DungeonRecentOnly == nil then
+        options.DungeonRecentOnly = true
+    end
     -- The officers' tab: Characters or People, the sorted column, raids that don't count (raid name -> true) and its own
     -- "Last 4 months only"
     options.OfficerView = options.OfficerView or "characters"

@@ -233,6 +233,13 @@ ScubaSounds.Audio.SoundInfo = {
         timeout = 1,
         credit = "Kaymon"
     },
+    ["Donut"] = {
+        extension = "ogg",
+        duration = 3,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Kaymon"
+    },
     ["DownTheWell"] = {
         extension = "ogg",
         duration = 3,
@@ -270,6 +277,13 @@ ScubaSounds.Audio.SoundInfo = {
         duration = 1,
         canOverlapSelf = false,
         timeout = 1
+    },
+    ["FeedMeCowboy"] = {
+        extension = "ogg",
+        duration = 3,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Kaymon"
     },
     ["FirstBeer"] = {
         extension = "ogg",
@@ -438,6 +452,13 @@ ScubaSounds.Audio.SoundInfo = {
         canOverlapSelf = false,
         timeout = 30,
         formerUse = "Used to play when entering Ahn'Qiraj (picks 1 of 4 with ComeOnYouApes, DisableHisHand and Cavern)"
+    },
+    ["ImHungry"] = {
+        extension = "ogg",
+        duration = 2,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Kaymon"
     },
     ["ImNano"] = {
         extension = "ogg",
@@ -616,6 +637,13 @@ ScubaSounds.Audio.SoundInfo = {
         duration = 1,
         canOverlapSelf = false,
         timeout = 1
+    },
+    ["MyTummy"] = {
+        extension = "ogg",
+        duration = 2,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Kaymon"
     },
     ["Nice"] = {
         extension = "ogg",
@@ -922,6 +950,13 @@ ScubaSounds.Audio.SoundInfo = {
         canOverlapSelf = false,
         timeout = 1,
         credit = "Shib"
+    },
+    ["Snickers"] = {
+        extension = "ogg",
+        duration = 3,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Kaymon"
     },
     ["Snore"] = {
         extension = "ogg",

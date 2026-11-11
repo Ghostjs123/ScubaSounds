@@ -296,6 +296,11 @@ ScubaSounds.Data.WolfFamilyName = "Wolf" -- UnitCreatureFamily for wolves and wo
 -- Camping: resting emotes near a campfire earn its buffs. Matched by ID or name like the spells above
 ScubaSounds.Data.CampfireNearbySpellId = 1283391
 ScubaSounds.Data.CampfireNearbyName = "Campfire Nearby"
+-- Well Fed counts as run out when it's gone no earlier than this many seconds before it was due to end. Gone, it's
+-- checked again this long after, in case eating again just replaced it
+ScubaSounds.Data.WellFedName = "Well Fed"
+ScubaSounds.Data.WellFedExpiryGrace = 2 -- seconds
+ScubaSounds.Data.WellFedRecheckDelay = 1 -- seconds
 ScubaSounds.Data.CampRestEmotes = {
     SIT = true,
     SLEEP = true,

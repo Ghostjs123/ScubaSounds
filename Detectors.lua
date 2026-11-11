@@ -510,8 +510,67 @@ function ScubaSounds:HasCampfireNearby()
     return false
 end
 
+-- Our Well Fed buff (matched by name: every food's has its own spell ID). Returns whether the buffs could be read, and
+-- its expiration (GetTime) when it's there. Combat can hide buffs, and then nothing about it can be told
+local function ReadWellFed()
+    local name = ScubaSounds.Data.WellFedName
+    for i = 1, 40 do
+        local ok, aura = pcall(C_UnitAuras.GetAuraDataByIndex, "player", i, "HELPFUL")
+        if not ok then
+            return false
+        end
+        if not aura then
+            return true, nil
+        end
+        if issecretvalue(aura.name) then
+            return false
+        end
+        if type(aura.name) == "string" and ScubaSounds:EqualsIgnoreCase(aura.name, name) then
+            local expires = aura.expirationTime
+            if issecretvalue(expires) then
+                return false
+            end
+            return true, type(expires) == "number" and expires > 0 and expires or nil
+        end
+    end
+    return true, nil
+end
+
+-- Well Fed running out on its own: gone at about the time it was due to end. Taken off early (right-click, dying) it
+-- stays quiet. Gone while buffs were hidden, it's noticed once they can be read again, after combat. Eating again
+-- replaces it, so a gap that short is checked again a moment later
+function ScubaSounds:CheckWellFed()
+    local state, data = ScubaSounds.State, ScubaSounds.Data
+    local readable, expires = ReadWellFed()
+    if not readable then
+        return
+    end
+    if expires then
+        state.WellFedExpires = expires
+        return
+    end
+    local due = state.WellFedExpires
+    if not due then
+        return
+    end
+    if GetTime() < due - data.WellFedExpiryGrace then
+        state.WellFedExpires = nil -- taken off early
+        return
+    end
+    C_Timer.After(data.WellFedRecheckDelay, function()
+        local stillReadable, back = ReadWellFed()
+        local dead = UnitIsDeadOrGhost("player")
+        if not stillReadable or back or issecretvalue(dead) or dead or state.WellFedExpires ~= due then
+            return
+        end
+        state.WellFedExpires = nil
+        ScubaSounds:Fire("WellFedExpired")
+    end)
+end
+
 function ScubaSounds:HandlePlayerAura()
     ScubaSounds:CheckDismount()
+    ScubaSounds:CheckWellFed()
     if ScubaSounds.State.RestedAtThisCampfire and not ScubaSounds:HasCampfireNearby() then
         ScubaSounds.State.RestedAtThisCampfire = false -- left the campfire
     end

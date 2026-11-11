@@ -42,6 +42,8 @@ function SlashCmdList.SCUBASOUNDS(args)
         ScubaSounds:ShowOptionsTab("Stats")
     elseif words[1] == "raids" or words[1] == "r" then
         ScubaSounds:ShowOptionsTab("Raids")
+    elseif words[1] == "dungeons" then
+        ScubaSounds:ShowOptionsTab("Dungeons")
     elseif words[1] == "o" or ScubaSounds:HasValue(words, "options") or ScubaSounds:HasValue(words, "option") then
         ScubaSounds:ShowOptionsTab("Options")
     elseif ScubaSounds:HasValue(words, "on") then
@@ -53,6 +55,7 @@ function SlashCmdList.SCUBASOUNDS(args)
             {"/ss", "open the ScubaSounds window"},
             {"/ss options (or /ss o)", "open the window on the Options tab"},
             {"/ss stats", "open the window on the Stats tab"},
+            {"/ss dungeons", "open the window on the Dungeons tab"},
             {"/ss raids (or /ss r)", "open the window on the Raids tab"},
             {"/ss on", "turn sounds on"},
             {"/ss off", "turn sounds off"},

@@ -1,5 +1,5 @@
 Loot: 14 chance boxes (expected 1 groups + 13 single-sound rows)
-Misc: 46 chance boxes (expected 8 groups + 38 single-sound rows)
+Misc: 47 chance boxes (expected 9 groups + 38 single-sound rows)
 PlayerDeaths: 35 chance boxes (expected 8 groups + 27 single-sound rows)
 LevelUps: 1 chance boxes (expected 1 groups + 0 single-sound rows)
 after typing 50 in the EpicRoll group box: saved 50, Sheesh 50, ZeldaItem 50

@@ -1,0 +1,10 @@
+runs out: played x1
+right-clicked off early: quiet
+eating again replaces it: quiet
+the new one runs out: played x1
+ran out in combat, still in combat: quiet
+combat ends: played x1
+died in combat: quiet
+still hidden after combat: quiet
+readable again: played x1
+never had it: quiet

@@ -1,5 +1,5 @@
-sounds on:  Misc tab toggle enabled, sound checkboxes 63/63 enabled, chance boxes 46/46 enabled, Options sound settings [on on on on on on], Disable Sounds checkbox enabled
-sounds off: Misc tab toggle DISABLED, sound checkboxes 0/63 enabled, chance boxes 0/46 enabled, Options sound settings [off off off off off off], Disable Sounds checkbox enabled
-on again:   Misc tab toggle enabled, sound checkboxes 63/63 enabled, chance boxes 46/46 enabled, Options sound settings [on on on on on on], Disable Sounds checkbox enabled
-far-away deaths on: Misc tab toggle enabled, sound checkboxes 63/63 enabled, chance boxes 46/46 enabled, Options sound settings [on on on off on on], Disable Sounds checkbox enabled
-far-away deaths off: Misc tab toggle enabled, sound checkboxes 63/63 enabled, chance boxes 46/46 enabled, Options sound settings [on on on on on on], Disable Sounds checkbox enabled
+sounds on:  Misc tab toggle enabled, sound checkboxes 68/68 enabled, chance boxes 47/47 enabled, Options sound settings [on on on on on on], Disable Sounds checkbox enabled
+sounds off: Misc tab toggle DISABLED, sound checkboxes 0/68 enabled, chance boxes 0/47 enabled, Options sound settings [off off off off off off], Disable Sounds checkbox enabled
+on again:   Misc tab toggle enabled, sound checkboxes 68/68 enabled, chance boxes 47/47 enabled, Options sound settings [on on on on on on], Disable Sounds checkbox enabled
+far-away deaths on: Misc tab toggle enabled, sound checkboxes 68/68 enabled, chance boxes 47/47 enabled, Options sound settings [on on on off on on], Disable Sounds checkbox enabled
+far-away deaths off: Misc tab toggle enabled, sound checkboxes 68/68 enabled, chance boxes 47/47 enabled, Options sound settings [on on on on on on], Disable Sounds checkbox enabled
