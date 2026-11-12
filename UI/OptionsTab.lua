@@ -166,9 +166,9 @@ function ScubaSounds:CreateGlobalOptionsPage(frame)
         end)
     ScubaSounds:CreateLabel(page, showGuildOnMap, ScubaSounds_ShowGuildOnMap)
     describe(showGuildOnMap, ScubaSounds_ShowGuildOnMap, "Shows guildmates as dots in their class color on your " ..
-        "world map and minimap. Hover one for who it is and where. Guildmates in your group show from the game's own " ..
-        "positions; everyone else from the addon, so only those sharing their location appear. Nobody inside a " ..
-        "dungeon, raid or battleground shows.")
+        "world map and minimap. Hover one for who it is and where. Only guildmates sharing their location appear. Your " ..
+        "own party or raid already shows on the maps, so they get no dot. Nobody inside a dungeon, raid or " ..
+        "battleground shows.")
 
     local playEvery =ScubaSounds:CreateCheckbox(page, GRID_LEFT + RIGHT_COLUMN_X,
         -31 - 4 * (ROW_HEIGHT + 4) - DEBUG_HEADER_HEIGHT,

@@ -225,24 +225,19 @@ def showing_off_draws_nothing():
 
 
 @test
-def group_members_use_the_games_position():
+def our_group_gets_no_dots():
+    """The game already shows party and raid members on both maps."""
     m = MapClient()
     m.c.run('GROUP = {{name = "Taco Lips", class = "MAGE"}, {name = "Stud Alert", class = "WARRIOR"}}; '
             'RAID_GROUP = true; UNIT_POS["Taco Lips"] = {map = 1411, x = 0.6, y = 0.5}')
     m.hear("Taco Lips", "P:1411:0.5100:0.5000")
-    check(m.world() == "Taco Lips 600 -400", "the game's position wins: %s" % m.world())
-    # Stud Alert has no addon: still drawn, from the game
-    m.c.run('UNIT_POS["Stud Alert"] = {map = 1411, x = 0.4, y = 0.5}')
-    check(m.world() == "Stud Alert 400 -400, Taco Lips 600 -400", m.world())
-
-
-@test
-def group_members_in_a_dungeon_dont_show():
-    m = MapClient()
-    m.c.run('GROUP = {{name = "Taco Lips", class = "MAGE"}}; RAID_GROUP = true; '
-            'UNIT_POS["Taco Lips"] = {map = 1581, x = 0.5, y = 0.5}')
-    m.hear("Taco Lips", "H")
-    check(m.world() == "", m.world())
+    m.hear("Robot Shark", "P:1411:0.5200:0.5000")
+    check(m.world() == "Robot Shark 520 -400", m.world())
+    check(m.minimap() == "Robot Shark 15 0", m.minimap())
+    # Out of the group again: back on the map from their messages
+    m.c.run("GROUP = {}; RAID_GROUP = false")
+    m.hear("Taco Lips", "P:1411:0.5100:0.5000")
+    check(m.world() == "Robot Shark 520 -400, Taco Lips 510 -400", m.world())
 
 
 @test

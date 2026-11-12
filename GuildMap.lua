@@ -1,7 +1,6 @@
 -- ScubaSounds: guildmates on the map. Each client sends its position to the guild every few seconds; every client
--- draws a class colored dot for each guildmate on the world map and the minimap. Group members' dots come from the
--- game's own unit positions instead, and guild members in the group get one even without the addon. Nobody inside an
--- instance shows anywhere: their client sends "hidden" instead of a position
+-- draws a class colored dot for each guildmate on the world map and the minimap. Our party or raid gets no dots: the
+-- game shows them itself. Nobody inside an instance shows anywhere: their client sends "hidden" instead of a position
 local _G = _G
 local CreateFrame = _G.CreateFrame
 local GameTooltip = _G.GameTooltip
@@ -171,34 +170,16 @@ local function WorldPosition(map, x, y)
     return continent, world
 end
 
--- Everyone to draw: {key, name, class, map, continent, world}
+-- Everyone to draw: {key, name, class, map, continent, world}. Our party or raid is left out: the game already
+-- shows them on both maps
 local function People()
     local now = GetTime()
     local people, inGroup = {}, {}
     local Raids = ScubaSounds.Raids
     for _, unit in ipairs(GroupUnits()) do
-        local name = ScubaSounds:FullName(unit)
-        local key = NameKey(name)
+        local key = NameKey(ScubaSounds:FullName(unit))
         if key then
             inGroup[key] = true
-            local synced = positions[key]
-            local hidden = synced and synced.hidden and now - synced.at <= STALE_AFTER
-            local connected = UnitIsConnected(unit)
-            if Raids:IsGuildMember(key) and not hidden and not issecretvalue(connected) and connected then
-                local map, x, y = UnitMapPosition(unit)
-                if not map and synced and not synced.hidden and now - synced.at <= STALE_AFTER then
-                    map, x, y = synced.map, synced.x, synced.y
-                end
-                if map then
-                    table.insert(people, {
-                        key = key,
-                        name = name,
-                        map = map,
-                        x = x,
-                        y = y
-                    })
-                end
-            end
         end
     end
     for key, synced in pairs(positions) do
