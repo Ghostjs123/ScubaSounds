@@ -635,6 +635,8 @@ frame:SetScript("OnEvent", function(_, event, ...)
 end)
 frame:RegisterEvent("ADDON_LOADED")
 frame:RegisterEvent("CHAT_MSG_ADDON")
+-- Forever lacks some events (CHAT_MSG_COMBAT_HOSTILE_DEATH); registering one throws, so each goes through pcall and a
+-- missing one doesn't stop the rest
 for event in pairs(handlers) do
-    frame:RegisterEvent(event)
+    pcall(frame.RegisterEvent, frame, event)
 end
