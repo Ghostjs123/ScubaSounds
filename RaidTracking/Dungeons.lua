@@ -186,6 +186,33 @@ function Dungeons:GuildRuns()
     return runs
 end
 
+-- The runs going on right now, as a set of run IDs: every guild member of the group is online and in the dungeon,
+-- going by the guild roster's zones. Only a group's newest run of a dungeon can be live, so an earlier run by the same
+-- people doesn't light up when they go back in. runs: GuildRuns(), newest first
+function Dungeons:LiveRuns(runs)
+    local live = {}
+    local taken = {} -- dungeon -> name keys already in a newer run of it
+    for _, run in ipairs(runs) do
+        local seen = taken[run.dungeon] or {}
+        taken[run.dungeon] = seen
+        local members, inside, newer = 0, true, false
+        for key in pairs(run.members) do
+            if Raids:IsGuildMember(key) then
+                members = members + 1
+                inside = inside and Raids:ZoneNow(key) == run.dungeon
+                newer = newer or seen[key] == true
+            end
+        end
+        if members > 0 and inside and not newer then
+            live[run.id] = true
+        end
+        for key in pairs(run.members) do
+            seen[key] = true
+        end
+    end
+    return live
+end
+
 function Dungeons:DisplayName(key)
     local current = Dungeons:State()
     return current and current.names[key] or Raids:DisplayName(key)
@@ -310,8 +337,7 @@ local function IsRareOrBetter(itemId, link)
     if not issecretvalue(quality) and type(quality) == "number" then
         return quality >= RARE_QUALITY
     end
-    return link:find("|cff0070dd", 1, true) ~= nil or link:find("|cffa335ee", 1, true) ~= nil or
-               link:find("|cffff8000", 1, true) ~= nil
+    return (ScubaSounds:LinkQuality(link) or 0) >= RARE_QUALITY
 end
 
 -- "You receive loot" and "<name> receives loot", single and stacks. Rolls end in one of these too, and quest rewards
@@ -383,7 +409,7 @@ function handlers.CHAT_MSG_LOOT(text)
     if not (name or isSelf) then
         return
     end
-    local link = text:match("|c%x+|Hitem:.-|h.-|h|r")
+    local link = ScubaSounds:ItemLinkIn(text)
     local itemId = link and ScubaSounds:ItemIdFromItemLink(link)
     if not itemId or not IsRareOrBetter(itemId, link) then
         return

@@ -120,6 +120,19 @@ def an_observer_records_someone_elses_win():
 
 
 @test
+def forever_style_links_are_recorded():
+    """Forever colors links |cnIQ<quality>: instead of |cffRRGGBB; with the quality not cached, the link's counts."""
+    c = Client("Bear Mon")
+    in_raid(c, saved=True)
+    kill_boss(c)
+    link = "|cnIQ4:|Hitem:%d::::::::60:::::|h[Item %d]|h|r" % (SULF, SULF)
+    c.fire("CHAT_MSG_LOOT", "Pug Person receives loot: " + link + ".")
+    c.step(6)
+    recvs = c.entries("recv")
+    check(len(recvs) == 1 and recvs[0][2]["p"] == "Pug Person" and recvs[0][2]["i"] == SULF, "receipts %r" % recvs)
+
+
+@test
 def blues_and_loot_outside_raids_are_ignored():
     c = Client("Bear Mon")
     in_raid(c, saved=True)

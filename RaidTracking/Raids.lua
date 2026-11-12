@@ -204,6 +204,9 @@ function Raids:ColoredName(key)
     return name
 end
 
+local zonesNow = {} -- name key -> zone, for online guild members
+local rosterListeners = {}
+
 -- A character can't change class in this version, so a class once seen in the guild roster is kept for good, offline
 -- and departed members included
 local function ScanRoster()
@@ -215,15 +218,39 @@ local function ScanRoster()
     if issecretvalue(total) or type(total) ~= "number" then
         return
     end
+    wipe(zonesNow)
     for i = 1, total do
-        local name, _, _, _, _, _, _, _, _, _, class = GetGuildRosterInfo(i)
+        local name, _, _, _, _, zone, _, _, online, _, class = GetGuildRosterInfo(i)
         if not issecretvalue(name) and not issecretvalue(class) and type(name) == "string" and type(class) == "string" then
             local key = NameKey(name)
             if key then
                 saved.classes[key] = class
                 saved.names[key] = ScubaSounds.RaidEntries.DisplayName(name)
+                if not issecretvalue(online) and online and not issecretvalue(zone) and type(zone) == "string" then
+                    zonesNow[key] = zone
+                end
             end
         end
+    end
+    for _, listener in ipairs(rosterListeners) do
+        listener()
+    end
+end
+
+-- The zone an online guild member is in, as of the last roster scan; nil when offline or not known
+function Raids:ZoneNow(key)
+    return zonesNow[key]
+end
+
+-- listener(): the guild roster was just read again
+function Raids:OnRoster(listener)
+    table.insert(rosterListeners, listener)
+end
+
+-- Asks the server for a fresh roster (it answers at most every few seconds)
+function Raids:RequestRoster()
+    if C_GuildInfo and C_GuildInfo.GuildRoster then
+        C_GuildInfo.GuildRoster()
     end
 end
 

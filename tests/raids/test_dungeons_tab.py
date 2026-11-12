@@ -75,6 +75,17 @@ class DungeonsTab:
         c.loot_line("Taco Lips receives loot: %s." % link(ROBE, "ff0070dd"))
         c.step(8)
 
+    def where(self, zone, names=None, offline=False):
+        """Sets guild members' roster zone (all of them by default) and lets the roster scan run."""
+        c = self.c
+        wanted = "nil" if names is None else "{%s}" % ", ".join('["%s"] = true' % n.replace(" ", "-", 1) for n in names)
+        c.run("""local wanted = %s
+        for _, m in ipairs(GUILD_ROSTER) do
+            if not wanted or wanted[m.name] then m.zone = "%s"; m.offline = %s end
+        end""" % (wanted, zone, "true" if offline else "false"))
+        c.fire("GUILD_ROSTER_UPDATE")
+        c.step(3)
+
     def click_header(self, index=1, button="LeftButton"):
         self.c.run("ScubaSounds:RefreshDungeons()")
         self.c.run('local h = ScubaSounds.UI.Dungeons.headers.used[%d]; h.scripts.OnClick(h, "%s")' % (index, button))
@@ -91,6 +102,7 @@ def no_runs_yet_says_so():
 def a_run_opens_to_the_group_bosses_and_who_looted_what():
     tab = DungeonsTab()
     tab.a_run()
+    tab.where(SM)
     shown = tab.shown()
     check(shown.startswith("H %s · " % SM) and shown.endswith("| Live · 2 bosses · 2 items"), shown)
     tab.click_header()
@@ -99,6 +111,46 @@ def a_run_opens_to_the_group_bosses_and_who_looted_what():
     check(lines[2:] == ["B Houndmaster Loksey", "I Item %d | Buff Check" % HELM, "B Herod", "I Item %d | Taco Lips" % ROBE],
           lines)
     print("    " + "\n    ".join(lines))
+
+
+@test
+def live_while_every_guild_member_is_in_the_dungeon():
+    tab = DungeonsTab()
+    tab.a_run()
+    tab.where("Zone")
+    check(tab.shown().endswith("| 2 bosses · 2 items"), "nobody's inside: not Live")
+    tab.where(SM)
+    check("Live" in tab.shown(), "everyone's inside: Live")
+    tab.where("Stormwind City", ["Wet Farts"])
+    check("Live" not in tab.shown(), "one guild member left: not Live")
+    tab.where(SM, ["Wet Farts"], offline=True)
+    check("Live" not in tab.shown(), "one guild member offline: not Live")
+    tab.where(SM)
+    check("Live" in tab.shown(), "all back inside")
+
+
+@test
+def pugs_dont_count_for_live():
+    tab = DungeonsTab()
+    c = tab.c
+    c.enter(["Buff Check", "Taco Lips", "Robot Shark", "Random Pug"])
+    c.target()
+    c.kill("Herod", 2)
+    c.step(8)
+    tab.where(SM)
+    check("Live" in tab.shown(), tab.shown())
+
+
+@test
+def only_the_groups_newest_run_of_a_dungeon_is_live():
+    tab = DungeonsTab()
+    old = tab.c.eval("NOW") - 5 * 3600
+    tab.c.run('ScubaSounds.Dungeons:Write("dkill", {r = "%s", e = 3, b = "Herod", l = "189-9", '
+              'm = {"Buff Check", "Taco Lips", "Robot Shark"}}, %d)' % (SM, old))
+    tab.a_run()
+    tab.where(SM)
+    headers = [line for line in tab.shown().split("\n") if line.startswith("H ")]
+    check(len(headers) == 2 and "Live" in headers[0] and "Live" not in headers[1], headers)
 
 
 @test

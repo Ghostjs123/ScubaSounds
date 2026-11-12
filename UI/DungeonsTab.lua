@@ -29,8 +29,8 @@ local TRASH = ScubaSounds.DungeonReplay.TRASH
 
 local DAY = 86400
 local RECENT_DAYS = 120 -- "Last 4 months only"
-local LIVE_FOR = 15 * 60 -- a run with an entry this recently is Live
-local LIVE_REFRESH = 60 -- seconds between redraws while a Live run shows, for it going quiet
+local RECENT_FOR = 2 * 3600 -- while a run this recent shows, the roster is reread for it going Live or not
+local LIVE_REFRESH = 60 -- seconds between those rereads
 local NEW_GLOW = 8 -- seconds an item that arrived while the tab was open stays lit up
 local GREEN = "|cff40ff40"
 local GREY = "|cffa8a8a8"
@@ -330,9 +330,15 @@ function ScubaSounds:CreateDungeonsPage(frame)
 
     page:SetScript("OnShow", function()
         ui.knownLoot = nil -- only items arriving while the tab is open light up
+        Raids:RequestRoster() -- fresh zones for Live
         ScubaSounds:RefreshDungeons()
     end)
     Dungeons:OnChange(function()
+        if page:IsVisible() then
+            ScubaSounds:RefreshDungeons()
+        end
+    end)
+    Raids:OnRoster(function()
         if page:IsVisible() then
             ScubaSounds:RefreshDungeons()
         end
@@ -464,7 +470,8 @@ function ScubaSounds:RefreshDungeons()
     ui.knownLoot = known
 
     local open = ScubaSounds_Options.DungeonsOpen
-    local anyLive = false
+    local liveRuns = Dungeons:LiveRuns(all)
+    local anyRecent = false
     local now = GetServerTime()
     local y = 0
     for _, run in ipairs(runs) do
@@ -475,8 +482,8 @@ function ScubaSounds:RefreshDungeons()
         local isOpen = open[run.id]
         header.Toggle:SetTexture(isOpen and MINUS or PLUS)
         header.Title:SetText(run.dungeon .. " · " .. StartText(run))
-        local live = now - run.last <= LIVE_FOR
-        anyLive = anyLive or live
+        local live = liveRuns[run.id] == true
+        anyRecent = anyRecent or live or now - run.last <= RECENT_FOR
         local bg, border = live and LIVE_BG or HEADER_BG, live and LIVE_BORDER or HEADER_BORDER
         header:SetBackdropColor(bg[1], bg[2], bg[3], 1)
         header:SetBackdropBorderColor(border[1], border[2], border[3], 1)
@@ -491,13 +498,17 @@ function ScubaSounds:RefreshDungeons()
     end
     ui.content:SetHeight(math.max(y, 1))
 
-    -- Redrawn on its own while something's changing: a Live run going quiet, and lit up items going dark
-    local delay = (glowing and NEW_GLOW + 0.1) or (anyLive and LIVE_REFRESH) or nil
+    -- Redrawn on its own while something's changing: lit up items going dark, and a recent run's group going in or out
+    -- (the roster is reread; its answer redraws)
+    local delay = (glowing and NEW_GLOW + 0.1) or (anyRecent and LIVE_REFRESH) or nil
     if delay and not ui.redrawScheduled then
         ui.redrawScheduled = true
         C_Timer.After(delay, function()
             ui.redrawScheduled = false
             if ui.page:IsVisible() then
+                if anyRecent then
+                    Raids:RequestRoster()
+                end
                 ScubaSounds:RefreshDungeons()
             end
         end)

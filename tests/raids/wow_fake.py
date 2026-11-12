@@ -229,12 +229,12 @@ C_Container = {
 }
 
 -- The guild
-GUILD_ROSTER = {}   -- {name, class}
+GUILD_ROSTER = {}   -- {name, class, zone?, offline?}
 function GetGuildInfo() return GUILD, "Rank", RANK end
 function GetNumGuildMembers() return #GUILD_ROSTER, #GUILD_ROSTER end
 function GetGuildRosterInfo(i)
     local m = GUILD_ROSTER[i]
-    return m.name, "Rank", 1, 60, m.class, "Zone", "", "", true, 0, m.class
+    return m.name, "Rank", 1, 60, m.class, m.zone or "Zone", "", "", not m.offline, 0, m.class
 end
 C_GuildInfo = {GuildRoster = function() C_Timer.After(1, function() FireEvent("GUILD_ROSTER_UPDATE") end) end}
 RAID_CLASS_COLORS = {WARRIOR = {colorStr = "ffc79c6e"}, MAGE = {colorStr = "ff69ccf0"}}
@@ -280,6 +280,14 @@ def format_to_pattern():
     return fn + "\nScubaSounds.FormatToPattern = FormatToPattern\n"
 
 
+# Util.lua's item link helpers (finding a link in text, its quality from its color), cut out the same way
+def link_functions():
+    util = open(os.path.join(ADDON, "Util.lua"), encoding="utf-8").read()
+    start = util.index("-- The first item link in text")
+    end = util.index("\nend\n", util.index("function ScubaSounds:LinkQuality")) + 5
+    return util[start:end]
+
+
 def guild_send_function():
     guild = open(os.path.join(ADDON, "Guild.lua"), encoding="utf-8").read()
     fn = re.search(r"^function ScubaSounds:SendAddonMessage\(.*?^end$", guild, re.S | re.M).group(0)
@@ -301,6 +309,7 @@ class Client:
         lua = lua_runtime()
         lua.execute(FAKE_WOW % (start_time, lua_string(name)))
         lua.execute(format_to_pattern())
+        lua.execute(link_functions())
         for f in ["Libs/ChatThrottleLib.lua"] + LIB_FILES + LEDGER_FILES + ["RaidTracking/Ledger/Ledger.lua"]:
             lua.execute(open(addon_file(f), encoding="utf-8").read())
         lua.execute(guild_send_function())

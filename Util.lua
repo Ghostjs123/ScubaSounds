@@ -116,6 +116,30 @@ function ScubaSounds:ItemIdFromItemLink(itemLink)
     return tonumber(itemLink:match("item:(%d+)"))
 end
 
+-- The first item link in text. Classic Era colors links |cffRRGGBB; Forever uses |cnIQ<quality>:
+function ScubaSounds:ItemLinkIn(text)
+    return text:match("|c[^|]*|Hitem:.-|h.-|h|r")
+end
+
+local LINK_COLOR_QUALITY = {
+    ff9d9d9d = 0,
+    ffffffff = 1,
+    ff1eff00 = 2,
+    ff0070dd = 3,
+    ffa335ee = 4,
+    ffff8000 = 5
+}
+
+-- An item link's quality from its color, or nil when the color isn't a quality color
+function ScubaSounds:LinkQuality(link)
+    local quality = link:match("^|cnIQ(%d+):")
+    if quality then
+        return tonumber(quality)
+    end
+    local color = link:match("^|c(%x%x%x%x%x%x%x%x)")
+    return color and LINK_COLOR_QUALITY[color:lower()]
+end
+
 -- Any instance the game calls a raid, so Forever's new raids count without a list. In an encounter the type can come
 -- back secret; then the last answer that could be read stands
 function ScubaSounds:IsInRaidInstance()

@@ -97,7 +97,7 @@ local function IsEpicOrBetter(itemId, link)
     if not issecretvalue(quality) and type(quality) == "number" then
         return quality >= EPIC_QUALITY
     end
-    return link ~= nil and (link:find("|cffa335ee", 1, true) ~= nil or link:find("|cffff8000", 1, true) ~= nil)
+    return link ~= nil and (ScubaSounds:LinkQuality(link) or 0) >= EPIC_QUALITY
 end
 
 -- This character's notes, kept with the guild's log: raids with entries waiting for a bind, and held items' trade
@@ -625,7 +625,7 @@ function handlers.CHAT_MSG_LOOT(text)
     if not (name or isSelf) then
         return
     end
-    local link = text:match("|c%x+|Hitem:.-|h.-|h|r")
+    local link = ScubaSounds:ItemLinkIn(text)
     local itemId = ItemIdOf(link)
     if not itemId or not IsEpicOrBetter(itemId, link) then
         return

@@ -76,6 +76,22 @@ def someone_elses_loot_is_written_once_by_an_observer():
 
 
 @test
+def forever_style_links_are_recorded():
+    """Forever colors links |cnIQ<quality>: instead of |cffRRGGBB. With the quality not cached, the link's says blue."""
+    buff = new_client("Buff Check")
+    buff.enter()
+    buff.target()
+    buff.kill()
+    buff.step(8)
+    forever = "|cnIQ3:|Hitem:%d::::::::60:::::|h[Item %d]|h|r" % (HELM, HELM)
+    buff.loot_line("You receive loot: %s." % forever)
+    buff.loot_line("Taco Lips receives loot: %s." % forever.replace("IQ3", "IQ2").replace(str(HELM), str(GREEN)))
+    buff.step(8)
+    loot = buff.dungeon_entries("dloot")
+    check(len(loot) == 1 and loot[0][2]["i"] == HELM and loot[0][2]["p"] == "Buff Check", loot)
+
+
+@test
 def three_guild_members_and_two_pugs_are_recorded_with_the_pugs():
     buff = new_client("Buff Check")
     buff.run("QUALITY[%d] = 4" % HELM)
