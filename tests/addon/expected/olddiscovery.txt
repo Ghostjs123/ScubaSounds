@@ -1,0 +1,9 @@
+Level Ups triggers playing Mario1Up: LevelUp
+nothing known: Newbie-X discovered a sound: !cff71d5ff!Hscubasounds:Mario1Up:Level Ups!h!TInterface\Buttons\UI-SpellbookIcon-NextPage-Up:0!t[Mario1Up (Level Ups tab)]!h!r
+found 30 seconds ago: Newbie-X discovered a sound: !cff71d5ff!Hscubasounds:Mario1Up:Level Ups!h!TInterface\Buttons\UI-SpellbookIcon-NextPage-Up:0!t[Mario1Up (Level Ups tab)]!h!r
+found yesterday: (hidden)
+another sound: Newbie-X discovered a sound: [SadTrombone (Player Deaths tab)] (Download ScubaSounds)
+sound known, a trigger not: Newbie-X discovered a sound: !cff71d5ff!Hscubasounds:Mario1Up:Level Ups!h!TInterface\Buttons\UI-SpellbookIcon-NextPage-Up:0!t[Mario1Up (Level Ups tab)]!h!r
+wrong tab name: Newbie-X discovered a sound: !cff71d5ff!Hscubasounds:Mario1Up:Misc!h!TInterface\Buttons\UI-SpellbookIcon-NextPage-Up:0!t[Mario1Up (Misc tab)]!h!r
+quiet, old: 0 lines
+quiet, new: 1 lines

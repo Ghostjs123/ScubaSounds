@@ -35,6 +35,12 @@ function ScubaSounds:InitOptions()
     if options[ScubaSounds_SendGuildMessages] == nil then
         options[ScubaSounds_SendGuildMessages] = true
     end
+    if options[ScubaSounds_ShareLocation] == nil then
+        options[ScubaSounds_ShareLocation] = true
+    end
+    if options[ScubaSounds_ShowGuildOnMap] == nil then
+        options[ScubaSounds_ShowGuildOnMap] = true
+    end
     if options[ScubaSounds_GuildDeaths] == nil then
         options[ScubaSounds_GuildDeaths] = false
     end

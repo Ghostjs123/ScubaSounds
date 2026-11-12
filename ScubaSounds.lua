@@ -503,7 +503,9 @@ ScubaSounds.Data.FirstPlayHereMessage = "First time you've heard %s"
 -- Receivers with the addon turn "[<sound> (<tab> tab)]" at the end of either message into a clickable link (click
 -- previews the sound, shift-click opens that options tab) and drop the "(Download ScubaSounds)" after it, which is only
 -- for guildmates without the addon. Links can't be sent in chat, so this happens on arrival
-ScubaSounds.Data.DiscoveryLinkPattern = "^(.- discovered a sound: )%[(%w+) %((.-) tab%)%] %(Download ScubaSounds%)$"
+-- Seconds since the guild first heard a sound (and its triggers) before a "discovered" line for it is hidden as old news
+ScubaSounds.Data.OldDiscoveryAge = 120
+ScubaSounds.Data.DiscoveryLinkPattern ="^(.- discovered a sound: )%[(%w+) %((.-) tab%)%] %(Download ScubaSounds%)$"
 -- /ss whisper <player> <sound>, linked the same way (on both ends of the whisper)
 ScubaSounds.Data.WhisperSoundMessage = "Have a listen: %s (%s tab)" -- sound, options tab
 -- A guild chat line shown only to us, because we're not in a guild yet: "SS - <line> (Only you see this)", with
@@ -628,6 +630,8 @@ ScubaSounds_PlayEverySound = "Play every sound" -- every guildmate's plays, hear
 ScubaSounds_SeeAllSounds = "See all sounds in chat" -- every guildmate's plays, with who, in our chat (debugging)
 ScubaSounds_PlayDiscoveries = "Play first discovery sounds when found" -- a guildmate's new find plays for us too
 ScubaSounds_SendGuildMessages = "Send messages in guild" -- chat players can read ("ding", "gz nigel"); addon messages always go out
+ScubaSounds_ShareLocation = "Share my location with the guild" -- our position for guildmates' maps (GuildMap.lua)
+ScubaSounds_ShowGuildOnMap = "Show guildmates on the map" -- their dots on our world map and minimap
 
 -- Options tabs. Every trigger belongs to one of these
 ScubaSounds.Data.Categories = {{

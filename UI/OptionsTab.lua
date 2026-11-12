@@ -148,7 +148,29 @@ function ScubaSounds:CreateGlobalOptionsPage(frame)
         "has heard yet, it plays for you too, wherever you are, so everyone hears the discovery as it happens.")
     ScubaSounds:RefreshSoundSettings()
 
-    local playEvery = ScubaSounds:CreateCheckbox(page, GRID_LEFT + RIGHT_COLUMN_X,
+    -- Guildmates on the map (GuildMap.lua). Not sound settings
+    local shareLocation = ScubaSounds:CreateCheckbox(page, GRID_LEFT, -31 - 6 * (ROW_HEIGHT + 4),
+        ScubaSounds_Options[ScubaSounds_ShareLocation], function(checked)
+            ScubaSounds_Options[ScubaSounds_ShareLocation] = checked
+            ScubaSounds.GuildMap:SharingChanged()
+        end)
+    ScubaSounds:CreateLabel(page, shareLocation, ScubaSounds_ShareLocation)
+    describe(shareLocation, ScubaSounds_ShareLocation, "Sends where you are to guildmates with the addon every few " ..
+        "seconds, so you show as a dot in your class color on their world map and minimap. Never while you're in a " ..
+        "dungeon, raid or battleground. Off, you disappear from their maps (a group you're in still sees you through " ..
+        "the game itself).")
+
+    local showGuildOnMap = ScubaSounds:CreateCheckbox(page, GRID_LEFT, -31 - 7 * (ROW_HEIGHT + 4),
+        ScubaSounds_Options[ScubaSounds_ShowGuildOnMap], function(checked)
+            ScubaSounds_Options[ScubaSounds_ShowGuildOnMap] = checked
+        end)
+    ScubaSounds:CreateLabel(page, showGuildOnMap, ScubaSounds_ShowGuildOnMap)
+    describe(showGuildOnMap, ScubaSounds_ShowGuildOnMap, "Shows guildmates as dots in their class color on your " ..
+        "world map and minimap. Hover one for who it is and where. Guildmates in your group show from the game's own " ..
+        "positions; everyone else from the addon, so only those sharing their location appear. Nobody inside a " ..
+        "dungeon, raid or battleground shows.")
+
+    local playEvery =ScubaSounds:CreateCheckbox(page, GRID_LEFT + RIGHT_COLUMN_X,
         -31 - 4 * (ROW_HEIGHT + 4) - DEBUG_HEADER_HEIGHT,
         ScubaSounds_Options[ScubaSounds_PlayEverySound], function(checked)
             ScubaSounds_Options[ScubaSounds_PlayEverySound] = checked
@@ -219,7 +241,7 @@ function ScubaSounds:CreateGlobalOptionsPage(frame)
     -- How the secrets work, for players new to the addon, below the checkboxes
     local heading = page:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     heading:SetText("Secret sounds")
-    heading:SetPoint("TOPLEFT", GRID_LEFT + 4, -31 - 6 * (ROW_HEIGHT + 4) - DEBUG_HEADER_HEIGHT - 16)
+    heading:SetPoint("TOPLEFT", GRID_LEFT + 4, -31 - 8 * (ROW_HEIGHT + 4) - 16)
     -- /ss debug hidden shows it anyway until the window closes
     local function updatePrank()
         local showPrank = prank.fired and ScubaSounds:IsStartAttackPrankTarget() or ScubaSounds.State.ShowHiddenOptions or

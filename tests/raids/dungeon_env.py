@@ -19,9 +19,21 @@ DUNGEON = {inside = false, name = "Scarlet Monastery", map = 189}
 PARTY = {}  -- the other party members' names (party1..party4)
 local raidInstanceInfo = GetInstanceInfo
 function GetInstanceInfo()
+    if DUNGEON.inside and DUNGEON.secret then return HIDDEN, HIDDEN, 1, "Normal", 5, 0, false, HIDDEN end
     if DUNGEON.inside then return DUNGEON.name, "party", 1, "Normal", 5, 0, false, DUNGEON.map end
     return raidInstanceInfo()
 end
+-- Units seen: dead ones, and names for any unit (the target's comes from TARGET.name)
+HIDDEN = {} -- a value that reads as secret
+SECRET[HIDDEN] = true
+DEAD = {}
+NAMES = {}
+function UnitIsDead(unit) return DEAD[unit] == true end
+local baseUnitName = UnitName
+function UnitName(unit) return NAMES[unit] or baseUnitName(unit) end
+COMBATLOG_XPGAIN_FIRSTPERSON = "%s dies, you gain %d experience."
+UNITDIESOTHER = "%s dies."
+SELFKILLOTHER = "You have slain %s!"
 function IsInGroup() return #PARTY > 0 or #GROUP > 0 end
 function IsInRaid() return #GROUP > 0 end
 function UnitExists(unit)
@@ -45,7 +57,7 @@ class DungeonClient(Client):
     def __init__(self, name, before_login=""):
         super().__init__(name)
         self.run(DUNGEON_FAKE)
-        for f in ["RaidTracking/DungeonReplay.lua", "RaidTracking/Dungeons.lua"]:
+        for f in ["Data/DungeonBosses.lua", "RaidTracking/DungeonReplay.lua", "RaidTracking/Dungeons.lua"]:
             self.run(open(addon_file(f), encoding="utf-8").read())
         self.fire("ADDON_LOADED", "ScubaSounds")
         self.run("GUILD_ROSTER = {}")
@@ -71,6 +83,19 @@ class DungeonClient(Client):
 
     def kill(self, boss="Herod", encounter=2):
         self.fire("ENCOUNTER_END", encounter, boss, 1, 5, 1)
+
+    def corpse(self, unit="target", guid=None, name=None):
+        """A dead unit seen: its GUID (None leaves it unset) and name."""
+        self.run('DEAD["%s"] = true' % unit)
+        self.run('GUIDS["%s"] = %s' % (unit, "nil" if guid is None else "HIDDEN" if guid == "SECRET" else '"%s"' % guid))
+        if name:
+            self.run('NAMES["%s"] = "%s"' % (unit, name))
+        if unit == "target":
+            self.fire("PLAYER_TARGET_CHANGED")
+        elif unit == "mouseover":
+            self.fire("UPDATE_MOUSEOVER_UNIT")
+        else:
+            self.fire("UNIT_TARGET", unit[:-len("target")])
 
     def loot_line(self, text):
         self.fire("CHAT_MSG_LOOT", text)

@@ -16,6 +16,7 @@ Sounds\SoundInfo.lua
 Data\PlayerNames.lua
 Data\NotableLoot.lua
 Data\DropSources.lua
+Data\DungeonBosses.lua
 ScubaSounds.lua
 Triggers.lua
 Util.lua
@@ -38,6 +39,7 @@ RaidTracking\Raids.lua
 RaidTracking\RaidRecorder.lua
 RaidTracking\Dungeons.lua
 RaidTracking\RaidLiveTest.lua
+GuildMap.lua
 SlashCommands.lua
 UI\MinimapButton.lua
 UI\Style.lua

@@ -26,6 +26,37 @@ local OBSERVED_WINDOW = {
 }
 local RARE_QUALITY = 3
 local PARTY_UNITS = {"player", "party1", "party2", "party3", "party4"}
+local COPY_WAIT = 10 -- seconds an entry waits for the copy number before it's written without one
+-- A boss without an encounter ID is keyed by this plus its NPC ID, clear of real encounter IDs
+local NPC_KEY_BASE = 10000000
+
+-- Each dungeon's bosses (Data\DungeonBosses.lua) by encounter ID, NPC ID and lower case name. Every way of telling a
+-- kill gives the boss the same key (its first encounter ID, else its NPC ID) and name, so they count as one kill
+local bossIndex = {} -- map -> {byEncounter, byNpc, byName}
+for map, bosses in pairs(ScubaSounds.Data.DungeonBosses or {}) do
+    local index = {
+        byEncounter = {},
+        byNpc = {},
+        byName = {}
+    }
+    for _, boss in ipairs(bosses) do
+        local entry = {
+            key = boss.encounters and boss.encounters[1] or NPC_KEY_BASE + boss.npc,
+            name = boss.fight or boss.name
+        }
+        for _, id in ipairs(boss.encounters or {}) do
+            index.byEncounter[id] = entry
+        end
+        if boss.npc then
+            index.byNpc[boss.npc] = entry
+        end
+        index.byName[boss.name:lower()] = entry
+        for _, alias in ipairs(boss.aliases or {}) do
+            index.byName[alias:lower()] = entry
+        end
+    end
+    bossIndex[map] = index
+end
 
 local Dungeons = {}
 ScubaSounds.Dungeons = Dungeons
@@ -221,15 +252,16 @@ end
 -- =================================================================
 -- Recording: where we are and who we're with
 -- =================================================================
--- The dungeon we're in, as {name, map}, when it's a 5-man run in a party
+-- The dungeon we're in, as name, map, when it's a 5-man run in a party. The third value is true when the game hides
+-- where we are (secret values, as in an encounter): that's not leaving
 local function CurrentDungeon()
     local name, instanceType, _, _, _, _, _, map = GetInstanceInfo()
-    if issecretvalue(instanceType) or instanceType ~= "party" or not Readable(name, "string") or
-        not Readable(map, "number") then
-        return nil
-    end
     local inGroup, inRaid = IsInGroup(), IsInRaid()
-    if issecretvalue(inGroup) or issecretvalue(inRaid) or not inGroup or inRaid then
+    if issecretvalue(instanceType) or issecretvalue(name) or issecretvalue(map) or issecretvalue(inGroup) or
+        issecretvalue(inRaid) then
+        return nil, nil, true
+    end
+    if instanceType ~= "party" or not Readable(name, "string") or not Readable(map, "number") or not inGroup or inRaid then
         return nil
     end
     return name, map
@@ -258,19 +290,49 @@ local function GuildGroup()
     return members >= Replay.MIN_GUILD and names or nil
 end
 
--- Entries written before the copy number is known wait for it; leaving the dungeon writes them without one
+-- Whether someone's copy of an observation is already in the log (with or without the copy number)
+local function AlreadyObserved(kind, data, t)
+    for _, l in ipairs({data.l or false, false}) do
+        local key = ObservationKey(kind, {
+            r = data.r,
+            l = l or nil,
+            e = data.e,
+            i = data.i,
+            p = data.p
+        })
+        local last = key and observed[key]
+        if last and math.abs(t - last) <= OBSERVED_WINDOW[kind] then
+            return true
+        end
+    end
+    return false
+end
+
+-- Writes a waiting entry, unless it's an observation someone else has written by now
+local function WriteWaiting(item, copy)
+    item.data.l = copy
+    if item.observed and AlreadyObserved(item.kind, item.data, item.t) then
+        return
+    end
+    Dungeons:Write(item.kind, item.data, item.t)
+end
+
+-- Entries written before the copy number is known wait for it (at most COPY_WAIT seconds: inside some dungeons
+-- creature GUIDs are hidden); leaving the dungeon writes them without one
 local function Flush(withCopy)
     local pending = waiting
     waiting = {}
     for _, item in ipairs(pending) do
-        item.data.l = withCopy
-        Dungeons:Write(item.kind, item.data, item.t)
+        WriteWaiting(item, withCopy)
     end
 end
 
 -- Notices which dungeon we're in, and starts over on leaving it or entering another
 local function UpdateHere()
-    local name, map = CurrentDungeon()
+    local name, map, unknown = CurrentDungeon()
+    if unknown then
+        return
+    end
     if here and (here.name ~= name or here.map ~= map) then
         Flush(here.copy)
         here = nil
@@ -299,19 +361,31 @@ local function ReadCopy(unit)
     end
 end
 
--- data gets the dungeon and the copy number (now, or once it's known)
-local function Record(kind, data, t)
+-- data gets the dungeon and the copy number (now, or once it's known). observed: someone else's copy may turn up
+-- while it waits
+local function Record(kind, data, t, isObserved)
     data.r = here.name
     if here.copy then
         data.l = here.copy
         Dungeons:Write(kind, data, t)
-    else
-        table.insert(waiting, {
-            kind = kind,
-            data = data,
-            t = t
-        })
+        return
     end
+    local item = {
+        kind = kind,
+        data = data,
+        t = t,
+        observed = isObserved
+    }
+    table.insert(waiting, item)
+    C_Timer.After(COPY_WAIT, function()
+        for i, other in ipairs(waiting) do
+            if other == item then
+                table.remove(waiting, i)
+                WriteWaiting(item, nil)
+                return
+            end
+        end
+    end)
 end
 
 -- Written after a random wait, unless someone else's copy has arrived by then
@@ -321,12 +395,106 @@ local function Observe(kind, data, t)
             return
         end
         data.r, data.l = here.name, here.copy
-        local last = observed[ObservationKey(kind, data)]
-        if last and math.abs(t - last) <= OBSERVED_WINDOW[kind] then
+        if AlreadyObserved(kind, data, t) then
             return
         end
-        Record(kind, data, t)
+        Record(kind, data, t, true)
     end)
+end
+
+-- =================================================================
+-- Recording: boss kills
+-- =================================================================
+local function BossIndex()
+    return here and bossIndex[here.map]
+end
+
+-- The NPC ID in a creature's GUID (Creature-0-<server>-<map>-<copy>-<npc>-<spawn>), or nil
+local function NpcOf(guid)
+    if issecretvalue(guid) or type(guid) ~= "string" then
+        return nil
+    end
+    local unitType, npc = guid:match("^(%a+)%-%d+%-%d+%-%d+%-%d+%-(%d+)%-")
+    if unitType == "Creature" or unitType == "Vehicle" then
+        return tonumber(npc)
+    end
+    return nil
+end
+
+local function BossNamed(name)
+    local index = BossIndex()
+    if not index or issecretvalue(name) or type(name) ~= "string" then
+        return nil
+    end
+    return index.byName[(name:lower():gsub("\226\128\153", "'"))] -- curly apostrophes as straight
+end
+
+-- One kill per boss while we're in the dungeon (a boss is told by several events); the log's observations cover
+-- coming back in
+local function Killed(boss)
+    if not here or not boss then
+        return
+    end
+    here.killed = here.killed or {}
+    if here.killed[boss.key] then
+        return
+    end
+    here.killed[boss.key] = true
+    local group = GuildGroup()
+    if group then
+        Observe("dkill", {
+            e = boss.key,
+            b = boss.name,
+            m = group
+        }, Now())
+    end
+end
+
+-- A dead boss seen as a unit: by the NPC ID in its GUID, else its name (Forever hides IDs inside some dungeons)
+local function CheckCorpse(unit)
+    local index = BossIndex()
+    if not index then
+        return
+    end
+    local okDead, dead = pcall(UnitIsDead, unit)
+    if not okDead or issecretvalue(dead) or not dead then
+        return
+    end
+    local okGuid, guid = pcall(UnitGUID, unit)
+    local npc = okGuid and NpcOf(guid)
+    local boss = npc and index.byNpc[npc]
+    if not boss then
+        local okName, name = pcall(UnitName, unit)
+        boss = okName and BossNamed(name) or nil
+    end
+    Killed(boss)
+end
+
+-- "<boss> dies, you gain N experience" (rested and group bonus lines start the same), "<boss> dies." and "You have
+-- slain <boss>!"
+local DEATH_LINES = {}
+for _, format in ipairs({"COMBATLOG_XPGAIN_FIRSTPERSON", "UNITDIESOTHER", "SELFKILLOTHER"}) do
+    local text = _G[format]
+    if type(text) == "string" then
+        local pattern = FormatToPattern(text, true)
+        if format == "COMBATLOG_XPGAIN_FIRSTPERSON" then
+            pattern = pattern:gsub("%$$", "")
+        end
+        table.insert(DEATH_LINES, pattern)
+    end
+end
+
+local function OnDeathLine(text)
+    if not here or issecretvalue(text) or type(text) ~= "string" then
+        return
+    end
+    for _, pattern in ipairs(DEATH_LINES) do
+        local name = text:match(pattern)
+        if name then
+            Killed(BossNamed(name))
+            return
+        end
+    end
 end
 
 -- =================================================================
@@ -364,34 +532,50 @@ function handlers.PLAYER_LOGOUT()
     Flush(here and here.copy)
 end
 
+local function OnUnit(unit)
+    ReadCopy(unit)
+    CheckCorpse(unit)
+end
+
 function handlers.PLAYER_TARGET_CHANGED()
-    ReadCopy("target")
+    OnUnit("target")
 end
 
 function handlers.UPDATE_MOUSEOVER_UNIT()
-    ReadCopy("mouseover")
+    OnUnit("mouseover")
 end
 
 function handlers.NAME_PLATE_UNIT_ADDED(unit)
     if not issecretvalue(unit) and type(unit) == "string" then
-        ReadCopy(unit)
+        OnUnit(unit)
     end
 end
 
+-- A party member's target: a corpse they click shows to us too
+function handlers.UNIT_TARGET(unit)
+    if here and not issecretvalue(unit) and type(unit) == "string" and unit:match("^party%d$") then
+        OnUnit(unit .. "target")
+    end
+end
+
+function handlers.CHAT_MSG_COMBAT_XP_GAIN(text)
+    OnDeathLine(text)
+end
+handlers.CHAT_MSG_COMBAT_HOSTILE_DEATH = handlers.CHAT_MSG_COMBAT_XP_GAIN
+
+-- A boss in Data\DungeonBosses.lua is keyed and named as the list has it, so its corpse or death line is the same
+-- kill; any other encounter as the game tells it
 function handlers.ENCOUNTER_END(encounterId, encounterName, _, _, success)
     UpdateHere()
     if not here or issecretvalue(encounterId) or issecretvalue(encounterName) or issecretvalue(success) or success ~= 1 or
         type(encounterId) ~= "number" or type(encounterName) ~= "string" then
         return
     end
-    local group = GuildGroup()
-    if group then
-        Observe("dkill", {
-            e = encounterId,
-            b = encounterName,
-            m = group
-        }, Now())
-    end
+    local index = BossIndex()
+    Killed(index and index.byEncounter[encounterId] or {
+        key = encounterId,
+        name = encounterName
+    })
 end
 
 function handlers.CHAT_MSG_LOOT(text)

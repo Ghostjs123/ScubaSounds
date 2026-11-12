@@ -17,6 +17,7 @@ end
 NUM_CHAT_WINDOWS = 0
 issecretvalue = function() return false end
 strlower = string.lower
+GetServerTime = function() return 1800000000 end
 """)
 for name in addon_lua_files(addon):
     lua.execute(open(os.path.join(addon, name), encoding="utf-8").read())

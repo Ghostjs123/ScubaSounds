@@ -846,7 +846,7 @@ end
 ScubaSounds.GuildEvents[ScubaSounds_QuietDiscoveryCommand] = function(self, playerName, fields)
     local sound, tabName, group = fields.s, fields.tab, fields.grp
     if ScubaSounds:IsOwnName(playerName) or type(sound) ~= "string" or not ScubaSounds.Audio.SoundInfo[sound] or
-        type(tabName) ~= "string" then
+        type(tabName) ~= "string" or ScubaSounds:IsOldDiscovery(sound, tabName) then
         return
     end
     local data = ScubaSounds.Data
@@ -941,6 +941,31 @@ function ScubaSounds:LinkSoundAtEnd(message, pattern)
     return before .. ScubaSounds:DiscoveryLink(sound, tabName)
 end
 
+-- Whether a "discovered a sound" line names something this client already knew had been found, well before now: a
+-- guildmate whose sync hadn't finished (new to the guild, say) announcing an old find. The line only names the sound
+-- and its tab, and a new trigger for a known sound posts it too, so the sound and every trigger in that tab playing it
+-- must all be known. A real discovery's own record arrives with it, too recent to count
+function ScubaSounds:IsOldDiscovery(sound, tabName)
+    local earliest = ScubaSounds_Options.GuildEarliest
+    local cutoff = GetServerTime() - ScubaSounds.Data.OldDiscoveryAge
+    local function old(record)
+        return type(record) == "table" and type(record.first) == "number" and record.first < cutoff
+    end
+    if not earliest or not old(earliest.sounds[sound]) then
+        return false
+    end
+    local any = false
+    for _, trigger in ipairs(ScubaSounds.Data.Triggers) do
+        if ScubaSounds:CategoryName(trigger.category) == tabName and ScubaSounds:HasValue(trigger.sounds, sound) then
+            any = true
+            if not old(earliest.triggers[trigger.id]) then
+                return false
+            end
+        end
+    end
+    return any
+end
+
 -- "<our name> discovered a sound: ..." as "<replacement>...": it's redundant in our own chat
 function ScubaSounds:DropOwnDiscoveryName(text, replacement)
     local name = ScubaSounds:FullName("player")
@@ -991,6 +1016,12 @@ function ScubaSounds:SetUpDiscoveryLinks()
         return function(_, _, message, ...)
             if issecretvalue(message) or type(message) ~= "string" then
                 return false
+            end
+            if pattern == data.DiscoveryLinkPattern then
+                local _, sound, tabName = message:match(pattern)
+                if sound and ScubaSounds:IsOldDiscovery(sound, tabName) then
+                    return true -- hidden
+                end
             end
             local linked = ScubaSounds:LinkSoundAtEnd(message, pattern)
             if not linked then
