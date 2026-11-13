@@ -100,7 +100,7 @@ end
 
 -- Epics and better, and big items
 local function IsEpicOrBetter(itemId, link)
-    if ScubaSounds:IsIgnoredRunLoot(itemId, link) then
+    if ScubaSounds:IsIgnoredRunLoot(itemId) then
         return false
     end
     if IsBigItem(itemId) then
@@ -534,7 +534,7 @@ function handlers.START_LOOT_ROLL(rollId)
     local link = Readable(GetLootRollItemLink(rollId), "string")
     local itemId = ItemIdOf(link)
     local _, _, _, quality = GetLootRollItemInfo(rollId)
-    if not itemId or ScubaSounds:IsIgnoredRunLoot(itemId, link) or not (IsBigItem(itemId) or
+    if not itemId or ScubaSounds:IsIgnoredRunLoot(itemId) or not (IsBigItem(itemId) or
         (not issecretvalue(quality) and type(quality) == "number" and quality >= EPIC_QUALITY)) then
         return
     end
@@ -563,7 +563,7 @@ function handlers.LOOT_OPENED()
         local link = Readable(GetLootSlotLink(slot), "string")
         local itemId = ItemIdOf(link)
         local _, _, _, _, quality = GetLootSlotInfo(slot)
-        if itemId and not ScubaSounds:IsIgnoredRunLoot(itemId, link) and (IsBigItem(itemId) or
+        if itemId and not ScubaSounds:IsIgnoredRunLoot(itemId) and (IsBigItem(itemId) or
             (not issecretvalue(quality) and type(quality) == "number" and quality >= EPIC_QUALITY)) then
             local corpse = Readable((GetLootSourceInfo and GetLootSourceInfo(slot)), "string") or "unknown"
             local hash = string.format("%x", Store.Fnv1a(corpse, Store.HASH_BASIS))

@@ -121,19 +121,14 @@ function ScubaSounds:ItemLinkIn(text)
     return text:match("|c[^|]*|Hitem:.-|h.-|h|r")
 end
 
--- Items left out of dungeon and raid loot, by name (their item IDs aren't known)
+-- Items left out of dungeon and raid loot, by item ID
 local IGNORED_RUN_LOOT = {
-    ["Sealed Artisan's Writ"] = true
+    [262890] = true -- Sealed Artisan's Writ
 }
 
--- Whether an item is left out of dungeon and raid loot. The name comes from the link when given, else from the item
--- cache (nil until the item has loaded once, so it counts as kept until then)
-function ScubaSounds:IsIgnoredRunLoot(itemId, link)
-    local name = type(link) == "string" and not issecretvalue(link) and link:match("|h%[(.-)%]|h") or nil
-    if not name and itemId and C_Item.GetItemNameByID then
-        name = C_Item.GetItemNameByID(itemId)
-    end
-    return type(name) == "string" and not issecretvalue(name) and IGNORED_RUN_LOOT[name] == true
+-- Whether an item is left out of dungeon and raid loot
+function ScubaSounds:IsIgnoredRunLoot(itemId)
+    return itemId ~= nil and IGNORED_RUN_LOOT[tonumber(itemId)] == true
 end
 
 local LINK_COLOR_QUALITY = {

@@ -502,7 +502,7 @@ end
 -- =================================================================
 -- Rares and better, and items on the Notable Loot tab's Big Items list (Data\NotableLoot.lua) whatever their quality
 local function IsRareOrBetter(itemId, link)
-    if ScubaSounds:IsIgnoredRunLoot(itemId, link) then
+    if ScubaSounds:IsIgnoredRunLoot(itemId) then
         return false
     end
     local big = ScubaSounds.Data and ScubaSounds.Data.BigItemIdsMap

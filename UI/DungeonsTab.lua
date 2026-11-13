@@ -346,7 +346,7 @@ function ScubaSounds:CreateDungeonsPage(frame)
     return page
 end
 
--- A run's loot without items left out of it (Sealed Artisan's Writ, recorded before it was left out)
+-- A run's loot without items left out of it (Sealed Artisan's Writ), in case some were recorded before
 local function ShownLoot(run)
     local shown = {}
     for _, loot in ipairs(run.loot) do

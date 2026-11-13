@@ -58,6 +58,9 @@ ScubaSounds.Data.NotableLoot = {{
             12363, -- Arcane Crystal
             12361, -- Blue Sapphire
             13468, -- Black Lotus
+            248822, -- Death Lotus
+            248819, -- Fel Crystal
+            248820, -- Torbernite
             7080, -- Essence of Water
             7082, -- Essence of Air
             19024, -- Arena Grand Master
