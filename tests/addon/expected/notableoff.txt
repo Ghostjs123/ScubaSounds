@@ -1,0 +1,6 @@
+our big item (ticked): heard nothing, sent a guild message
+a guildmate's big item (ticked): heard HelloThere, sent nothing
+our womp womp item (ticked): heard Downer, sent nothing
+our big item (unticked): heard nothing, sent nothing
+a guildmate's big item (unticked): heard nothing, sent nothing
+our womp womp item (unticked): heard nothing, sent nothing

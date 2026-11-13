@@ -370,7 +370,8 @@ AddTrigger("GuildLeave", "Loot", "QSBtZW1iZXIgbGVhdmVzIHRoZSBndWlsZA==", {"BonVo
 AddTrigger("WompLoot", "Loot", "WW91IGxvb3QgYSBkaXNhcHBvaW50aW5nIGl0ZW0=", {"Downer"}, {
     on = "LootReceived",
     when = function(loot)
-        return ScubaSounds:Contains(Data.WompWompItemIdsMap, tostring(loot.itemId))
+        return ScubaSounds:Contains(Data.WompWompItemIdsMap, tostring(loot.itemId)) and
+                   ScubaSounds:IsNotableLootOn(loot.itemId)
     end
 })
 

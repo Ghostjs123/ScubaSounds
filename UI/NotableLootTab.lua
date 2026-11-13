@@ -61,15 +61,44 @@ function ScubaSounds:CreateLootHeader(content, key, text, indent, isList, sound,
     return header
 end
 
--- Icon straight away (GetItemInfoInstant needs no server data); name and quality once the item loads
+-- Dims an item whose checkbox is unticked
+local function ShowItemOn(button)
+    local on = ScubaSounds:IsNotableLootOn(button.ItemId)
+    button.Check:SetChecked(on)
+    button.Icon:SetDesaturated(not on)
+    button.Icon:SetAlpha(on and 1 or 0.5)
+    button.Name:SetAlpha(on and 1 or 0.5)
+    button.Border:SetAlpha(on and 1 or 0.5)
+end
+
+-- Icon straight away (GetItemInfoInstant needs no server data); name and quality once the item loads. The checkbox
+-- before it turns the item off for this player (ScubaSounds:IsNotableLootOn)
 function ScubaSounds:CreateLootItem(content, itemId, width)
     local button = CreateFrame("Button", nil, content)
     button:SetSize(width, LOOT_ITEM_HEIGHT)
     button:RegisterForClicks("LeftButtonUp")
     button:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight", "ADD")
+    button.ItemId = itemId
+    local check = CreateFrame("CheckButton", nil, button, "UICheckButtonTemplate")
+    check:SetSize(LOOT_ICON_SIZE + 2, LOOT_ICON_SIZE + 2)
+    check:SetPoint("LEFT", 0, 0)
+    check:SetScript("OnClick", function(self)
+        ScubaSounds_Options.NotableLootOff[tostring(itemId)] = not self:GetChecked() or nil
+        ShowItemOn(button)
+    end)
+    check:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetText(self:GetChecked() and "On" or "Off", 1, 1, 1)
+        GameTooltip:AddLine("Unticked, getting this item plays nothing and tells the guild nothing, and a " ..
+            "guildmate getting it plays nothing for you. Only changes it for you.", nil, nil, nil, true)
+        GameTooltip:Show()
+    end)
+    check:SetScript("OnLeave", GameTooltip_Hide)
+    button.Check = check
     local icon = button:CreateTexture(nil, "ARTWORK")
     icon:SetSize(LOOT_ICON_SIZE, LOOT_ICON_SIZE)
-    icon:SetPoint("LEFT", 2, 0)
+    icon:SetPoint("LEFT", check, "RIGHT", 2, 0)
+    button.Icon = icon
     local _, _, _, _, iconFile = C_Item.GetItemInfoInstant(itemId)
     icon:SetTexture(iconFile or QUESTION_MARK_ICON)
     button.Border = button:CreateTexture(nil, "OVERLAY")
@@ -77,11 +106,11 @@ function ScubaSounds:CreateLootItem(content, itemId, width)
     button.Border:SetAllPoints(icon)
     button.Name = button:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
     button.Name:SetPoint("LEFT", icon, "RIGHT", 6, 0)
-    button.Name:SetWidth(width - LOOT_ICON_SIZE - 12)
+    button.Name:SetWidth(width - LOOT_ICON_SIZE * 2 - 16)
     button.Name:SetJustifyH("LEFT")
     button.Name:SetWordWrap(false)
     button.Name:SetText(iconFile and "" or "Unknown item " .. itemId)
-    button.ItemId = itemId
+    ShowItemOn(button)
     button:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
         GameTooltip:SetItemByID(itemId)
@@ -121,8 +150,11 @@ function ScubaSounds:CreateNotableLootPage(frame)
     page:Hide()
 
     local note = page:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-    note:SetPoint("TOPLEFT", GRID_LEFT + 2, -40)
-    note:SetText("Getting one of these plays a sound. Any legendary item also counts as a big item.")
+    note:SetPoint("TOPLEFT", GRID_LEFT + 2, -36)
+    note:SetWidth(OPTIONS_WIDTH - GRID_LEFT * 2 - 4)
+    note:SetJustifyH("LEFT")
+    note:SetText("Getting one of these plays a sound. Any legendary item also counts as a big item. Untick an " ..
+        "item to turn it off for you.")
 
     local separator = page:CreateTexture(nil, "ARTWORK")
     separator:SetColorTexture(0.35, 0.33, 0.27, 1)

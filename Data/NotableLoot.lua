@@ -310,6 +310,13 @@ ScubaSounds.Data.NotableLoot = {{
     }}
 }}
 
+-- Whether a Notable Loot item is still ticked on the Notable Loot tab. Unticked ones play nothing and send nothing on
+-- this client
+function ScubaSounds:IsNotableLootOn(itemId)
+    local off = ScubaSounds_Options and ScubaSounds_Options.NotableLootOff
+    return not (off and itemId and off[tostring(itemId)])
+end
+
 -- Lookup maps for the loot check, built from the lists above
 ScubaSounds.Data.BigItemIdsMap = {}
 ScubaSounds.Data.WompWompItemIdsMap = {}

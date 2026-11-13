@@ -95,6 +95,8 @@ function ScubaSounds:InitOptions()
     options.NotableLootOpen = options.NotableLootOpen or {
         big = true
     }
+    -- Notable Loot items the player unticked: item ID (as a string) -> true. Those play nothing and send nothing here
+    options.NotableLootOff = options.NotableLootOff or {}
     -- Sounds played on this account: character -> sound -> {first = server time, count}
     options.SoundsHeard = options.SoundsHeard or {}
     -- Other accounts' characters, from their reports: sound -> character -> first heard (server time)

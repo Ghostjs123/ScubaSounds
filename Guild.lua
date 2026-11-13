@@ -20,6 +20,11 @@ function ScubaSounds:HandleAddonMessage(prefix, message)
     command = command or message -- for messages that send just a command
 
     if command == ScubaSounds_LegendaryReceivedCommand then
+        -- A guildmate's big item that we unticked on the Notable Loot tab: no sound or chat line here
+        local itemId = itemLink and itemLink:match("item:(%d+)")
+        if itemId and not ScubaSounds:IsNotableLootOn(itemId) then
+            return
+        end
         ScubaSounds.State.RecentHelloTheresCount = ScubaSounds.State.RecentHelloTheresCount + 1
         local isTriple = ScubaSounds.State.RecentHelloTheresCount == 3 -- in the last minute
         if isTriple then

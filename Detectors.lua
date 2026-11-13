@@ -1123,8 +1123,12 @@ function ScubaSounds:HandleLoot(lootMessage)
     local itemId = ScubaSounds:ItemIdFromItemLink(itemLink)
     local isLegendary = C_Item.GetItemQualityByID(itemId) == ScubaSounds.Data.LegendaryQuality or
                             itemLink:find("|cffff8000") ~= nil
-    if (isLegendary or ScubaSounds:Contains(ScubaSounds.Data.BigItemIdsMap, tostring(itemId))) and
-        not ScubaSounds:IsItemLinkEnchanted(itemLink) then
+    local isBig = ScubaSounds:Contains(ScubaSounds.Data.BigItemIdsMap, tostring(itemId))
+    -- Unticked on the Notable Loot tab: no message to the guild for it
+    if isBig and not isLegendary and not ScubaSounds:IsNotableLootOn(itemId) then
+        return
+    end
+    if (isLegendary or isBig) and not ScubaSounds:IsItemLinkEnchanted(itemLink) then
         -- Guildmates would hear it with nothing in chat to explain it, so it stays quiet with guild messages off
         if IsInGuild() and ScubaSounds_Options[ScubaSounds_SendGuildMessages] then
             ScubaSounds:SendGuildMessage(ScubaSounds_LegendaryReceivedCommand .. ":" .. ScubaSounds:FullName("player") ..
