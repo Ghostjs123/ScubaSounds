@@ -63,6 +63,7 @@ ScubaSounds.Data.NotableLoot = {{
             19024, -- Arena Grand Master
             18706, -- Arena Master (12 are turned in for Arena Grand Master)
             1404, -- Tidal Charm
+            4500, -- Traveler's Backpack
             23007, -- Piglet's Collar
             23015, -- Rat Cage
             23002, -- Turtle Box

@@ -41,6 +41,9 @@ function ScubaSounds:InitOptions()
     if options[ScubaSounds_ShowGuildOnMap] == nil then
         options[ScubaSounds_ShowGuildOnMap] = true
     end
+    if options[ScubaSounds_GroupOnlyOnMap] == nil then
+        options[ScubaSounds_GroupOnlyOnMap] = false
+    end
     if options[ScubaSounds_GuildDeaths] == nil then
         options[ScubaSounds_GuildDeaths] = false
     end

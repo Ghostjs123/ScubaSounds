@@ -632,6 +632,7 @@ ScubaSounds_PlayDiscoveries = "Play first discovery sounds when found" -- a guil
 ScubaSounds_SendGuildMessages = "Send messages in guild" -- chat players can read ("ding", "gz nigel"); addon messages always go out
 ScubaSounds_ShareLocation = "Share my location with the guild" -- our position for guildmates' maps (GuildMap.lua)
 ScubaSounds_ShowGuildOnMap = "Show guildmates on the map" -- their dots on our world map and minimap
+ScubaSounds_GroupOnlyOnMap = "Hide other guildmates while grouped" -- no guild dots while we're in a party or raid
 
 -- Options tabs. Every trigger belongs to one of these
 ScubaSounds.Data.Categories = {{

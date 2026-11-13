@@ -170,6 +170,14 @@ function ScubaSounds:CreateGlobalOptionsPage(frame)
         "own party or raid already shows on the maps, so they get no dot. Nobody inside a dungeon, raid or " ..
         "battleground shows.")
 
+    local groupOnlyOnMap = ScubaSounds:CreateCheckbox(page, GRID_LEFT, -31 - 8 * (ROW_HEIGHT + 4),
+        ScubaSounds_Options[ScubaSounds_GroupOnlyOnMap], function(checked)
+            ScubaSounds_Options[ScubaSounds_GroupOnlyOnMap] = checked
+        end)
+    ScubaSounds:CreateLabel(page, groupOnlyOnMap, ScubaSounds_GroupOnlyOnMap)
+    describe(groupOnlyOnMap, ScubaSounds_GroupOnlyOnMap, "While you're in a party or raid, guildmates outside it " ..
+        "get no dot on your maps, so only your group shows. Out of a group, guildmates show as usual.")
+
     local playEvery =ScubaSounds:CreateCheckbox(page, GRID_LEFT + RIGHT_COLUMN_X,
         -31 - 4 * (ROW_HEIGHT + 4) - DEBUG_HEADER_HEIGHT,
         ScubaSounds_Options[ScubaSounds_PlayEverySound], function(checked)
@@ -241,7 +249,7 @@ function ScubaSounds:CreateGlobalOptionsPage(frame)
     -- How the secrets work, for players new to the addon, below the checkboxes
     local heading = page:CreateFontString(nil, "ARTWORK", "GameFontNormal")
     heading:SetText("Secret sounds")
-    heading:SetPoint("TOPLEFT", GRID_LEFT + 4, -31 - 8 * (ROW_HEIGHT + 4) - 16)
+    heading:SetPoint("TOPLEFT", GRID_LEFT + 4, -31 - 9 * (ROW_HEIGHT + 4) - 16)
     -- /ss debug hidden shows it anyway until the window closes
     local function updatePrank()
         local showPrank = prank.fired and ScubaSounds:IsStartAttackPrankTarget() or ScubaSounds.State.ShowHiddenOptions or

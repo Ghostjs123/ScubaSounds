@@ -346,6 +346,17 @@ function ScubaSounds:CreateDungeonsPage(frame)
     return page
 end
 
+-- A run's loot without items left out of it (Sealed Artisan's Writ, recorded before it was left out)
+local function ShownLoot(run)
+    local shown = {}
+    for _, loot in ipairs(run.loot) do
+        if not ScubaSounds:IsIgnoredRunLoot(loot.item) then
+            table.insert(shown, loot)
+        end
+    end
+    return shown
+end
+
 -- A run's loot grouped by boss: its kills in order, then Trash. Bosses that dropped nothing are left out
 local function BossGroups(run)
     local groups, byBoss = {}, {}
@@ -362,7 +373,7 @@ local function BossGroups(run)
         boss = TRASH,
         loot = {}
     }
-    for _, loot in ipairs(run.loot) do
+    for _, loot in ipairs(ShownLoot(run)) do
         table.insert((byBoss[loot.boss] or trash).loot, loot)
     end
     local shown = {}
@@ -487,7 +498,7 @@ function ScubaSounds:RefreshDungeons()
         local bg, border = live and LIVE_BG or HEADER_BG, live and LIVE_BORDER or HEADER_BORDER
         header:SetBackdropColor(bg[1], bg[2], bg[3], 1)
         header:SetBackdropBorderColor(border[1], border[2], border[3], 1)
-        local items = #run.loot
+        local items = #ShownLoot(run)
         header.Summary:SetText((live and (GREEN .. "Live|r · ") or "") .. #run.kills ..
                                    (#run.kills == 1 and " boss" or " bosses") .. " · " .. items ..
                                    (items == 1 and " item" or " items"))

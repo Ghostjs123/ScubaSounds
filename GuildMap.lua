@@ -15,8 +15,8 @@ local MINIMAP_REFRESH = 0.1 -- seconds between minimap redraws
 local DOT_SIZE = 10
 local MINIMAP_DOT_SIZE = 8
 local CIRCLE = "Interface\\CHARACTERFRAME\\TempPortraitAlphaMask"
--- The minimap's radius in yards at each zoom level (0 to 5), outdoors and indoors
-local MINIMAP_RADIUS = {
+-- The minimap's width in yards at each zoom level (0 to 5), outdoors and indoors (half of it is the radius)
+local MINIMAP_DIAMETER = {
     outdoor = {466 + 2 / 3, 400, 333 + 1 / 3, 266 + 2 / 3, 200, 133 + 1 / 3},
     indoor = {300, 240, 180, 120, 80, 50}
 }
@@ -171,11 +171,17 @@ local function WorldPosition(map, x, y)
 end
 
 -- Everyone to draw: {key, name, class, map, continent, world}. Our party or raid is left out: the game already
--- shows them on both maps
+-- shows them on both maps. With the group-only option on, nobody is drawn while we're grouped
 local function People()
     local now = GetTime()
     local people, inGroup = {}, {}
     local Raids = ScubaSounds.Raids
+    if ScubaSounds_Options[ScubaSounds_GroupOnlyOnMap] == true then
+        local grouped = IsInGroup()
+        if not issecretvalue(grouped) and grouped then
+            return people
+        end
+    end
     for _, unit in ipairs(GroupUnits()) do
         local key = NameKey(ScubaSounds:FullName(unit))
         if key then
@@ -203,19 +209,93 @@ local function People()
 end
 
 -- Their position on one map (0 to 1 each way), or nil when they're off it
+-- A map's rectangle in world coordinates: {continent, top, left, height, width}, false when it has none. A world
+-- position's x runs north-south (falling going south) and its y east-west (falling going east). Read from the
+-- map's top left and middle, as HereBeDragons does (some maps don't answer for their far corner)
+local mapRects = {}
+local function MapRect(map)
+    local rect = mapRects[map]
+    if rect == nil then
+        rect = false
+        local continent, topLeft = WorldPosition(map, 0, 0)
+        local _, middle = WorldPosition(map, 0.5, 0.5)
+        if continent and topLeft and middle then
+            local top, left = Number(topLeft.x), Number(topLeft.y)
+            local midX, midY = Number(middle.x), Number(middle.y)
+            if top and left and midX and midY then
+                local height, width = (top - midX) * 2, (left - midY) * 2
+                if height ~= 0 and width ~= 0 then
+                    rect = {
+                        continent = continent,
+                        top = top,
+                        left = left,
+                        height = height,
+                        width = width
+                    }
+                end
+            end
+        end
+        mapRects[map] = rect
+    end
+    return rect
+end
+
 local function OnMap(person, map)
-    if not person.continent then
+    local rect = person.continent and MapRect(map)
+    if not rect or rect.continent ~= person.continent then
         return nil
     end
-    local ok, onMap, position = pcall(C_Map.GetMapPosFromWorldPos, person.continent, person.world, map)
-    if not ok or type(position) ~= "table" or (Number(onMap) and onMap ~= map) then
+    local wx, wy = Number(person.world.x), Number(person.world.y)
+    if not wx or not wy then
         return nil
     end
-    local x, y = Number(position.x), Number(position.y)
-    if not x or not y or x < 0 or x > 1 or y < 0 or y > 1 then
+    local x, y = (rect.left - wy) / rect.width, (rect.top - wx) / rect.height
+    if x < 0 or x > 1 or y < 0 or y > 1 then
         return nil
     end
     return x, y
+end
+
+-- /ss debug map: for the map open in the world map (else the one we're on), its rectangle and where each guildmate
+-- lands on it, to see why a dot is missing
+function GuildMap:Diagnose()
+    local function Text(value)
+        if issecretvalue(value) then
+            return "secret"
+        elseif type(value) == "number" then
+            return string.format("%.4g", value)
+        end
+        return tostring(value)
+    end
+    local map = WorldMapFrame and WorldMapFrame:IsShown() and WorldMapFrame:GetMapID()
+    if not Number(map) then
+        map = UnitMapPosition("player")
+    end
+    ScubaSounds:SendMessage("Map " .. Text(map))
+    for _, corner in ipairs({{0, 0}, {0.5, 0.5}, {1, 1}}) do
+        local ok, continent, world = pcall(C_Map.GetWorldPosFromMapPos, map, CreateVector2D(corner[1], corner[2]))
+        DEFAULT_CHAT_FRAME:AddMessage(string.format("   corner %s,%s: ok %s continent %s world %s, %s", corner[1],
+            corner[2], tostring(ok), Text(continent), Text(type(world) == "table" and world.x),
+            Text(type(world) == "table" and world.y)))
+    end
+    mapRects[map] = nil
+    local rect = MapRect(map)
+    if rect then
+        DEFAULT_CHAT_FRAME:AddMessage(string.format("   rect: continent %s top %s left %s height %s width %s",
+            Text(rect.continent), Text(rect.top), Text(rect.left), Text(rect.height), Text(rect.width)))
+    else
+        DEFAULT_CHAT_FRAME:AddMessage("   rect: none")
+    end
+    local people = People()
+    if #people == 0 then
+        DEFAULT_CHAT_FRAME:AddMessage("   nobody to draw (no recent positions, or all grouped/hidden)")
+    end
+    for _, person in ipairs(people) do
+        local x, y = OnMap(person, map)
+        DEFAULT_CHAT_FRAME:AddMessage(string.format("   %s: map %s at %s,%s, continent %s world %s, %s -> %s, %s",
+            person.name or person.key, Text(person.map), Text(person.x), Text(person.y), Text(person.continent),
+            Text(person.world and person.world.x), Text(person.world and person.world.y), Text(x), Text(y)))
+    end
 end
 
 -- =================================================================
@@ -353,30 +433,17 @@ end
 -- The minimap
 -- =================================================================
 local minimapDots
-local mapSizes = {} -- map -> width, height in yards
-
+-- A map's width and height in yards
 local function MapSize(map)
-    local size = mapSizes[map]
-    if size == nil then
-        local _, topLeft = WorldPosition(map, 0, 0)
-        local _, bottomRight = WorldPosition(map, 1, 1)
-        size = false
-        if topLeft and bottomRight then
-            local width, height = math.abs(topLeft.x - bottomRight.x), math.abs(topLeft.y - bottomRight.y)
-            if width > 0 and height > 0 then
-                size = {width, height}
-            end
-        end
-        mapSizes[map] = size
-    end
-    return size
+    local rect = MapRect(map)
+    return rect and {math.abs(rect.width), math.abs(rect.height)}
 end
 
 local function MinimapRadius()
     local zoom = Number(Minimap:GetZoom()) or 0
     local indoors = IsIndoors()
-    local radii = (not issecretvalue(indoors) and indoors) and MINIMAP_RADIUS.indoor or MINIMAP_RADIUS.outdoor
-    return radii[zoom + 1] or radii[1]
+    local widths = (not issecretvalue(indoors) and indoors) and MINIMAP_DIAMETER.indoor or MINIMAP_DIAMETER.outdoor
+    return (widths[zoom + 1] or widths[1]) / 2
 end
 
 local function DrawMinimap()

@@ -332,6 +332,8 @@ function ScubaSounds:DebugCommand(words)
         else
             ScubaSounds:ToggleDebugLog()
         end
+    elseif words[2] == "map" then
+        ScubaSounds.GuildMap:Diagnose()
     elseif words[2] == "comms" then
         -- /ss debug comms: hidden test messages to ourselves, on the guild channel (which comes back to the sender) and
         -- whispered to each way our name could be written, sent straight to the game. Prints what the game answered
@@ -359,6 +361,8 @@ function ScubaSounds:DebugCommand(words)
                           {"/ss debug comms",
                            "send a few hidden test messages to yourself and print which come back, to see if " ..
                                "guildmates' addons can reach you"},
+                          {"/ss debug map",
+                           "where each guildmate lands on the map that's open, to see why a dot is missing"},
                           {"/ss debug comms <name>",
                            "ask that guildmate, then the guild, for their sound stats and print who answers"}}
         local heading = "Debug commands (only print here, nothing is unlocked or sent unless it says so):"

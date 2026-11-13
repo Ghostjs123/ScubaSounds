@@ -12,7 +12,8 @@ from tab_env import UI_FAKE  # noqa: E402
 
 DUROTAR, KALIMDOR, DEADMINES = 1411, 1414, 1581
 
-# Maps as rectangles of world coordinates. Like the game's, a world position's x falls going east and y going south
+# Maps as rectangles of world coordinates. Like the game's, a world position's x runs north-south (falling going
+# south) and its y east-west (falling going east); left/right are y values, top/bottom x values
 MAP_FAKE = r"""
 MAPS = {
     [1411] = {continent = 1, left = 0, top = 0, right = -5000, bottom = -3000, type = 3, name = "Durotar"},
@@ -41,12 +42,12 @@ C_Map = {
     GetMapInfo = function(map) local m = MAPS[map]; return m and {mapType = m.type, name = m.name} end,
     GetWorldPosFromMapPos = function(map, pos)
         local m = MAPS[map]
-        return m.continent, vector(m.left + (m.right - m.left) * pos.x, m.top + (m.bottom - m.top) * pos.y)
+        return m.continent, vector(m.top + (m.bottom - m.top) * pos.y, m.left + (m.right - m.left) * pos.x)
     end,
     GetMapPosFromWorldPos = function(continent, world, map)
         local m = MAPS[map]
         if m.continent ~= continent then return nil end
-        return map, vector((world.x - m.left) / (m.right - m.left), (world.y - m.top) / (m.bottom - m.top))
+        return map, vector((world.y - m.left) / (m.right - m.left), (world.x - m.top) / (m.bottom - m.top))
     end,
 }
 function IsInGuild() return true end
@@ -62,6 +63,7 @@ RAID_CLASS_COLORS.WARRIOR.r, RAID_CLASS_COLORS.WARRIOR.g, RAID_CLASS_COLORS.WARR
 RAID_CLASS_COLORS.MAGE.r, RAID_CLASS_COLORS.MAGE.g, RAID_CLASS_COLORS.MAGE.b = 0.41, 0.8, 0.94
 ScubaSounds_ShareLocation = "Share my location with the guild"
 ScubaSounds_ShowGuildOnMap = "Show guildmates on the map"
+ScubaSounds_GroupOnlyOnMap = "Hide other guildmates while grouped"
 """
 
 # The world map and minimap, after the UI fake: 1000x800 world map canvas, a 140 wide minimap at zoom 0
@@ -181,20 +183,34 @@ def sharing_off_sends_hidden_straight_away():
 def a_guildmates_dot_on_the_world_map_and_minimap():
     m = MapClient()
     m.hear("Taco Lips", "P:1411:0.5100:0.5000")
-    # 1% of Durotar's 5000 yard width east of us: 50 yards, at zoom 0's 466.7 yard radius on a 70 pixel half width
+    # 1% of Durotar's 5000 yard width east of us: 50 yards, at zoom 0's 233.3 yard radius on a 70 pixel half width
     check(m.world() == "Taco Lips 510 -400", m.world())
-    check(m.minimap() == "Taco Lips 8 0", m.minimap())
+    check(m.minimap() == "Taco Lips 15 0", m.minimap())
+    # 1% of its 3000 yard height north of us: 30 yards
+    m.hear("Taco Lips", "P:1411:0.5000:0.4900")
+    check(m.minimap() == "Taco Lips 0 9", m.minimap())
     m.c.run("WORLD_MAP_ID = 1414")
-    check(m.world() == "Taco Lips 418 -307", "on Kalimdor: %s" % m.world())
+    check(m.world() == "Taco Lips 417 -306", "on Kalimdor: %s" % m.world())
 
 
 @test
 def the_minimap_turns_with_us_when_it_rotates():
     m = MapClient()
     m.hear("Taco Lips", "P:1411:0.5200:0.5000")
-    check(m.minimap() == "Taco Lips 15 0", m.minimap())
+    check(m.minimap() == "Taco Lips 30 0", m.minimap())
     m.c.run('CVARS.rotateMinimap = "1"; FACING = math.pi / 2')  # facing west: east is behind us
-    check(m.minimap() == "Taco Lips 0 -15", m.minimap())
+    check(m.minimap() == "Taco Lips 0 -30", m.minimap())
+
+
+@test
+def walking_toward_a_still_guildmate_brings_their_dot_in():
+    m = MapClient()
+    m.hear("Taco Lips", "P:1411:0.5200:0.5000")
+    check(m.minimap() == "Taco Lips 30 0", m.minimap())
+    m.c.run("MY.x = 0.51")  # 50 yards east, toward them
+    check(m.minimap() == "Taco Lips 15 0", m.minimap())
+    m.c.run("MY.x = 0.52")
+    check(m.minimap() == "Taco Lips 0 0", m.minimap())
 
 
 @test
@@ -233,11 +249,26 @@ def our_group_gets_no_dots():
     m.hear("Taco Lips", "P:1411:0.5100:0.5000")
     m.hear("Robot Shark", "P:1411:0.5200:0.5000")
     check(m.world() == "Robot Shark 520 -400", m.world())
-    check(m.minimap() == "Robot Shark 15 0", m.minimap())
+    check(m.minimap() == "Robot Shark 30 0", m.minimap())
     # Out of the group again: back on the map from their messages
     m.c.run("GROUP = {}; RAID_GROUP = false")
     m.hear("Taco Lips", "P:1411:0.5100:0.5000")
     check(m.world() == "Robot Shark 520 -400, Taco Lips 510 -400", m.world())
+
+
+@test
+def group_only_hides_everyone_while_grouped():
+    m = MapClient()
+    m.c.run('ScubaSounds_Options[ScubaSounds_GroupOnlyOnMap] = true')
+    m.hear("Robot Shark", "P:1411:0.5200:0.5000")
+    # Not grouped: guildmates show as usual
+    check(m.world() == "Robot Shark 520 -400", m.world())
+    m.c.run('GROUP = {{name = "Taco Lips", class = "MAGE"}}')
+    m.hear("Robot Shark", "P:1411:0.5200:0.5000")
+    check(m.world() == "" and m.minimap() == "", m.world() + " / " + m.minimap())
+    m.c.run("GROUP = {}")
+    m.hear("Robot Shark", "P:1411:0.5200:0.5000")
+    check(m.world() == "Robot Shark 520 -400", m.world())
 
 
 @test

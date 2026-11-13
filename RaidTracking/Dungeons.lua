@@ -500,7 +500,15 @@ end
 -- =================================================================
 -- Recording: kills and loot
 -- =================================================================
+-- Rares and better, and items on the Notable Loot tab's Big Items list (Data\NotableLoot.lua) whatever their quality
 local function IsRareOrBetter(itemId, link)
+    if ScubaSounds:IsIgnoredRunLoot(itemId, link) then
+        return false
+    end
+    local big = ScubaSounds.Data and ScubaSounds.Data.BigItemIdsMap
+    if big and big[tostring(itemId)] then
+        return true
+    end
     local quality = C_Item.GetItemQualityByID and C_Item.GetItemQualityByID(itemId)
     if not issecretvalue(quality) and type(quality) == "number" then
         return quality >= RARE_QUALITY

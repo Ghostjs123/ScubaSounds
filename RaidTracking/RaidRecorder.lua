@@ -92,7 +92,20 @@ local function ItemIdOf(link)
     return link and ScubaSounds:ItemIdFromItemLink(link)
 end
 
+-- On the Notable Loot tab's Big Items list (Data\NotableLoot.lua), recorded whatever its quality
+local function IsBigItem(itemId)
+    local big = ScubaSounds.Data and ScubaSounds.Data.BigItemIdsMap
+    return big ~= nil and itemId ~= nil and big[tostring(itemId)] == true
+end
+
+-- Epics and better, and big items
 local function IsEpicOrBetter(itemId, link)
+    if ScubaSounds:IsIgnoredRunLoot(itemId, link) then
+        return false
+    end
+    if IsBigItem(itemId) then
+        return true
+    end
     local quality = C_Item.GetItemQualityByID and C_Item.GetItemQualityByID(itemId)
     if not issecretvalue(quality) and type(quality) == "number" then
         return quality >= EPIC_QUALITY
@@ -521,7 +534,8 @@ function handlers.START_LOOT_ROLL(rollId)
     local link = Readable(GetLootRollItemLink(rollId), "string")
     local itemId = ItemIdOf(link)
     local _, _, _, quality = GetLootRollItemInfo(rollId)
-    if not itemId or issecretvalue(quality) or type(quality) ~= "number" or quality < EPIC_QUALITY then
+    if not itemId or ScubaSounds:IsIgnoredRunLoot(itemId, link) or not (IsBigItem(itemId) or
+        (not issecretvalue(quality) and type(quality) == "number" and quality >= EPIC_QUALITY)) then
         return
     end
     local key = "r" .. rollId .. ":" .. itemId
@@ -549,7 +563,8 @@ function handlers.LOOT_OPENED()
         local link = Readable(GetLootSlotLink(slot), "string")
         local itemId = ItemIdOf(link)
         local _, _, _, _, quality = GetLootSlotInfo(slot)
-        if itemId and not issecretvalue(quality) and type(quality) == "number" and quality >= EPIC_QUALITY then
+        if itemId and not ScubaSounds:IsIgnoredRunLoot(itemId, link) and (IsBigItem(itemId) or
+            (not issecretvalue(quality) and type(quality) == "number" and quality >= EPIC_QUALITY)) then
             local corpse = Readable((GetLootSourceInfo and GetLootSourceInfo(slot)), "string") or "unknown"
             local hash = string.format("%x", Store.Fnv1a(corpse, Store.HASH_BASIS))
             local copyKey = hash .. ":" .. itemId

@@ -143,6 +143,20 @@ def greens_and_quest_rewards_dont_count():
 
 
 @test
+def big_items_count_whatever_their_quality_and_the_writ_never_does():
+    buff = new_client("Buff Check")
+    buff.run("QUALITY[4500] = 2; QUALITY[%d] = 3; "
+             "ScubaSounds.Data.BigItemIdsMap = {['4500'] = true}" % HELM)
+    buff.enter()
+    buff.target()
+    buff.loot_line("You receive loot: |cnIQ2:|Hitem:4500::::::::60:::::|h[Traveler's Backpack]|h|r.")
+    buff.loot_line("You receive loot: |cnIQ3:|Hitem:%d::::::::60:::::|h[Sealed Artisan's Writ]|h|r." % HELM)
+    buff.step(8)
+    items = [entry[2]["i"] for entry in buff.dungeon_entries("dloot")]
+    check(items == [4500], items)
+
+
+@test
 def a_guildmate_who_logs_in_later_doesnt_catch_up():
     buff = new_client("Buff Check")
     buff.enter()
