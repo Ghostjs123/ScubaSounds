@@ -36,7 +36,7 @@ def entries_wait_for_the_copy_number():
     buff.enter()
     buff.loot_line("You receive loot: %s." % link(HELM, "ff0070dd"))
     buff.step(1)
-    check(buff.dungeon_entries() == [], "nothing before the copy is known")
+    check(buff.dungeon_entries("dloot") == [], "nothing before the copy is known")
     buff.target()
     buff.step(1)
     loot = buff.dungeon_entries("dloot")
@@ -50,7 +50,7 @@ def leaving_before_seeing_a_mob_writes_without_a_copy():
     buff.enter()
     buff.kill()
     buff.step(8)
-    check(buff.dungeon_entries() == [], "waiting")
+    check(buff.dungeon_entries("dkill") == [], "waiting")
     buff.leave()
     kills = buff.dungeon_entries("dkill")
     check(len(kills) == 1 and "l" not in kills[0][2], kills)
@@ -108,6 +108,57 @@ def three_guild_members_and_two_pugs_are_recorded_with_the_pugs():
 
 
 @test
+def a_roll_win_is_marked_need_or_greed():
+    """The roll lines come before the loot line: the winner's roll is saved with the loot, by its looter or by an
+    observer. Loot nobody rolled on has no mark."""
+    buff, taco = new_client("Buff Check"), new_client("Taco Lips")
+    for c in (buff, taco):
+        c.run("QUALITY[%d] = 4; QUALITY[%d] = 3; QUALITY[%d] = 3" % (HELM, HELM + 1, HELM + 2))
+        c.enter()
+        c.target()
+        c.kill()
+    pump([buff, taco], 8)
+    for c in (buff, taco):
+        c.loot_line("Need Roll - 4 for %s by Taco Lips" % link(HELM))
+        c.loot_line("Need Roll - 54 for %s by Robot Shark" % link(HELM))
+        c.loot_line("Greed Roll - 70 for %s by Buff Check" % link(HELM + 1))
+        c.loot_line("Robot Shark won: %s." % link(HELM))
+        c.loot_line("Robot Shark receives loot: %s." % link(HELM))
+    buff.loot_line("Buff Check won: %s." % link(HELM + 1))
+    buff.loot_line("You receive loot: %s." % link(HELM + 1))
+    taco.loot_line("Buff Check receives loot: %s." % link(HELM + 1))
+    taco.loot_line("You receive loot: %s." % link(HELM + 2))
+    pump([buff, taco], 12)
+    rolls = {(e[2]["p"], e[2]["i"]): e[2].get("n") for e in buff.dungeon_entries("dloot")}
+    check(rolls == {("Robot Shark", HELM): "need", ("Buff Check", HELM + 1): "greed", ("Taco Lips", HELM + 2): None},
+          rolls)
+    loot = {(l.person, l.item): l.roll for run in taco.runs() for l in run.loot.values()}
+    check(loot == {("robot shark", HELM): "need", ("buff check", HELM + 1): "greed", ("taco lips", HELM + 2): None},
+          loot)
+
+
+@test
+def going_in_is_written_once_for_the_group():
+    """Two of the group have the addon: one entered entry between them, with the copy once a mob is seen. Going back
+    in (after a wipe) doesn't write another."""
+    buff, taco = new_client("Buff Check"), new_client("Taco Lips")
+    for c in (buff, taco):
+        c.enter()
+    pump([buff, taco], 3)
+    for c in (buff, taco):
+        c.target()
+    pump([buff, taco], 12)
+    for c in (buff, taco):
+        entered = c.dungeon_entries("denter")
+        check(len(entered) == 1 and sorted(entered[0][2]["m"]) == sorted(PARTY), "one on %s: %r" % (c.name, entered))
+    for c in (buff, taco):
+        c.leave()
+        c.enter()
+    pump([buff, taco], 15)
+    check(len(buff.dungeon_entries("denter")) == 1, buff.dungeon_entries("denter"))
+
+
+@test
 def two_guild_members_and_three_pugs_write_nothing():
     buff = new_client("Buff Check")
     buff.run("QUALITY[%d] = 4" % HELM)
@@ -120,11 +171,33 @@ def two_guild_members_and_three_pugs_write_nothing():
 
 
 @test
-def a_raid_group_in_a_dungeon_isnt_tracked():
-    buff = new_client("Buff Check")
-    buff.run('GROUP = {{name = "Buff Check", class = "DRUID", zone = "Scarlet Monastery", online = true}}')
-    buff.enter()
+def a_raid_group_in_a_dungeon_is_tracked():
+    """Blackrock Spire takes 10 and is run as a raid group, but reports "party" like any dungeon."""
+    buff, outside = new_client("Buff Check"), new_client("Outside Guy")
+    group = PARTY + ["Downvote Stars", "Raid Pug"]
+    buff.run("QUALITY[%d] = 4" % HELM)
+    buff.run("GROUP = {%s}" % ", ".join(
+        '{name = "%s", class = "WARRIOR", zone = "Scarlet Monastery", online = true}' % n for n in group))
+    buff.enter([])
     buff.target()
+    buff.kill()
+    pump([buff, outside], 8)
+    buff.loot_line("Raid Pug receives loot: %s." % link(HELM))
+    pump([buff, outside], 8)
+    kills, loot = buff.dungeon_entries("dkill"), buff.dungeon_entries("dloot")
+    check(len(kills) == 1 and sorted(kills[0][2]["m"]) == sorted(group), kills)
+    check(len(loot) == 1 and loot[0][2]["p"] == "Raid Pug", loot)
+    check(len(buff.dungeon_entries("denter")) == 1, buff.dungeon_entries("denter"))
+    runs = outside.runs()
+    check(len(runs) == 1 and len(runs[0].loot) == 1, "outside sees the raid group's run")
+
+
+@test
+def a_raid_instance_isnt_a_dungeon():
+    buff = new_client("Buff Check")
+    buff.run('GROUP = {{name = "Buff Check", class = "DRUID", zone = "Molten Core", online = true}}')
+    buff.run('RAID_GROUP = true; INSTANCE.name = "Molten Core"; INSTANCE.type = "raid"')
+    buff.fire("ZONE_CHANGED_NEW_AREA")
     buff.kill()
     buff.step(8)
     check(buff.dungeon_entries() == [], buff.dungeon_entries())
@@ -139,34 +212,92 @@ def greens_and_quest_rewards_dont_count():
     buff.loot_line("You receive loot: %s." % link(GREEN, "ff1eff00"))
     buff.loot_line("You receive item: %s." % link(HELM))
     buff.step(2)
-    check(buff.dungeon_entries() == [], buff.dungeon_entries())
+    check(buff.dungeon_entries("dloot") == [], buff.dungeon_entries("dloot"))
 
 
 @test
-def big_items_count_whatever_their_quality_and_the_writ_never_does():
+def big_items_count_whatever_their_quality_and_the_writ_and_shards_never_do():
     buff = new_client("Buff Check")
-    buff.run("QUALITY[4500] = 2; QUALITY[262890] = 3; "
+    buff.run("QUALITY[4500] = 2; QUALITY[262890] = 3; QUALITY[14344] = 3; "
              "ScubaSounds.Data.BigItemIdsMap = {['4500'] = true}")
     buff.enter()
     buff.target()
     buff.loot_line("You receive loot: |cnIQ2:|Hitem:4500::::::::60:::::|h[Traveler's Backpack]|h|r.")
     buff.loot_line("You receive loot: |cnIQ3:|Hitem:262890::::::::60:::::|h[Sealed Artisan's Writ]|h|r.")
+    buff.loot_line("You receive loot: |cnIQ3:|Hitem:14344::::::::60:::::|h[Large Brilliant Shard]|h|r.")
     buff.step(8)
     items = [entry[2]["i"] for entry in buff.dungeon_entries("dloot")]
     check(items == [4500], items)
 
 
+COUNT_SENDS = """
+DUNGEON_PARTS = 0
+local send = C_ChatInfo.SendAddonMessage
+C_ChatInfo.SendAddonMessage = function(prefix, text, channel)
+    if prefix == "SSDungeon" then DUNGEON_PARTS = DUNGEON_PARTS + 1 end
+    return send(prefix, text, channel)
+end
+"""
+
+
+def saved_kills(*kills):
+    """Lua for before_login: a saved dungeon log with these (age in seconds, boss) kills by Buff Check."""
+    entries = ", ".join(
+        '{t = GetServerTime() - %d, w = GetServerTime() - %d, c = 0, a = "Buff Check", k = "dkill", '
+        'd = {r = "Scarlet Monastery", e = %d, b = "%s", m = {"Buff Check", "Taco Lips", "Robot Shark"}}}'
+        % (age, age, i + 2, boss) for i, (age, boss) in enumerate(kills))
+    return 'ScubaSounds_Ledger = {["Scuba Cops"] = {dungeons = {entries = {%s}}}}' % entries
+
+
 @test
-def a_guildmate_who_logs_in_later_doesnt_catch_up():
+def a_guildmate_who_logs_in_later_is_caught_up():
     buff = new_client("Buff Check")
+    buff.run("QUALITY[%d] = 4" % HELM)
     buff.enter()
     buff.target()
     buff.kill()
     pump([buff], 10)  # sent while nobody else is online
-    check(len(buff.dungeon_entries("dkill")) == 1, "written")
+    buff.loot_line("You receive loot: %s." % link(HELM))
+    pump([buff], 5)
+    check(len(buff.dungeon_entries("dkill")) == 1 and len(buff.dungeon_entries("dloot")) == 1, "written")
     late = new_client("Outside Guy")
-    pump([buff, late], 60)
-    check(late.runs() == [], "live only")
+    pump([buff, late], 30)
+    runs = late.runs()
+    check(len(runs) == 1 and len(runs[0].kills) == 1 and len(runs[0].loot) == 1, "the live run, caught up")
+
+
+@test
+def only_the_last_three_hours_are_caught_up():
+    buff = new_client("Buff Check", before_login=saved_kills((4 * 3600, "Old Boss"), (2 * 3600, "Recent Boss")))
+    late = new_client("Outside Guy")
+    pump([buff, late], 30)
+    kills = late.dungeon_entries("dkill")
+    check(len(kills) == 1 and kills[0][2]["b"] == "Recent Boss", kills)
+
+
+@test
+def one_client_answers_and_the_other_only_adds_what_it_missed():
+    buff = new_client("Buff Check", before_login=saved_kills((600, "Herod")))
+    taco = new_client("Taco Lips", before_login=saved_kills((600, "Herod")))
+    pump([buff, taco], 30)
+    for c in (buff, taco):
+        c.run(COUNT_SENDS)
+    late = new_client("Outside Guy")
+    pump([buff, taco, late], 30)
+    check(len(late.dungeon_entries("dkill")) == 1, late.dungeon_entries())
+    sent = [c.eval("DUNGEON_PARTS") for c in (buff, taco)]
+    check(sorted(sent)[0] == 0 and sorted(sent)[1] >= 1, "one answer: %r" % sent)
+
+
+@test
+def nothing_is_sent_to_a_client_that_already_has_it():
+    """A /reload: the client asking already has every recent entry."""
+    buff = new_client("Buff Check", before_login=saved_kills((600, "Herod")))
+    pump([buff], 30)
+    buff.run(COUNT_SENDS)
+    again = new_client("Taco Lips", before_login=saved_kills((600, "Herod")))
+    pump([buff, again], 30)
+    check(buff.eval("DUNGEON_PARTS") == 0, buff.eval("DUNGEON_PARTS"))
 
 
 @test

@@ -8,10 +8,11 @@
 --                                   belong to lockout l
 --   drop  {r, l?, x, i, g?, m?, a?} an epic or better item dropped: drop key, item ID, boss guess, who was in the
 --                                   instance; a = added by an officer
---   recv  {i, v, r?, l?, x?, p?, c?, u?, f?}
+--   recv  {i, v, r?, l?, x?, p?, c?, u?, f?, n?}
 --                                   someone received an item: via ("roll", "ml" master loot, "loot", "trade"), the
 --                                   recipient p (left out when it's the author), their class c (pugs), u = the
---                                   recipient can't use it, f = who traded it to them
+--                                   recipient can't use it, f = who traded it to them, n = "need" or "greed" (how a
+--                                   roll was won)
 --   step  {s, i, p?, c?}            the author did something with an item they hold: s = "trade" (to p, of class c),
 --                                   "de" (disenchanted), "sell", "buyback", "equip", "window" (raid trade window ended)
 --   role  {r, l?, s, n, q?, o?}     loot role s ("col" collectors, "de" disenchanters) set to the names n (none: empty).
@@ -42,6 +43,11 @@ Entries.RAID_KINDS = {
     fix = true,
     del = true,
     delraid = true
+}
+
+Entries.ROLL_TYPES = {
+    need = true,
+    greed = true
 }
 
 Entries.VIA = {
@@ -186,7 +192,8 @@ local SCHEMAS = {
         p = optionalName,
         c = optionalText,
         u = optionalBoolean,
-        f = optionalName
+        f = optionalName,
+        n = Optional(OneOf(Entries.ROLL_TYPES))
     },
     step = {
         s = OneOf(Entries.STEPS),

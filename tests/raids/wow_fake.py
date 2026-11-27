@@ -12,7 +12,7 @@ from ledger_env import ADDON, LIB_FILES, LEDGER_FILES, START_TIME, addon_file, l
 
 RAID_FILES = ["Data/DropSources.lua", "RaidTracking/RaidEntries.lua", "RaidTracking/RaidReplay.lua",
               "RaidTracking/RaidSample.lua", "RaidTracking/RaidEquip.lua",
-              "RaidTracking/Raids.lua", "RaidTracking/RaidRecorder.lua", "RaidTracking/RaidLiveTest.lua"]
+              "RaidTracking/Raids.lua", "RaidTracking/LootRolls.lua", "RaidTracking/RaidRecorder.lua", "RaidTracking/RaidLiveTest.lua"]
 
 FAKE_WOW = r"""
 FRAMES = {}
@@ -242,6 +242,8 @@ RAID_CLASS_COLORS = {WARRIOR = {colorStr = "ffc79c6e"}, MAGE = {colorStr = "ff69
 -- Game strings
 LOOT_ROLL_YOU_WON = "You won: %%s"
 LOOT_ROLL_WON = "%%s won: %%s."
+LOOT_ROLL_ROLLED_NEED = "Need Roll - %%d for %%s by %%s"
+LOOT_ROLL_ROLLED_GREED = "Greed Roll - %%d for %%s by %%s"
 LOOT_ITEM_SELF = "You receive loot: %%s."
 LOOT_ITEM_SELF_MULTIPLE = "You receive loot: %%sx%%d."
 LOOT_ITEM = "%%s receives loot: %%s."

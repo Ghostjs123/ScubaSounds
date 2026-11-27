@@ -53,6 +53,24 @@ ScubaSounds.Data.NotableLoot = {{
             14153, -- Robe of the Void
         }
     }, {
+        name = "Recipes",
+        -- IDs from Wowhead Forever. Recipes a vendor sells are left out
+        items = {
+            16252, -- Formula: Enchant Weapon - Crusader
+            16253, -- Formula: Enchant Chest - Greater Stats
+            22389, -- Plans: Sageblade
+            12717, -- Plans: Lionheart Helm
+            12838, -- Plans: Arcanite Reaper
+            12834, -- Plans: Arcanite Champion
+            12821, -- Plans: Dawn's Edge
+            18291, -- Schematic: Force Reactive Disk
+            16054, -- Schematic: Arcanite Dragonling
+            14513, -- Pattern: Robe of the Archmage
+            14512, -- Pattern: Truefaith Vestments
+            14514, -- Pattern: Robe of the Void
+            15772, -- Pattern: Devilsaur Leggings
+        }
+    }, {
         name = "Out in the World",
         items = {
             12363, -- Arcane Crystal

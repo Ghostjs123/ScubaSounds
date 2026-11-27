@@ -95,10 +95,14 @@ def a_roll_drop_and_our_win():
     drops = c.entries("drop")
     check(len(drops) == 1 and drops[0][2]["x"] == "r77:%d" % SULF, "drop %r" % drops)
     link = c.eval("Link(%d)" % SULF)
+    c.fire("CHAT_MSG_LOOT", "Greed Roll - 12 for %s by Pug Person" % link)
+    c.fire("CHAT_MSG_LOOT", "Need Roll - 54 for %s by Bear Mon" % link)
     c.fire("CHAT_MSG_LOOT", "You won: " + link)
     c.fire("CHAT_MSG_LOOT", "You receive loot: " + link + ".")
     recvs = c.entries("recv")
     check(len(recvs) == 1 and recvs[0][2]["v"] == "roll" and "p" not in recvs[0][2], "receipts %r" % recvs)
+    check(recvs[0][2].get("n") == "need", "won on need: %r" % recvs)
+    check(c.state().dropsByItem[SULF][1].receipt.roll == "need", "replayed")
     check(status(c, SULF) == ["won:bear mon"], status(c, SULF))
 
 
@@ -111,11 +115,13 @@ def an_observer_records_someone_elses_win():
     c.fire("START_LOOT_ROLL", 78, 60)
     c.step(6)
     link = c.eval("Link(%d)" % SULF)
+    c.fire("CHAT_MSG_LOOT", "Greed Roll - 80 for %s by Pug Person" % link)
     c.fire("CHAT_MSG_LOOT", "Pug Person won: " + link + ".")
     c.fire("CHAT_MSG_LOOT", "Pug Person receives loot: " + link + ".")
     c.step(6)
     recvs = c.entries("recv")
     check(len(recvs) == 1 and recvs[0][2]["p"] == "Pug Person" and recvs[0][2]["c"] == "MAGE", "receipts %r" % recvs)
+    check(recvs[0][2].get("n") == "greed", "won on greed: %r" % recvs)
     check(status(c, SULF) == ["won:pug person"], status(c, SULF))
 
 

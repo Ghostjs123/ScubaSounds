@@ -1,4 +1,4 @@
--- ScubaSounds: each 5-man dungeon's bosses, for the Dungeons tab's boss kills (docs\DUNGEON_TRACKING_DESIGN.md). Keyed by
+-- ScubaSounds: each dungeon's bosses, for the Dungeons tab's boss kills (docs\DUNGEON_TRACKING_DESIGN.md). Keyed by
 -- the instance map ID (GetInstanceInfo's 8th value); wings that share an instance (Scarlet Monastery, Dire Maul,
 -- Blackrock Spire, Stratholme) are listed together. Forever closes the combat log and hides who died inside dungeons,
 -- so a kill is told by any of: ENCOUNTER_END (encounters: its IDs, the same on every client language; a boss can have

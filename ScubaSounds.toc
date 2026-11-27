@@ -36,6 +36,7 @@ RaidTracking\DungeonReplay.lua
 RaidTracking\RaidSample.lua
 RaidTracking\RaidEquip.lua
 RaidTracking\Raids.lua
+RaidTracking\LootRolls.lua
 RaidTracking\RaidRecorder.lua
 RaidTracking\Dungeons.lua
 RaidTracking\RaidLiveTest.lua

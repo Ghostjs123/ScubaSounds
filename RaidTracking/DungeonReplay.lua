@@ -2,7 +2,10 @@
 -- kinds, their data in one-letter keys like the raid log's:
 --   dkill {r, e, b, m, l?}  a boss kill: dungeon, encounter ID, boss name, the group's names; l = the run's instance
 --                           copy ("<map>-<copy>", from creature GUIDs), when it could be read
---   dloot {r, i, p, m, l?}  item i (blue or better) looted by p in dungeon r
+--   dloot {r, i, p, m, l?, n?}  item i (blue or better) looted by p in dungeon r; n = "need" or "greed" when p won
+--                           it on a roll
+--   denter {r, m, l?}       a group with at least MIN_GUILD guild members went into dungeon r: the run shows (while
+--                           it's live) before anything dies or drops
 --   ddel  {r, s, l?}        an officer deleted the run of dungeon r (and copy l) that was going on at time s
 -- Dungeons save nobody, so there's no lockout ID: runs are worked out here. Entries with the same copy are one run
 -- (copies are reused once a dungeon shuts down, so a long gap starts a new one). An entry without a copy joins the
@@ -21,14 +24,21 @@ local SAME_LOOT = 120 -- seconds: copies of one item looted by one person this c
 local MIN_SHARED = 3 -- group members an entry without a copy must share with a run to join it
 local MAX_NAME = 64
 local MAX_TEXT = 128
-local MAX_GROUP = 5
+local MAX_GROUP = 10 -- the most a dungeon takes: Blackrock Spire, run as a raid group
+Replay.MAX_GROUP = MAX_GROUP
 local TRASH = "Trash"
 Replay.TRASH = TRASH
 Replay.MIN_GUILD = 3 -- guild members a group needs for its run to be recorded and shown
 
+local ROLL_TYPES = {
+    need = true,
+    greed = true
+}
+
 Replay.KINDS = {
     dkill = true,
     dloot = true,
+    denter = true,
     ddel = true
 }
 
@@ -60,7 +70,9 @@ function Replay.IsValid(kind, d)
     if kind == "dkill" then
         return IsId(d.e) and IsText(d.b, MAX_TEXT) and IsGroup(d.m)
     elseif kind == "dloot" then
-        return IsId(d.i) and IsText(d.p, MAX_NAME) and IsGroup(d.m)
+        return IsId(d.i) and IsText(d.p, MAX_NAME) and IsGroup(d.m) and (d.n == nil or ROLL_TYPES[d.n] == true)
+    elseif kind == "denter" then
+        return IsGroup(d.m)
     elseif kind == "ddel" then
         return IsId(d.s)
     end
@@ -115,7 +127,8 @@ end
 
 -- entries: the dungeon log in replay order. Returns {list = runs newest first, names = name key -> display name}.
 -- A run: {id, dungeon, first, last, copies = set, members = name key set, kills = {{e, boss, t}}, loot = {{uid, item,
--- person, t, boss}}}. Runs without a kill aren't listed
+-- person, t, boss, roll = "need" / "greed" / nil}}, entered = true when a denter started or joined it}. Runs without a
+-- kill are only listed when they were entered (the tab shows those while they're live)
 function Replay.Build(entries)
     local runs, names, deletes = {}, {}, {}
     for _, entry in ipairs(entries) do
@@ -152,7 +165,9 @@ function Replay.Build(entries)
                 for _, key in ipairs(keys) do
                     run.members[key] = true
                 end
-                if entry.k == "dkill" then
+                if entry.k == "denter" then
+                    run.entered = true
+                elseif entry.k == "dkill" then
                     -- Several clients may write the same kill; the first copy counts
                     if not KilledBefore(run, d.e, entry.t) then
                         table.insert(run.kills, {
@@ -164,18 +179,22 @@ function Replay.Build(entries)
                 else
                     local person = NameKey(d.p)
                     names[person] = names[person] or DisplayName(d.p)
-                    local copy = false
+                    local copy
                     for _, loot in ipairs(run.loot) do
                         if loot.item == d.i and loot.person == person and math.abs(loot.t - entry.t) <= SAME_LOOT then
-                            copy = true
+                            copy = loot
                         end
                     end
-                    if not copy then
+                    if copy then
+                        -- A later copy only fills in what the first one lacked
+                        copy.roll = copy.roll or d.n
+                    else
                         table.insert(run.loot, {
                             uid = entry.id or (entry.a .. "|" .. entry.w .. "|" .. entry.c),
                             item = d.i,
                             person = person,
-                            t = entry.t
+                            t = entry.t,
+                            roll = d.n
                         })
                     end
                 end
@@ -191,7 +210,7 @@ function Replay.Build(entries)
                 deleted = true
             end
         end
-        if not deleted and #run.kills > 0 then
+        if not deleted and (#run.kills > 0 or run.entered) then
             -- Each item under the last boss killed before it was looted, or Trash before the first kill
             for _, loot in ipairs(run.loot) do
                 loot.boss = TRASH

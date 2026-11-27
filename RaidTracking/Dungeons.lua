@@ -1,7 +1,11 @@
--- ScubaSounds: dungeon tracking's WoW side (docs\DUNGEON_TRACKING_DESIGN.md). Records 5-man runs with at least 3 guild
--- members in the group: boss kills and blue or better loot (see DungeonReplay for the entry kinds). Entries live in their own
--- store, apart from the raid log, and are only sent live: each goes to the guild once as it's written, under its own
--- prefix, and nothing is caught up later. Kept 4 months
+-- ScubaSounds: dungeon tracking's WoW side (docs\DUNGEON_TRACKING_DESIGN.md). Records dungeon runs (5-man, and the
+-- 10-man Blackrock Spire in a raid group) with at least 3 guild members in the group: boss kills and blue or better loot (see DungeonReplay for the entry kinds). Entries live in their own
+-- store, apart from the raid log, under their own prefix. Each goes to the guild once as it's written, and a client
+-- that logs in asks to be caught up on the last CATCH_UP_FOR (runs going on now), nothing older. Kept 4 months
+-- Messages, all tables with v (VERSION) and o (the operation):
+--   dn  {e}     entries, sent as they're written
+--   cq  {n, h}  catch-up query: request ID n, and the IDs of the entries from the last CATCH_UP_FOR we already have
+--   ca  {n, e}  catch-up answer to request n: the entries it lacked. Anyone else about to answer leaves these out
 local _G = _G
 local CreateFrame = _G.CreateFrame
 -- Values can be "secret" in combat/instances. Comparing, boolean testing, indexing or doing math on them throws.
@@ -22,11 +26,17 @@ local OBSERVE_DELAY_MAX = 5
 -- Seconds between two copies of an observation for them to count as the same one
 local OBSERVED_WINDOW = {
     dkill = 2 * 3600,
-    dloot = 120
+    dloot = 120,
+    denter = 2 * 3600 -- going back in (after a wipe, say) is the same run
 }
 local RARE_QUALITY = 3
 local PARTY_UNITS = {"player", "party1", "party2", "party3", "party4"}
 local COPY_WAIT = 10 -- seconds an entry waits for the copy number before it's written without one
+local CATCH_UP_FOR = 3 * 3600 -- seconds back a client that logs in is caught up on (by written time)
+local CATCH_UP_DELAY = 10 -- seconds after login before asking: the guild channel can drop messages right away
+local ANSWER_DELAY_MIN = 1 -- seconds before answering a catch-up query, at random, so one client answers first
+local ANSWER_DELAY_MAX = 5
+local MAX_CATCH_UP_IDS = 5000 -- a query listing more IDs than this is ignored
 -- A boss without an encounter ID is keyed by this plus its NPC ID, clear of real encounter IDs
 local NPC_KEY_BASE = 10000000
 
@@ -69,6 +79,8 @@ local notifyScheduled = false
 local observed = {} -- observation key -> event time of the last copy in the log
 local here = nil -- the dungeon we're in: {name, map, copy}; copy is nil until a creature's GUID shows it
 local waiting = {} -- entries waiting for the copy number: {kind, data, t}
+local ourRequest -- our catch-up query's ID, so we don't answer it
+local answering = {} -- catch-up query ID -> set of entry IDs the asker has or someone has already sent
 
 local function Readable(value, kind)
     if issecretvalue(value) or type(value) ~= kind then
@@ -103,6 +115,15 @@ local function ObservationKey(kind, d)
         return "dkill:" .. d.r .. ":" .. (d.l or "") .. ":" .. d.e
     elseif kind == "dloot" then
         return "dloot:" .. d.r .. ":" .. d.i .. ":" .. (NameKey(d.p) or "")
+    elseif kind == "denter" then
+        -- The group's names in order: everyone in it writes the same key. No copy number: going back in may not read
+        -- it again
+        local keys = {}
+        for _, name in ipairs(d.m or {}) do
+            table.insert(keys, NameKey(name) or "")
+        end
+        table.sort(keys)
+        return "denter:" .. d.r .. ":" .. table.concat(keys, ",")
     end
     return nil
 end
@@ -116,15 +137,106 @@ local function Noted(entry)
     end
 end
 
-local function Receive(message)
-    if type(message) ~= "table" or message.v ~= VERSION or message.o ~= "dn" or type(message.e) ~= "table" then
-        return
-    end
-    for _, entry in ipairs(message.e) do
-        if type(entry) == "table" and Replay.KINDS[entry.k] and Replay.IsValid(entry.k, entry.d) then
-            store:Add(entry)
+-- An entry as it goes on the wire
+local function Wire(entry)
+    return {
+        t = entry.t,
+        w = entry.w,
+        c = entry.c,
+        a = entry.a,
+        k = entry.k,
+        d = entry.d
+    }
+end
+
+-- Our entries written in the last CATCH_UP_FOR
+local function RecentEntries()
+    local cutoff = Now() - CATCH_UP_FOR
+    local recent = {}
+    for _, entry in ipairs(store:Entries()) do
+        if entry.w >= cutoff then
+            table.insert(recent, entry)
         end
     end
+    return recent
+end
+
+local function IsRequestId(value)
+    return type(value) == "string" and #value >= 1 and #value <= 64
+end
+
+-- Adds the dungeon entries in a dn or ca message, and notes their IDs as sent for a catch-up being answered
+local function AddEntries(entries, sent)
+    for _, entry in ipairs(entries) do
+        if type(entry) == "table" and Replay.KINDS[entry.k] and Replay.IsValid(entry.k, entry.d) then
+            store:Add(entry)
+            if sent and type(entry.a) == "string" and type(entry.w) == "number" and type(entry.c) == "number" then
+                sent[ScubaSounds.LedgerStore.Id(entry)] = true
+            end
+        end
+    end
+end
+
+-- Sends the asker the recent entries nobody has covered yet
+local function Answer(request)
+    local covered = answering[request]
+    answering[request] = nil
+    if not covered then
+        return
+    end
+    local missing = {}
+    for _, entry in ipairs(RecentEntries()) do
+        if not covered[entry.id] then
+            table.insert(missing, Wire(entry))
+        end
+    end
+    if #missing > 0 then
+        comms:Send({
+            v = VERSION,
+            o = "ca",
+            n = request,
+            e = missing
+        }, "BULK")
+    end
+end
+
+local function Receive(message)
+    if type(message) ~= "table" or message.v ~= VERSION then
+        return
+    end
+    if message.o == "dn" and type(message.e) == "table" then
+        AddEntries(message.e)
+    elseif message.o == "ca" and IsRequestId(message.n) and type(message.e) == "table" then
+        AddEntries(message.e, answering[message.n])
+    elseif message.o == "cq" and IsRequestId(message.n) and type(message.h) == "table" and #message.h <=
+        MAX_CATCH_UP_IDS and message.n ~= ourRequest and not answering[message.n] then
+        local covered = {}
+        for _, id in ipairs(message.h) do
+            if type(id) == "string" then
+                covered[id] = true
+            end
+        end
+        answering[message.n] = covered
+        C_Timer.After(ANSWER_DELAY_MIN + math.random() * (ANSWER_DELAY_MAX - ANSWER_DELAY_MIN), function()
+            Answer(message.n)
+        end)
+    end
+end
+
+-- Asks the guild for the entries of the last CATCH_UP_FOR we don't have, listing the ones we do
+local function AskToCatchUp()
+    local have = {}
+    for _, entry in ipairs(RecentEntries()) do
+        table.insert(have, entry.id)
+    end
+    ourRequest = string.format("%s|%d|%d", ScubaSounds:FullName("player") or UnitName("player") or "?", Now(),
+        math.random(0, 999999))
+    comms:Send({
+        v = VERSION,
+        o = "cq",
+        n = ourRequest,
+        h = have
+    }, "NORMAL")
 end
 
 -- Starts on the guild's saved table once the raid log has one (the guild's name is readable)
@@ -159,6 +271,10 @@ ScubaSounds.Ledger:OnReady(function()
         Changed()
     end)
     Changed()
+    if not ourRequest then
+        ourRequest = ""
+        C_Timer.After(CATCH_UP_DELAY, AskToCatchUp)
+    end
 end)
 
 -- Writes one of our entries and sends it to the guild. Returns it, or nil without a guild or when it's invalid
@@ -171,14 +287,7 @@ function Dungeons:Write(kind, data, eventTime)
         comms:Send({
             v = VERSION,
             o = "dn",
-            e = {{
-                t = entry.t,
-                w = entry.w,
-                c = entry.c,
-                a = entry.a,
-                k = entry.k,
-                d = entry.d
-            }}
+            e = {Wire(entry)}
         }, "BULK")
     end
     return entry
@@ -202,7 +311,8 @@ function Dungeons:OnChange(listener)
     table.insert(changeListeners, listener)
 end
 
--- The runs with at least Replay.MIN_GUILD guild members, newest first
+-- The runs with at least Replay.MIN_GUILD guild members, newest first. A run without a boss kill yet (only entered)
+-- is left out unless it's live
 function Dungeons:GuildRuns()
     local current = Dungeons:State()
     local runs = {}
@@ -214,7 +324,14 @@ function Dungeons:GuildRuns()
             table.insert(runs, run)
         end
     end
-    return runs
+    local live = Dungeons:LiveRuns(runs)
+    local shown = {}
+    for _, run in ipairs(runs) do
+        if #run.kills > 0 or live[run.id] then
+            table.insert(shown, run)
+        end
+    end
+    return shown
 end
 
 -- The runs going on right now, as a set of run IDs: every guild member of the group is online and in the dungeon,
@@ -252,19 +369,32 @@ end
 -- =================================================================
 -- Recording: where we are and who we're with
 -- =================================================================
--- The dungeon we're in, as name, map, when it's a 5-man run in a party. The third value is true when the game hides
--- where we are (secret values, as in an encounter): that's not leaving
+-- The dungeon we're in, as name, map, when we're in a group in a dungeon. Raid groups count: Blackrock Spire takes 10
+-- and reports "party" like any dungeon, while raids report "raid" and go to the Raids tab. The third value is true when
+-- the game hides where we are (secret values, as in an encounter): that's not leaving
 local function CurrentDungeon()
     local name, instanceType, _, _, _, _, _, map = GetInstanceInfo()
-    local inGroup, inRaid = IsInGroup(), IsInRaid()
-    if issecretvalue(instanceType) or issecretvalue(name) or issecretvalue(map) or issecretvalue(inGroup) or
-        issecretvalue(inRaid) then
+    local inGroup = IsInGroup()
+    if issecretvalue(instanceType) or issecretvalue(name) or issecretvalue(map) or issecretvalue(inGroup) then
         return nil, nil, true
     end
-    if instanceType ~= "party" or not Readable(name, "string") or not Readable(map, "number") or not inGroup or inRaid then
+    if instanceType ~= "party" or not Readable(name, "string") or not Readable(map, "number") or not inGroup then
         return nil
     end
     return name, map
+end
+
+-- The group's unit tokens: raid1..raidN in a raid group (the player is one of them), else the party's
+local function GroupUnits()
+    local inRaid, count = IsInRaid(), GetNumGroupMembers()
+    if issecretvalue(inRaid) or not inRaid or issecretvalue(count) or type(count) ~= "number" then
+        return PARTY_UNITS
+    end
+    local units = {}
+    for i = 1, math.min(count, Replay.MAX_GROUP) do
+        table.insert(units, "raid" .. i)
+    end
+    return units
 end
 
 -- The group's names when at least Replay.MIN_GUILD of them are guild members, else nil (nothing is written for a group
@@ -274,7 +404,7 @@ local function GuildGroup()
         return nil
     end
     local names, members = {}, 0
-    for _, unit in ipairs(PARTY_UNITS) do
+    for _, unit in ipairs(GroupUnits()) do
         local exists = UnitExists(unit)
         if not issecretvalue(exists) and exists then
             local name = ScubaSounds:FullName(unit)
@@ -298,7 +428,8 @@ local function AlreadyObserved(kind, data, t)
             l = l or nil,
             e = data.e,
             i = data.i,
-            p = data.p
+            p = data.p,
+            m = data.m
         })
         local last = key and observed[key]
         if last and math.abs(t - last) <= OBSERVED_WINDOW[kind] then
@@ -402,6 +533,22 @@ local function Observe(kind, data, t)
     end)
 end
 
+-- A guild group inside: the run is written as entered, so the tab shows it live before anything dies or drops. Once
+-- per visit; the group can reach MIN_GUILD guild members after we're in, or the roster be read later
+local function NoteEntered()
+    if not here or here.entered then
+        return
+    end
+    local group = GuildGroup()
+    if not group then
+        return
+    end
+    here.entered = true
+    Observe("denter", {
+        m = group
+    }, Now())
+end
+
 -- =================================================================
 -- Recording: boss kills
 -- =================================================================
@@ -502,7 +649,7 @@ end
 -- =================================================================
 -- Rares and better, and items on the Notable Loot tab's Big Items list (Data\NotableLoot.lua) whatever their quality
 local function IsRareOrBetter(itemId, link)
-    if ScubaSounds:IsIgnoredRunLoot(itemId) then
+    if ScubaSounds:IsIgnoredDungeonLoot(itemId) then
         return false
     end
     local big = ScubaSounds.Data and ScubaSounds.Data.BigItemIdsMap
@@ -531,6 +678,7 @@ local handlers = {}
 
 function handlers.PLAYER_ENTERING_WORLD()
     UpdateHere()
+    NoteEntered()
 end
 handlers.ZONE_CHANGED_NEW_AREA = handlers.PLAYER_ENTERING_WORLD
 handlers.GROUP_ROSTER_UPDATE = handlers.PLAYER_ENTERING_WORLD
@@ -559,9 +707,9 @@ function handlers.NAME_PLATE_UNIT_ADDED(unit)
     end
 end
 
--- A party member's target: a corpse they click shows to us too
+-- A group member's target: a corpse they click shows to us too
 function handlers.UNIT_TARGET(unit)
-    if here and not issecretvalue(unit) and type(unit) == "string" and unit:match("^party%d$") then
+    if here and not issecretvalue(unit) and type(unit) == "string" and (unit:match("^party%d$") or unit:match("^raid%d+$")) then
         OnUnit(unit .. "target")
     end
 end
@@ -587,6 +735,7 @@ function handlers.ENCOUNTER_END(encounterId, encounterName, _, _, success)
 end
 
 function handlers.CHAT_MSG_LOOT(text)
+    ScubaSounds.LootRolls.Note(text)
     if not here or issecretvalue(text) or type(text) ~= "string" then
         return
     end
@@ -618,6 +767,8 @@ function handlers.CHAT_MSG_LOOT(text)
     if not data.p then
         return
     end
+    -- Won on a roll: whether the winner rolled Need or Greed
+    data.n = ScubaSounds.LootRolls.Of(data.p, itemId)
     -- Our own loot is ours to write; someone else's waits in case their own client writes it
     if isSelf then
         Record("dloot", data, Now())
@@ -643,6 +794,8 @@ frame:SetScript("OnEvent", function(_, event, ...)
 end)
 frame:RegisterEvent("ADDON_LOADED")
 frame:RegisterEvent("CHAT_MSG_ADDON")
+-- The roster read for the first time after we went in decides who's a guild member
+Raids:OnRoster(NoteEntered)
 -- Forever lacks some events (CHAT_MSG_COMBAT_HOSTILE_DEATH); registering one throws, so each goes through pcall and a
 -- missing one doesn't stop the rest
 for event in pairs(handlers) do

@@ -39,7 +39,9 @@ function IsInRaid() return #GROUP > 0 end
 function UnitExists(unit)
     if unit == "player" then return true end
     local i = unit:match("^party(%d)$")
-    return i ~= nil and PARTY[tonumber(i)] ~= nil
+    if i then return PARTY[tonumber(i)] ~= nil end
+    local r = unit:match("^raid(%d+)$")
+    return r ~= nil and GROUP[tonumber(r)] ~= nil
 end
 local raidUnitName = GetUnitName
 function GetUnitName(unit)

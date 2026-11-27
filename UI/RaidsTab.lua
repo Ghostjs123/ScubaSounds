@@ -140,6 +140,11 @@ local function ItemName(itemId, onLoad)
     return nil
 end
 
+-- "need" or "greed" when the drop was won on a roll (unless an officer changed who got it)
+local function RollOf(drop)
+    return not drop.corrected and drop.receipt and drop.receipt.roll or nil
+end
+
 -- Where a drop went, as shown (docs\RAID_TRACKING_DESIGN.md, "Outcomes"), and its color
 local function Outcome(drop)
     local status = drop.status
@@ -530,6 +535,7 @@ local function ShowDropTooltip(row)
     GameTooltip:AddLine("Dropped by " .. drop.boss, 1, 0.82, 0)
     local text, color = Outcome(drop)
     GameTooltip:AddLine(text, color[1], color[2], color[3])
+    Style.AddRollLine(GameTooltip, RollOf(drop))
     local seen = #Members(drop.seen)
     GameTooltip:AddLine("Seen drop by " .. seen .. (seen == 1 and " guild member" or " guild members") .. " in the raid",
         0.66, 0.66, 0.66)
@@ -603,7 +609,7 @@ local function ShowItemName(row)
     end)
     local _, _, _, _, icon = C_Item.GetItemInfoInstant(itemId)
     row.Icon:SetTexture(icon or QUESTION_MARK_ICON)
-    local name = item and item.name or ("Item " .. itemId)
+    local name = (item and item.name or ("Item " .. itemId)) .. Style.RollTag(RollOf(row.Drop))
     if row.Drop.possibleDuplicate then
         name = name .. "  " .. ORANGE .. "possible duplicate|r"
     end

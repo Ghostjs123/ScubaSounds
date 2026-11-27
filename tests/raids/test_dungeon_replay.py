@@ -219,7 +219,7 @@ def bad_entries_are_skipped():
     log.kill("Taco Lips", T0, "Herod", 2)
     log.write("Taco Lips", "dkill", T0 + MINUTE, r=SM, e=3, b="Mograine", m={})  # no group
     log.write("Taco Lips", "dloot", T0 + MINUTE, r=SM, i=HELM, m=list(GROUP))  # no looter
-    log.write("Taco Lips", "dloot", T0 + MINUTE, r=SM, i=HELM, p="Taco Lips", m=GROUP + ["A Sixth"])  # six in a 5-man
+    log.write("Taco Lips", "dloot", T0 + MINUTE, r=SM, i=HELM, p="Taco Lips", m=GROUP + ["Pug %d" % n for n in range(6)])  # 11, over the 10 a dungeon takes
     lines = log.lines()
     check(len(lines) == 1 and "Mograine" not in lines[0] and lines[0].endswith("| "), lines)
 

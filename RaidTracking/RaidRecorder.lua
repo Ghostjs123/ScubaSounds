@@ -632,6 +632,7 @@ local function ParseLootLine(text)
 end
 
 function handlers.CHAT_MSG_LOOT(text)
+    ScubaSounds.LootRolls.Note(text)
     local raid = CurrentRaid()
     if not raid or issecretvalue(text) or type(text) ~= "string" then
         return
@@ -661,10 +662,13 @@ function handlers.CHAT_MSG_LOOT(text)
     end
     local isMaster, mine = MasterLoot()
     local via = won and "roll" or (isMaster and "ml" or "loot")
+    -- Won on a roll: whether the winner rolled Need or Greed
+    local roll = via == "roll" and ScubaSounds.LootRolls.Of(name, itemId) or nil
     if isSelf then
         Write("recv", ForRaid(raid, {
             i = itemId,
             v = via,
+            n = roll,
             u = CantUse(itemId) or nil
         }))
     elseif not (via == "ml" and mine) then -- the master looter's assignment already says who got it
@@ -672,6 +676,7 @@ function handlers.CHAT_MSG_LOOT(text)
             return ForRaid(raid, {
                 i = itemId,
                 v = via,
+                n = roll,
                 p = name,
                 c = PugClass(name)
             })

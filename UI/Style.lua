@@ -213,3 +213,26 @@ function Style.CreatePlayButton(parent, sound, size)
     play:SetScript("OnLeave", GameTooltip_Hide)
     return play
 end
+
+-- How a looted item was won on a roll, for the Dungeons and Raids tabs: a tag after the item name, and its tooltip line
+local ROLL_TAGS = {
+    need = "|cff40c040Need|r",
+    greed = "|cffa8a8a8Greed|r"
+}
+local ROLL_LINES = {
+    need = {"Won on a Need roll", 0.25, 0.75, 0.25},
+    greed = {"Won on a Greed roll", 0.66, 0.66, 0.66}
+}
+
+-- "  Need" or "  Greed" (colored) to put after an item name, or "" when it wasn't won on a roll
+function Style.RollTag(roll)
+    return ROLL_TAGS[roll] and ("  " .. ROLL_TAGS[roll]) or ""
+end
+
+-- Adds "Won on a Need roll" (or Greed) to the tooltip when it was won on a roll
+function Style.AddRollLine(tooltip, roll)
+    local line = ROLL_LINES[roll]
+    if line then
+        tooltip:AddLine(line[1], line[2], line[3], line[4])
+    end
+end

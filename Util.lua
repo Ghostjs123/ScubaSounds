@@ -123,12 +123,32 @@ end
 
 -- Items left out of dungeon and raid loot, by item ID
 local IGNORED_RUN_LOOT = {
+    [262888] = true, -- Sealed Journeyman's Writ
+    [262889] = true, -- Sealed Expert's Writ
     [262890] = true -- Sealed Artisan's Writ
 }
 
 -- Whether an item is left out of dungeon and raid loot
 function ScubaSounds:IsIgnoredRunLoot(itemId)
     return itemId ~= nil and IGNORED_RUN_LOOT[tonumber(itemId)] == true
+end
+
+-- Disenchanting's blue and better results (the dusts and essences are below blue, so never recorded anyway)
+local DISENCHANT_RESULTS = {
+    [10978] = true, -- Small Glimmering Shard
+    [11084] = true, -- Large Glimmering Shard
+    [11138] = true, -- Small Glowing Shard
+    [11139] = true, -- Large Glowing Shard
+    [11177] = true, -- Small Radiant Shard
+    [11178] = true, -- Large Radiant Shard
+    [14343] = true, -- Small Brilliant Shard
+    [14344] = true, -- Large Brilliant Shard
+    [20725] = true -- Nexus Crystal
+}
+
+-- Whether an item is left out of dungeon loot: the run loot ones and disenchanting's results
+function ScubaSounds:IsIgnoredDungeonLoot(itemId)
+    return ScubaSounds:IsIgnoredRunLoot(itemId) or (itemId ~= nil and DISENCHANT_RESULTS[tonumber(itemId)] == true)
 end
 
 local LINK_COLOR_QUALITY = {

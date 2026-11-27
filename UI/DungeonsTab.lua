@@ -1,4 +1,4 @@
--- ScubaSounds: the options window's Dungeons tab (docs\DUNGEON_TRACKING_DESIGN.md, "Dungeons tab"). Every 5-man run
+-- ScubaSounds: the options window's Dungeons tab (docs\DUNGEON_TRACKING_DESIGN.md, "Dungeons tab"). Every dungeon run
 -- with at least 3 guild members, newest first: the group, and each blue or better item under the boss killed before
 -- it was looted, with who looted it. Officers can delete a run. Laid out like the Raids tab, whose rows it shares; rows
 -- are only made for open runs, and reused between refreshes
@@ -175,6 +175,7 @@ local function ShowLootTooltip(row)
     GameTooltip:AddLine(" ")
     GameTooltip:AddLine((loot.boss == TRASH and "Looted from trash" or ("Dropped by " .. loot.boss)), 1, 0.82, 0)
     GameTooltip:AddLine("Looted by " .. Dungeons:DisplayName(loot.person), 1, 1, 1)
+    Style.AddRollLine(GameTooltip, loot.roll)
     GameTooltip:Show()
 end
 
@@ -226,7 +227,7 @@ local function ShowItemName(row)
     end)
     local _, _, _, _, icon = C_Item.GetItemInfoInstant(itemId)
     row.Icon:SetTexture(icon or QUESTION_MARK_ICON)
-    row.Name:SetText(item and item.name or ("Item " .. itemId))
+    row.Name:SetText((item and item.name or ("Item " .. itemId)) .. Style.RollTag(row.Loot.roll))
     local r, g, b = 0, 0.44, 0.87
     if item then
         r, g, b = item.r, item.g, item.b
@@ -346,11 +347,12 @@ function ScubaSounds:CreateDungeonsPage(frame)
     return page
 end
 
--- A run's loot without items left out of it (Sealed Artisan's Writ), in case some were recorded before
+-- A run's loot without items left out of it (Sealed Artisan's Writ, disenchanting's shards), in case some were
+-- recorded before
 local function ShownLoot(run)
     local shown = {}
     for _, loot in ipairs(run.loot) do
-        if not ScubaSounds:IsIgnoredRunLoot(loot.item) then
+        if not ScubaSounds:IsIgnoredDungeonLoot(loot.item) then
             table.insert(shown, loot)
         end
     end
@@ -461,9 +463,10 @@ function ScubaSounds:RefreshDungeons()
     local runs = VisibleRuns()
     ui.empty:SetShown(#runs == 0)
     ui.empty:SetText(#all == 0 and
-                         "No dungeon runs recorded yet. A run shows here after its first boss kill, when at least 3 " ..
-                         "of the group are guild members. Runs are only shared as they happen, so this lists the ones " ..
-                         "from while you were online." or "No runs match these filters.")
+                         "No dungeon runs recorded yet. A run shows here as soon as a group with at least 3 guild " ..
+                         "members goes in, while they're inside, and stays once a boss dies. Runs are shared as they " ..
+                         "happen, and logging in catches up the last 3 hours." or
+                         "No runs match these filters.")
 
     -- Items that weren't there the last time the tab drew have just arrived: lit up for NEW_GLOW seconds. The first draw
     -- is the baseline, so nothing lights up then
@@ -484,6 +487,11 @@ function ScubaSounds:RefreshDungeons()
     local liveRuns = Dungeons:LiveRuns(all)
     local anyRecent = false
     local now = GetServerTime()
+    -- A run only entered so far is hidden until the roster puts its group inside, so recent hidden runs keep the
+    -- roster being reread too
+    for _, run in ipairs(Dungeons:State().list) do
+        anyRecent = anyRecent or now - run.last <= RECENT_FOR
+    end
     local y = 0
     for _, run in ipairs(runs) do
         local header = ui.headers:Get()

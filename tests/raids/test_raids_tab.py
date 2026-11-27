@@ -81,6 +81,26 @@ def hovering_an_item_shows_where_it_dropped_and_went():
 
 
 @test
+def a_roll_win_shows_need_or_greed_after_the_item_and_in_its_tooltip():
+    tab = Tab()
+    c = tab.c
+    rec.kill_boss(c)
+    c.run('QUALITY[%d] = 4' % rec.SULF)
+    c.run('ScubaSounds.Ledger:Write("drop", {r = "%s", l = %d, x = "r1:%d", i = %d, m = {"Bear Mon"}})' % (
+        rec.MC, rec.LOCKOUT, rec.SULF, rec.SULF))
+    c.run('ScubaSounds.Ledger:Write("recv", {r = "%s", l = %d, i = %d, v = "roll", p = "Bear Mon", n = "greed"})' % (
+        rec.MC, rec.LOCKOUT, rec.SULF))
+    c.step(1)
+    tab.refresh()
+    tab.click_header()
+    shown = tab.shown()
+    check("I Item %d  Greed | Bear Mon" % rec.SULF in shown.split("\n"), shown)
+    tab.c.run("local r = ScubaSounds.UI.Raids.items.used[1]; r.scripts.OnEnter(r)")
+    lines = list(lua_to_python(tab.c.eval("TOOLTIP_LINES")))
+    check(lines[3] == "Bear Mon" and lines[4] == "Won on a Greed roll", lines)
+
+
+@test
 def officers_set_a_winner_mark_disenchanted_and_delete():
     tab = Tab()
     a_night(tab)

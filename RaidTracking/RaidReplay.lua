@@ -265,6 +265,7 @@ function Replay.Build(entries, opts)
                         person = person,
                         firstPerson = person == author,
                         via = d.v,
+                        roll = d.n,
                         -- Only the recipient's own client can tell whether they can use it
                         unusable = person == author and d.u == true
                     })
@@ -445,12 +446,14 @@ function Replay.Build(entries, opts)
             if drop.receipt then
                 drop.receipt.t = math.min(drop.receipt.t, receipt.t)
                 drop.receipt.unusable = drop.receipt.unusable or receipt.unusable
+                drop.receipt.roll = drop.receipt.roll or receipt.roll
             else
                 drop.receipt = {
                     t = receipt.t,
                     id = receipt.id,
                     person = receipt.person,
                     via = receipt.via,
+                    roll = receipt.roll,
                     unusable = receipt.unusable
                 }
             end

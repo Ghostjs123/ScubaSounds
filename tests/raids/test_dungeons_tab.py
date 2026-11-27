@@ -95,7 +95,7 @@ class DungeonsTab:
 def no_runs_yet_says_so():
     tab = DungeonsTab()
     shown = tab.shown()
-    check(shown.startswith("E No dungeon runs recorded yet") and "while you were online" in shown, shown)
+    check(shown.startswith("E No dungeon runs recorded yet") and "catches up the last 3 hours" in shown, shown)
 
 
 @test
@@ -127,6 +127,29 @@ def live_while_every_guild_member_is_in_the_dungeon():
     check("Live" not in tab.shown(), "one guild member offline: not Live")
     tab.where(SM)
     check("Live" in tab.shown(), "all back inside")
+
+
+@test
+def a_run_shows_live_as_soon_as_the_group_is_inside():
+    tab = DungeonsTab()
+    tab.c.enter()
+    tab.c.step(20)
+    tab.where("Zone")
+    check(tab.shown().startswith("E "), "not inside yet: hidden")
+    tab.where(SM)
+    shown = tab.shown()
+    check(shown.startswith("H Scarlet Monastery") and "Live · 0 bosses · 0 items" in shown, shown)
+    # Leaving without a kill: gone again
+    tab.where("Zone")
+    check(tab.shown().startswith("E "), tab.shown())
+    # Back in and a boss dies: it stays once they leave
+    tab.where(SM)
+    tab.c.target()
+    tab.c.kill("Herod", 2)
+    tab.c.step(8)
+    tab.where("Zone")
+    shown = tab.shown()
+    check(shown.count("H Scarlet Monastery") == 1 and "1 boss · 0 items" in shown and "Live" not in shown, shown)
 
 
 @test
@@ -173,6 +196,29 @@ def hovering_an_item_says_where_it_dropped_and_who_looted_it():
     tab.c.run("local r = ScubaSounds.UI.Dungeons.items.used[2]; r.scripts.OnEnter(r)")
     lines = list(tab.c.eval("TOOLTIP_LINES").values())
     check("Dropped by Herod" in lines and "Looted by Taco Lips" in lines, lines)
+
+
+@test
+def a_roll_win_shows_need_or_greed_after_the_item_and_in_its_tooltip():
+    tab = DungeonsTab()
+    c = tab.c
+    c.run("QUALITY[%d] = 4; QUALITY[%d] = 3" % (HELM, ROBE))
+    c.enter()
+    c.target()
+    c.kill("Herod", 2)
+    c.step(8)
+    c.loot_line("Need Roll - 54 for %s by Buff Check" % link(HELM))
+    c.loot_line("Buff Check won: %s." % link(HELM))
+    c.loot_line("You receive loot: %s." % link(HELM))
+    c.loot_line("Greed Roll - 20 for %s by Taco Lips" % link(ROBE, "ff0070dd"))
+    c.loot_line("Taco Lips receives loot: %s." % link(ROBE, "ff0070dd"))
+    c.step(8)
+    tab.click_header()
+    lines = tab.shown().split("\n")
+    check("I Item %d  Need | Buff Check" % HELM in lines and "I Item %d  Greed | Taco Lips" % ROBE in lines, lines)
+    c.run("local r = ScubaSounds.UI.Dungeons.items.used[1]; r.scripts.OnEnter(r)")
+    tips = list(c.eval("TOOLTIP_LINES").values())
+    check("Won on a Need roll" in tips, tips)
 
 
 @test

@@ -1020,6 +1020,13 @@ ScubaSounds.Audio.SoundInfo = {
         canOverlapSelf = false,
         timeout = 1
     },
+    ["ThisIsPrime"] = {
+        extension = "ogg",
+        duration = 4,
+        canOverlapSelf = false,
+        timeout = 1,
+        credit = "Roz"
+    },
     ["Tyler1Driving"] = {
         extension = "ogg",
         duration = 4,
